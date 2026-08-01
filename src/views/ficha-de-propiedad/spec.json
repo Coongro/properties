@@ -352,6 +352,21 @@
               "icon": "ShieldCheck",
               "children": [
                 {
+                  "id": "btn_cert",
+                  "kind": "component",
+                  "comp": "Button",
+                  "align": "right",
+                  "props": {
+                    "label": "Registrar certificado",
+                    "variant": "secondary",
+                    "action": {
+                      "id": "openForm",
+                      "label": "Registrar certificado",
+                      "target": "properties.certificado.open"
+                    }
+                  }
+                },
+                {
                   "id": "tbl_certs",
                   "kind": "component",
                   "comp": "DataTable",

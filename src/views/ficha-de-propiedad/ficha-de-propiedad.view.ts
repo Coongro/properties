@@ -1760,6 +1760,24 @@ export function FichaDePropiedadView() {
                   },
                   h(
                     'div',
+                    { 'data-cg-block-id': 'btn_cert', style: { display: 'contents' } },
+                    h(
+                      'div',
+                      { style: { display: 'flex', justifyContent: 'flex-end' } },
+                      h(
+                        UI.Button,
+                        {
+                          variant: 'secondary',
+                          onClick: () => {
+                            views.open('properties.certificado.open', undefined, { mode: 'sheet' });
+                          },
+                        },
+                        'Registrar certificado'
+                      )
+                    )
+                  ),
+                  h(
+                    'div',
                     { 'data-cg-block-id': 'tbl_certs', style: { display: 'contents' } },
                     renderTable3()
                   )

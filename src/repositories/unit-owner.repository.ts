@@ -151,7 +151,9 @@ export class UnitOwnerRepository {
         .where(eq(contactTable.id, id))
         .limit(1)
     );
-    const fila = rows[0] as (Record<string, unknown> & { metadata?: Record<string, unknown> }) | undefined;
+    const fila = rows[0] as
+      | (Record<string, unknown> & { metadata?: Record<string, unknown> })
+      | undefined;
     if (!fila) return {};
 
     const { metadata, ...columnas } = fila;
@@ -232,7 +234,9 @@ export class UnitOwnerRepository {
   }
 
   /** El contacto crudo, para saber qué había en `metadata` antes de tocarla. */
-  private async contactoPorId(id: string): Promise<{ metadata?: Record<string, unknown> } | undefined> {
+  private async contactoPorId(
+    id: string
+  ): Promise<{ metadata?: Record<string, unknown> } | undefined> {
     const rows = await this.db.ormQuery((tx) =>
       tx
         .select({ metadata: contactTable.metadata })

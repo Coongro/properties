@@ -26,6 +26,8 @@ export function useCertificadoView() {
     };
   }, []);
   const [values, setValues] = useState<Record<string, any>>({
+    building_id: null,
+    unit_id: null,
     type: null,
     done_at: null,
     expires_at: null,
@@ -85,9 +87,38 @@ export function useCertificadoView() {
     });
     // deps intencionalmente fijas: el efecto corre una sola vez
   }, []);
+  const [refOptions, setRefOptions] = useState<Record<string, any[]>>({});
+  const refLabel =
+    customHandlers.refLabel ?? ((r: any) => String(r?.name ?? r?.title ?? r?.label ?? r?.id ?? ''));
+  useEffect(() => {
+    void Promise.all([
+      actions
+        .execute<any[]>('properties.buildings.list')
+        .then((r) => {
+          if (mounted.current)
+            setRefOptions((o: any) => ({ ...o, building_id: Array.isArray(r) ? r : [] }));
+        })
+        .catch(() => {}),
+      actions
+        .execute<any[]>('properties.units.list')
+        .then((r) => {
+          if (mounted.current)
+            setRefOptions((o: any) => ({ ...o, unit_id: Array.isArray(r) ? r : [] }));
+        })
+        .catch(() => {}),
+    ]);
+    // deps intencionalmente fijas: el efecto corre una sola vez
+  }, []);
 
   const validate = useCallback((): Record<string, string> => {
     const errs: Record<string, string> = {};
+    if (
+      values['building_id'] === null ||
+      values['building_id'] === undefined ||
+      values['building_id'] === '' ||
+      values['building_id'] === false
+    )
+      errs['building_id'] = '«Propiedad» es requerido';
     if (
       values['type'] === null ||
       values['type'] === undefined ||
@@ -131,6 +162,8 @@ export function useCertificadoView() {
       toast.success(editingId ? 'Actualizado' : 'Guardado', 'El registro se guardó correctamente');
       setEditingId(null);
       setValues({
+        building_id: null,
+        unit_id: null,
         type: null,
         done_at: null,
         expires_at: null,
@@ -146,5 +179,5 @@ export function useCertificadoView() {
     // deps intencionalmente fijas: el efecto corre una sola vez
   }, [values, validate, editingId]);
 
-  return { values, errors, setField, editingId, submit };
+  return { values, errors, setField, editingId, refOptions, refLabel, submit };
 }

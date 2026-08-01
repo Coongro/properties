@@ -256,6 +256,16 @@
               "type": "object",
               "description": "Datos de Certificado a crear.",
               "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
+                "unit_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Unidad"
+                },
                 "type": {
                   "type": "string",
                   "enum": [
@@ -293,7 +303,7 @@
                 },
                 "notes": { "type": "string", "description": "Observaciones" }
               },
-              "required": ["type", "expires_at"],
+              "required": ["building_id", "type", "expires_at"],
               "additionalProperties": false
             }
           },
@@ -346,6 +356,16 @@
               "type": "object",
               "description": "Campos de Certificado a modificar.",
               "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
+                "unit_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Unidad"
+                },
                 "type": {
                   "type": "string",
                   "enum": [
@@ -414,262 +434,6 @@
               "name": "expiresAt",
               "label": "Vence",
               "format": "date"
-            }
-          ],
-          "identifierKey": "id"
-        }
-      },
-      {
-        "id": "properties.buildingExpenses.list",
-        "action": "properties.buildingExpenses.list",
-        "generatedBy": "builder",
-        "title": "Listar Expensas del mes",
-        "description": "Obtiene Expensas del mes disponibles para el cliente actual.",
-        "effect": "read",
-        "confirmation": "never",
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "limit": {
-              "type": "integer",
-              "description": "Cantidad de resultados a devolver. Default 20; máximo 50."
-            },
-            "offset": {
-              "type": "integer",
-              "description": "Cantidad de resultados a saltear para pedir la página siguiente."
-            }
-          },
-          "additionalProperties": false
-        },
-        "output": {
-          "kind": "collection",
-          "fields": [
-            {
-              "key": "period",
-              "name": "period",
-              "label": "Período",
-              "format": "text"
-            },
-            {
-              "key": "amount",
-              "name": "amount",
-              "label": "Total",
-              "format": "money"
-            },
-            {
-              "key": "status",
-              "name": "status",
-              "label": "Estado",
-              "format": "text",
-              "values": [
-                { "value": "recibida", "label": "Recibida" },
-                { "value": "pagada", "label": "Pagada" }
-              ]
-            }
-          ],
-          "identifierKey": "id",
-          "defaultLimit": 10,
-          "maxLimit": 50
-        }
-      },
-      {
-        "id": "properties.buildingExpenses.getById",
-        "action": "properties.buildingExpenses.getById",
-        "generatedBy": "builder",
-        "title": "Consultar Expensas del mes",
-        "description": "Obtiene un registro de Expensas del mes por su ID.",
-        "effect": "read",
-        "confirmation": "never",
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" }
-          },
-          "required": ["id"],
-          "additionalProperties": false
-        },
-        "output": {
-          "kind": "record",
-          "fields": [
-            {
-              "key": "period",
-              "name": "period",
-              "label": "Período",
-              "format": "text"
-            },
-            {
-              "key": "amount",
-              "name": "amount",
-              "label": "Total",
-              "format": "money"
-            },
-            {
-              "key": "status",
-              "name": "status",
-              "label": "Estado",
-              "format": "text",
-              "values": [
-                { "value": "recibida", "label": "Recibida" },
-                { "value": "pagada", "label": "Pagada" }
-              ]
-            }
-          ],
-          "identifierKey": "id"
-        }
-      },
-      {
-        "id": "properties.buildingExpenses.create",
-        "action": "properties.buildingExpenses.create",
-        "generatedBy": "builder",
-        "title": "Crear Expensas del mes",
-        "description": "Crea Expensas del mes con los mismos campos disponibles en el formulario del cliente.",
-        "effect": "write",
-        "confirmation": "always",
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "data": {
-              "type": "object",
-              "description": "Datos de Expensas del mes a crear.",
-              "properties": {
-                "building_id": {
-                  "type": "string",
-                  "format": "uuid",
-                  "description": "Propiedad"
-                },
-                "period": { "type": "string", "description": "Período" },
-                "amount": {
-                  "type": "string",
-                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
-                  "description": "Total liquidado"
-                },
-                "status": {
-                  "type": "string",
-                  "enum": ["recibida", "pagada"],
-                  "description": "Estado. Opciones: recibida (Recibida), pagada (Pagada).",
-                  "default": "recibida"
-                },
-                "paid_at": {
-                  "type": "string",
-                  "format": "date",
-                  "description": "Fecha de pago"
-                },
-                "document_url": {
-                  "type": "string",
-                  "description": "Link a la liquidación"
-                },
-                "notes": { "type": "string", "description": "Observaciones" }
-              },
-              "required": ["building_id", "period", "amount"],
-              "additionalProperties": false
-            }
-          },
-          "required": ["data"],
-          "additionalProperties": false
-        },
-        "output": {
-          "kind": "record",
-          "fields": [
-            {
-              "key": "period",
-              "name": "period",
-              "label": "Período",
-              "format": "text"
-            },
-            {
-              "key": "amount",
-              "name": "amount",
-              "label": "Total",
-              "format": "money"
-            },
-            {
-              "key": "status",
-              "name": "status",
-              "label": "Estado",
-              "format": "text",
-              "values": [
-                { "value": "recibida", "label": "Recibida" },
-                { "value": "pagada", "label": "Pagada" }
-              ]
-            }
-          ],
-          "identifierKey": "id"
-        }
-      },
-      {
-        "id": "properties.buildingExpenses.update",
-        "action": "properties.buildingExpenses.update",
-        "generatedBy": "builder",
-        "title": "Actualizar Expensas del mes",
-        "description": "Actualiza los campos editables de Expensas del mes.",
-        "effect": "write",
-        "confirmation": "always",
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" },
-            "data": {
-              "type": "object",
-              "description": "Campos de Expensas del mes a modificar.",
-              "properties": {
-                "building_id": {
-                  "type": "string",
-                  "format": "uuid",
-                  "description": "Propiedad"
-                },
-                "period": { "type": "string", "description": "Período" },
-                "amount": {
-                  "type": "string",
-                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
-                  "description": "Total liquidado"
-                },
-                "status": {
-                  "type": "string",
-                  "enum": ["recibida", "pagada"],
-                  "description": "Estado. Opciones: recibida (Recibida), pagada (Pagada).",
-                  "default": "recibida"
-                },
-                "paid_at": {
-                  "type": "string",
-                  "format": "date",
-                  "description": "Fecha de pago"
-                },
-                "document_url": {
-                  "type": "string",
-                  "description": "Link a la liquidación"
-                },
-                "notes": { "type": "string", "description": "Observaciones" }
-              },
-              "additionalProperties": false
-            }
-          },
-          "required": ["id", "data"],
-          "additionalProperties": false
-        },
-        "output": {
-          "kind": "record",
-          "fields": [
-            {
-              "key": "period",
-              "name": "period",
-              "label": "Período",
-              "format": "text"
-            },
-            {
-              "key": "amount",
-              "name": "amount",
-              "label": "Total",
-              "format": "money"
-            },
-            {
-              "key": "status",
-              "name": "status",
-              "label": "Estado",
-              "format": "text",
-              "values": [
-                { "value": "recibida", "label": "Recibida" },
-                { "value": "pagada", "label": "Pagada" }
-              ]
             }
           ],
           "identifierKey": "id"
@@ -1436,6 +1200,262 @@
               "name": "referenceRent",
               "label": "Alquiler de referencia",
               "format": "money"
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
+        "id": "properties.buildingExpenses.list",
+        "action": "properties.buildingExpenses.list",
+        "generatedBy": "builder",
+        "title": "Listar Expensas del mes",
+        "description": "Obtiene Expensas del mes disponibles para el cliente actual.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Cantidad de resultados a devolver. Default 20; máximo 50."
+            },
+            "offset": {
+              "type": "integer",
+              "description": "Cantidad de resultados a saltear para pedir la página siguiente."
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "period",
+              "name": "period",
+              "label": "Período",
+              "format": "text"
+            },
+            {
+              "key": "amount",
+              "name": "amount",
+              "label": "Total",
+              "format": "money"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "recibida", "label": "Recibida" },
+                { "value": "pagada", "label": "Pagada" }
+              ]
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 10,
+          "maxLimit": 50
+        }
+      },
+      {
+        "id": "properties.buildingExpenses.getById",
+        "action": "properties.buildingExpenses.getById",
+        "generatedBy": "builder",
+        "title": "Consultar Expensas del mes",
+        "description": "Obtiene un registro de Expensas del mes por su ID.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid", "description": "ID" }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "period",
+              "name": "period",
+              "label": "Período",
+              "format": "text"
+            },
+            {
+              "key": "amount",
+              "name": "amount",
+              "label": "Total",
+              "format": "money"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "recibida", "label": "Recibida" },
+                { "value": "pagada", "label": "Pagada" }
+              ]
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
+        "id": "properties.buildingExpenses.create",
+        "action": "properties.buildingExpenses.create",
+        "generatedBy": "builder",
+        "title": "Crear Expensas del mes",
+        "description": "Crea Expensas del mes con los mismos campos disponibles en el formulario del cliente.",
+        "effect": "write",
+        "confirmation": "always",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "description": "Datos de Expensas del mes a crear.",
+              "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
+                "period": { "type": "string", "description": "Período" },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                  "description": "Total liquidado"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["recibida", "pagada"],
+                  "description": "Estado. Opciones: recibida (Recibida), pagada (Pagada).",
+                  "default": "recibida"
+                },
+                "paid_at": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Fecha de pago"
+                },
+                "document_url": {
+                  "type": "string",
+                  "description": "Link a la liquidación"
+                },
+                "notes": { "type": "string", "description": "Observaciones" }
+              },
+              "required": ["building_id", "period", "amount"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["data"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "period",
+              "name": "period",
+              "label": "Período",
+              "format": "text"
+            },
+            {
+              "key": "amount",
+              "name": "amount",
+              "label": "Total",
+              "format": "money"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "recibida", "label": "Recibida" },
+                { "value": "pagada", "label": "Pagada" }
+              ]
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
+        "id": "properties.buildingExpenses.update",
+        "action": "properties.buildingExpenses.update",
+        "generatedBy": "builder",
+        "title": "Actualizar Expensas del mes",
+        "description": "Actualiza los campos editables de Expensas del mes.",
+        "effect": "write",
+        "confirmation": "always",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid", "description": "ID" },
+            "data": {
+              "type": "object",
+              "description": "Campos de Expensas del mes a modificar.",
+              "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
+                "period": { "type": "string", "description": "Período" },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                  "description": "Total liquidado"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["recibida", "pagada"],
+                  "description": "Estado. Opciones: recibida (Recibida), pagada (Pagada).",
+                  "default": "recibida"
+                },
+                "paid_at": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Fecha de pago"
+                },
+                "document_url": {
+                  "type": "string",
+                  "description": "Link a la liquidación"
+                },
+                "notes": { "type": "string", "description": "Observaciones" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["id", "data"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "period",
+              "name": "period",
+              "label": "Período",
+              "format": "text"
+            },
+            {
+              "key": "amount",
+              "name": "amount",
+              "label": "Total",
+              "format": "money"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "recibida", "label": "Recibida" },
+                { "value": "pagada", "label": "Pagada" }
+              ]
             }
           ],
           "identifierKey": "id"
