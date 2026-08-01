@@ -382,7 +382,46 @@
                     "columns": [
                       {
                         "key": "type",
-                        "label": "Certificado"
+                        "label": "Certificado",
+                        "display": "pill",
+                        "values": [
+                          {
+                            "value": "matafuegos",
+                            "label": "Matafuegos",
+                            "tone": "outline",
+                            "icon": "FireExtinguisher"
+                          },
+                          {
+                            "value": "gas",
+                            "label": "Instalación de gas",
+                            "tone": "outline",
+                            "icon": "Flame"
+                          },
+                          {
+                            "value": "ascensor",
+                            "label": "Ascensor",
+                            "tone": "outline",
+                            "icon": "MoveVertical"
+                          },
+                          {
+                            "value": "electricidad",
+                            "label": "Instalación eléctrica",
+                            "tone": "outline",
+                            "icon": "Zap"
+                          },
+                          {
+                            "value": "seguro",
+                            "label": "Seguro del inmueble",
+                            "tone": "outline",
+                            "icon": "Umbrella"
+                          },
+                          {
+                            "value": "otro",
+                            "label": "Otro",
+                            "tone": "outline",
+                            "icon": "FileText"
+                          }
+                        ]
                       },
                       {
                         "key": "status",
@@ -414,17 +453,17 @@
                     ],
                     "cells": [
                       [
-                        "Matafuegos",
+                        "matafuegos",
                         "por_vencer",
                         "2026-09-05"
                       ],
                       [
-                        "Instalación de gas",
+                        "gas",
                         "vigente",
                         "2027-03-20"
                       ],
                       [
-                        "Ascensor",
+                        "ascensor",
                         "vigente",
                         "2026-12-01"
                       ]

@@ -507,7 +507,19 @@ export function useFichaDePropiedadView() {
       emptyLabel?: string;
       emptyIcon?: string;
     }[] = [
-      { key: 'type', label: 'Certificado' },
+      {
+        key: 'type',
+        label: 'Certificado',
+        display: 'pill',
+        values: [
+          { value: 'matafuegos', label: 'Matafuegos', tone: 'outline', icon: 'FireExtinguisher' },
+          { value: 'gas', label: 'Instalación de gas', tone: 'outline', icon: 'Flame' },
+          { value: 'ascensor', label: 'Ascensor', tone: 'outline', icon: 'MoveVertical' },
+          { value: 'electricidad', label: 'Instalación eléctrica', tone: 'outline', icon: 'Zap' },
+          { value: 'seguro', label: 'Seguro del inmueble', tone: 'outline', icon: 'Umbrella' },
+          { value: 'otro', label: 'Otro', tone: 'outline', icon: 'FileText' },
+        ],
+      },
       {
         key: 'status',
         label: 'Estado',
