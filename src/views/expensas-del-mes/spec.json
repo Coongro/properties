@@ -1,0 +1,116 @@
+{
+  "specVersion": 1,
+  "kind": "form",
+  "title": "Expensas del mes",
+  "data": {
+    "repositoryPrefix": "properties.buildingExpenses"
+  },
+  "blocks": [
+    {
+      "id": "sec_liq",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Liquidación del consorcio",
+      "icon": "Receipt",
+      "children": [
+        {
+          "id": "f_building",
+          "kind": "field",
+          "fieldType": "ref",
+          "name": "building_id",
+          "label": "Propiedad",
+          "refEntity": "properties.buildings",
+          "placeholder": "Elegí la propiedad",
+          "width": "full",
+          "validations": [
+            "required"
+          ]
+        },
+        {
+          "id": "f_period",
+          "kind": "field",
+          "fieldType": "text",
+          "name": "period",
+          "label": "Período",
+          "placeholder": "Ej: 2026-09",
+          "width": "half",
+          "validations": [
+            "required"
+          ]
+        },
+        {
+          "id": "f_amount",
+          "kind": "field",
+          "fieldType": "money",
+          "name": "amount",
+          "label": "Total liquidado",
+          "placeholder": "Ej: 900000",
+          "width": "half",
+          "validations": [
+            "required"
+          ]
+        },
+        {
+          "id": "f_status",
+          "kind": "field",
+          "fieldType": "enum",
+          "name": "status",
+          "label": "Estado",
+          "width": "half",
+          "default": "recibida",
+          "options": [
+            {
+              "value": "recibida",
+              "label": "Recibida",
+              "icon": "Inbox"
+            },
+            {
+              "value": "pagada",
+              "label": "Pagada",
+              "icon": "CircleCheck"
+            }
+          ],
+          "validations": []
+        },
+        {
+          "id": "f_paid",
+          "kind": "field",
+          "fieldType": "date",
+          "name": "paid_at",
+          "label": "Fecha de pago",
+          "width": "half",
+          "validations": []
+        }
+      ]
+    },
+    {
+      "id": "sec_resp",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Respaldo",
+      "icon": "Paperclip",
+      "children": [
+        {
+          "id": "f_doc",
+          "kind": "field",
+          "fieldType": "text",
+          "name": "document_url",
+          "label": "Link a la liquidación",
+          "placeholder": "Ej: https://drive.google.com/…",
+          "width": "full",
+          "validations": []
+        },
+        {
+          "id": "f_notes",
+          "kind": "field",
+          "fieldType": "text",
+          "name": "notes",
+          "label": "Observaciones",
+          "placeholder": "Ej: incluye fondo de reserva extraordinario",
+          "width": "full",
+          "validations": []
+        }
+      ]
+    }
+  ]
+}

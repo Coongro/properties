@@ -1,0 +1,423 @@
+{
+  "id": "properties",
+  "version": "0.1.1",
+  "apiVersion": "2.0",
+  "displayName": "Propiedades",
+  "assets": {
+    "styles": [
+      "./dist/assets/tailwind.css",
+      "./dist/assets/fontawesome/css/all.min.css"
+    ]
+  },
+  "contributes": {
+    "menus": [
+      {
+        "path": "Propiedades",
+        "order": 10,
+        "viewId": "properties.propiedades.open",
+        "icon": "Building2"
+      },
+      {
+        "path": "Propietarios",
+        "order": 20,
+        "viewId": "properties.propietarios.open",
+        "icon": "Users"
+      }
+    ],
+    "views": [
+      {
+        "id": "properties.propiedad.open",
+        "title": "Propiedad",
+        "component": "./dist/views/propiedad/index.js",
+        "export": "PropiedadView"
+      },
+      {
+        "id": "properties.propiedades.open",
+        "title": "Propiedades",
+        "component": "./dist/views/propiedades/index.js",
+        "export": "PropiedadesView"
+      },
+      {
+        "id": "properties.unidad.open",
+        "title": "Unidad",
+        "component": "./dist/views/unidad/index.js",
+        "export": "UnidadView"
+      },
+      {
+        "id": "properties.certificado.open",
+        "title": "Certificado",
+        "component": "./dist/views/certificado/index.js",
+        "export": "CertificadoView"
+      },
+      {
+        "id": "properties.ficha-de-propiedad.open",
+        "title": "Ficha de propiedad",
+        "component": "./dist/views/ficha-de-propiedad/index.js",
+        "export": "FichaDePropiedadView"
+      },
+      {
+        "id": "properties.propietario.open",
+        "title": "Propietario",
+        "component": "./dist/views/propietario/index.js",
+        "export": "PropietarioView"
+      },
+      {
+        "id": "properties.propietarios.open",
+        "title": "Propietarios",
+        "component": "./dist/views/propietarios/index.js",
+        "export": "PropietariosView"
+      },
+      {
+        "id": "properties.expensas-del-mes.open",
+        "title": "Expensas del mes",
+        "component": "./dist/views/expensas-del-mes/index.js",
+        "export": "ExpensasDelMesView"
+      }
+    ],
+    "repositories": [
+      {
+        "module": "./dist/repositories/building.repository.js",
+        "export": "BuildingRepository",
+        "prefix": "properties.buildings"
+      },
+      {
+        "module": "./dist/repositories/unit.repository.js",
+        "export": "UnitRepository",
+        "prefix": "properties.units"
+      },
+      {
+        "module": "./dist/repositories/certificate.repository.js",
+        "export": "CertificateRepository",
+        "prefix": "properties.certificates"
+      },
+      {
+        "module": "./dist/repositories/unit-owner.repository.js",
+        "export": "UnitOwnerRepository",
+        "prefix": "properties.unitOwners"
+      },
+      {
+        "module": "./dist/repositories/building-expense.repository.js",
+        "export": "BuildingExpenseRepository",
+        "prefix": "properties.buildingExpenses"
+      }
+    ],
+    "settings": {
+      "groups": [{ "id": "properties", "label": "properties", "order": 50 }],
+      "pages": [
+        {
+          "id": "properties.certificados",
+          "group": "properties",
+          "label": "Certificados",
+          "icon": "ShieldCheck",
+          "order": 10
+        }
+      ],
+      "sections": [
+        {
+          "id": "properties.certificados.aviso-de-vencimiento",
+          "page": "properties.certificados",
+          "label": "Aviso de vencimiento",
+          "order": 10,
+          "items": [
+            {
+              "key": "properties.certificates.alertDays",
+              "type": "number",
+              "label": "Avisar con esta anticipación",
+              "description": "Cuántos días antes del vencimiento un certificado empieza a marcarse como «por vencer». Con 30 te enterás el mes anterior, que suele alcanzar para pedir turno; si tu municipio o el service tardan más, subí el número.",
+              "default": 30,
+              "min": 1,
+              "max": 365,
+              "tags": [
+                "properties",
+                "certificates",
+                "alertdays",
+                "avisar",
+                "esta",
+                "anticipación"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "copilotCapabilities": [
+      {
+        "id": "properties.buildings.list",
+        "action": "properties.buildings.list",
+        "generatedBy": "builder",
+        "title": "Listar Propiedades",
+        "description": "Obtiene Propiedades disponibles para el cliente actual.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Cantidad de resultados a devolver. Default 20; máximo 50."
+            },
+            "offset": {
+              "type": "integer",
+              "description": "Cantidad de resultados a saltear para pedir la página siguiente."
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Propiedad",
+              "format": "text"
+            },
+            {
+              "key": "address",
+              "name": "address",
+              "label": "Dirección",
+              "format": "text"
+            },
+            {
+              "key": "certs",
+              "name": "certs",
+              "label": "Certificados",
+              "format": "text",
+              "values": [
+                { "value": "ok", "label": "Al día" },
+                { "value": "soon", "label": "Certificado por vencer" },
+                { "value": "expired", "label": "Certificado vencido" }
+              ]
+            },
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Tipo",
+              "format": "text",
+              "values": [
+                { "value": "edificio", "label": "Edificio" },
+                { "value": "departamento", "label": "Departamento" },
+                { "value": "casa", "label": "Casa" },
+                { "value": "local", "label": "Local" },
+                { "value": "oficina", "label": "Oficina" },
+                { "value": "galpon", "label": "Galpón" },
+                { "value": "cochera", "label": "Cochera" },
+                { "value": "baulera", "label": "Baulera" }
+              ]
+            },
+            {
+              "key": "occupancy",
+              "name": "occupancy",
+              "label": "Ocupación",
+              "format": "text"
+            },
+            {
+              "key": "reference_rent",
+              "name": "referenceRent",
+              "label": "Alquiler de referencia",
+              "format": "money"
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 20,
+          "maxLimit": 50
+        }
+      },
+      {
+        "id": "properties.buildings.getById",
+        "action": "properties.buildings.getById",
+        "generatedBy": "builder",
+        "title": "Consultar Propiedad",
+        "description": "Obtiene un registro de Propiedad por su ID.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid", "description": "ID" }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Propiedad",
+              "format": "text"
+            },
+            {
+              "key": "address",
+              "name": "address",
+              "label": "Dirección",
+              "format": "text"
+            },
+            {
+              "key": "certs",
+              "name": "certs",
+              "label": "Certificados",
+              "format": "text",
+              "values": [
+                { "value": "ok", "label": "Al día" },
+                { "value": "soon", "label": "Certificado por vencer" },
+                { "value": "expired", "label": "Certificado vencido" }
+              ]
+            },
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Tipo",
+              "format": "text",
+              "values": [
+                { "value": "edificio", "label": "Edificio" },
+                { "value": "departamento", "label": "Departamento" },
+                { "value": "casa", "label": "Casa" },
+                { "value": "local", "label": "Local" },
+                { "value": "oficina", "label": "Oficina" },
+                { "value": "galpon", "label": "Galpón" },
+                { "value": "cochera", "label": "Cochera" },
+                { "value": "baulera", "label": "Baulera" }
+              ]
+            },
+            {
+              "key": "occupancy",
+              "name": "occupancy",
+              "label": "Ocupación",
+              "format": "text"
+            },
+            {
+              "key": "reference_rent",
+              "name": "referenceRent",
+              "label": "Alquiler de referencia",
+              "format": "money"
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
+        "id": "properties.units.list",
+        "action": "properties.units.list",
+        "generatedBy": "builder",
+        "title": "Listar Unidad",
+        "description": "Obtiene Unidad disponibles para el cliente actual.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Cantidad de resultados a devolver. Default 20; máximo 50."
+            },
+            "offset": {
+              "type": "integer",
+              "description": "Cantidad de resultados a saltear para pedir la página siguiente."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      {
+        "id": "properties.units.getById",
+        "action": "properties.units.getById",
+        "generatedBy": "builder",
+        "title": "Consultar Unidad",
+        "description": "Obtiene un registro de Unidad por su ID.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid", "description": "ID" }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        }
+      },
+      {
+        "id": "properties.certificates.list",
+        "action": "properties.certificates.list",
+        "generatedBy": "builder",
+        "title": "Listar Certificado",
+        "description": "Obtiene Certificado disponibles para el cliente actual.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Cantidad de resultados a devolver. Default 20; máximo 50."
+            },
+            "offset": {
+              "type": "integer",
+              "description": "Cantidad de resultados a saltear para pedir la página siguiente."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      {
+        "id": "properties.certificates.getById",
+        "action": "properties.certificates.getById",
+        "generatedBy": "builder",
+        "title": "Consultar Certificado",
+        "description": "Obtiene un registro de Certificado por su ID.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid", "description": "ID" }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        }
+      },
+      {
+        "id": "properties.buildingExpenses.list",
+        "action": "properties.buildingExpenses.list",
+        "generatedBy": "builder",
+        "title": "Listar Expensas del mes",
+        "description": "Obtiene Expensas del mes disponibles para el cliente actual.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Cantidad de resultados a devolver. Default 20; máximo 50."
+            },
+            "offset": {
+              "type": "integer",
+              "description": "Cantidad de resultados a saltear para pedir la página siguiente."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      {
+        "id": "properties.buildingExpenses.getById",
+        "action": "properties.buildingExpenses.getById",
+        "generatedBy": "builder",
+        "title": "Consultar Expensas del mes",
+        "description": "Obtiene un registro de Expensas del mes por su ID.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid", "description": "ID" }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        }
+      }
+    ]
+  },
+  "initView": null
+}

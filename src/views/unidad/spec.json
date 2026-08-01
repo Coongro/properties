@@ -1,0 +1,139 @@
+{
+  "specVersion": 1,
+  "kind": "panel",
+  "title": "Unidad",
+  "data": {
+    "repositoryPrefix": "properties.units"
+  },
+  "blocks": [
+    {
+      "id": "s1",
+      "kind": "container",
+      "ctype": "card",
+      "label": "La unidad",
+      "icon": "DoorOpen",
+      "children": [
+        {
+          "id": "f_name",
+          "kind": "field",
+          "name": "name",
+          "fieldType": "text",
+          "label": "Nombre o número",
+          "validations": [
+            "required"
+          ],
+          "placeholder": "Ej: 3°B"
+        },
+        {
+          "id": "f_rooms",
+          "kind": "field",
+          "name": "rooms",
+          "fieldType": "number",
+          "label": "Ambientes",
+          "validations": [],
+          "placeholder": "Ej: 3"
+        },
+        {
+          "id": "f_bathrooms",
+          "kind": "field",
+          "name": "bathrooms",
+          "fieldType": "number",
+          "label": "Baños",
+          "validations": [],
+          "placeholder": "Ej: 1"
+        },
+        {
+          "id": "f_surface",
+          "kind": "field",
+          "name": "surface_m2",
+          "fieldType": "number",
+          "label": "Superficie (m²)",
+          "validations": [],
+          "placeholder": "Ej: 72"
+        },
+        {
+          "id": "f_share",
+          "kind": "field",
+          "name": "share_pct",
+          "fieldType": "number",
+          "label": "Alícuota de expensas (%)",
+          "validations": [],
+          "placeholder": "Ej: 4.5"
+        },
+        {
+          "id": "f_photo",
+          "kind": "field",
+          "name": "photo_url",
+          "fieldType": "text",
+          "label": "Foto (URL)",
+          "validations": [],
+          "placeholder": "https://…"
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Situación",
+      "icon": "Activity",
+      "children": [
+        {
+          "id": "f_status",
+          "kind": "field",
+          "name": "status",
+          "fieldType": "enum",
+          "label": "Estado",
+          "validations": [
+            "required"
+          ],
+          "options": [
+            {
+              "value": "vacante",
+              "label": "Vacante",
+              "icon": "DoorOpen"
+            },
+            {
+              "value": "ocupada",
+              "label": "Ocupada",
+              "icon": "UserCheck"
+            },
+            {
+              "value": "en_recambio",
+              "label": "En recambio",
+              "icon": "Paintbrush"
+            },
+            {
+              "value": "con_preaviso",
+              "label": "Con preaviso",
+              "icon": "BellRing"
+            },
+            {
+              "value": "no_disponible",
+              "label": "No disponible",
+              "icon": "Ban"
+            }
+          ]
+        },
+        {
+          "id": "f_rent",
+          "kind": "field",
+          "name": "reference_rent",
+          "fieldType": "money",
+          "label": "Alquiler de referencia",
+          "validations": [],
+          "placeholder": "Ej: 485000"
+        },
+        {
+          "id": "f_notes",
+          "kind": "field",
+          "name": "notes",
+          "fieldType": "text",
+          "label": "Notas",
+          "validations": [],
+          "placeholder": "Ej: cochera incluida"
+        }
+      ]
+    }
+  ]
+}

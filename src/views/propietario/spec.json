@@ -1,0 +1,179 @@
+{
+  "specVersion": 1,
+  "kind": "form",
+  "title": "Propietario",
+  "blocks": [
+    {
+      "id": "s1",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Quién es",
+      "icon": "User",
+      "children": [
+        {
+          "id": "f_name",
+          "kind": "field",
+          "name": "name",
+          "fieldType": "text",
+          "label": "Nombre y apellido o razón social",
+          "width": "half",
+          "validations": [
+            "required"
+          ],
+          "placeholder": "Ej: Ana María Ruiz"
+        },
+        {
+          "id": "f_doc_type",
+          "kind": "field",
+          "name": "document_type",
+          "fieldType": "enum",
+          "label": "Documento",
+          "width": "half",
+          "validations": [
+            "required"
+          ],
+          "options": [
+            {
+              "value": "cuit",
+              "label": "CUIT"
+            },
+            {
+              "value": "cuil",
+              "label": "CUIL"
+            },
+            {
+              "value": "dni",
+              "label": "DNI"
+            }
+          ]
+        },
+        {
+          "id": "f_doc",
+          "kind": "field",
+          "name": "document_number",
+          "fieldType": "text",
+          "label": "Número",
+          "width": "half",
+          "validations": [
+            "required"
+          ],
+          "placeholder": "Ej: 27-11402887-3"
+        },
+        {
+          "id": "f_tax",
+          "kind": "field",
+          "name": "tax_condition",
+          "fieldType": "enum",
+          "label": "Condición frente al IVA",
+          "width": "half",
+          "validations": [],
+          "options": [
+            {
+              "value": "monotributo",
+              "label": "Monotributo"
+            },
+            {
+              "value": "responsable_inscripto",
+              "label": "Responsable inscripto"
+            },
+            {
+              "value": "exento",
+              "label": "Exento"
+            },
+            {
+              "value": "consumidor_final",
+              "label": "Consumidor final"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Contacto",
+      "icon": "Phone",
+      "children": [
+        {
+          "id": "f_email",
+          "kind": "field",
+          "name": "email",
+          "fieldType": "text",
+          "label": "Email",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: ana.ruiz@gmail.com"
+        },
+        {
+          "id": "f_phone",
+          "kind": "field",
+          "name": "phone",
+          "fieldType": "text",
+          "label": "Teléfono",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: 341 555-1234"
+        },
+        {
+          "id": "f_address",
+          "kind": "field",
+          "name": "address",
+          "fieldType": "text",
+          "label": "Domicilio",
+          "validations": [],
+          "placeholder": "Ej: Pellegrini 1450, Rosario"
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Dónde cobra",
+      "icon": "Landmark",
+      "children": [
+        {
+          "id": "f_bank",
+          "kind": "field",
+          "name": "bank",
+          "fieldType": "text",
+          "label": "Banco",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: Banco Galicia"
+        },
+        {
+          "id": "f_account",
+          "kind": "field",
+          "name": "account",
+          "fieldType": "text",
+          "label": "Tipo y número de cuenta",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: Caja de ahorro 4001234-5"
+        },
+        {
+          "id": "f_cbu",
+          "kind": "field",
+          "name": "cbu",
+          "fieldType": "text",
+          "label": "CBU",
+          "width": "half",
+          "validations": [],
+          "placeholder": "22 dígitos"
+        },
+        {
+          "id": "f_alias",
+          "kind": "field",
+          "name": "alias",
+          "fieldType": "text",
+          "label": "Alias",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: ana.ruiz.mp"
+        }
+      ]
+    }
+  ]
+}

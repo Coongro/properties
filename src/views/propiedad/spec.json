@@ -1,0 +1,363 @@
+{
+  "specVersion": 1,
+  "kind": "form",
+  "title": "Propiedad",
+  "data": {
+    "repositoryPrefix": "properties.buildings"
+  },
+  "blocks": [
+    {
+      "id": "s1",
+      "kind": "container",
+      "ctype": "card",
+      "label": "La propiedad",
+      "icon": "Building2",
+      "children": [
+        {
+          "id": "f_type",
+          "kind": "field",
+          "name": "type",
+          "fieldType": "enum",
+          "label": "Tipo",
+          "width": "half",
+          "validations": [
+            "required"
+          ],
+          "options": [
+            {
+              "value": "edificio",
+              "label": "Edificio",
+              "icon": "Building2"
+            },
+            {
+              "value": "departamento",
+              "label": "Departamento",
+              "icon": "Building"
+            },
+            {
+              "value": "casa",
+              "label": "Casa",
+              "icon": "House"
+            },
+            {
+              "value": "local",
+              "label": "Local",
+              "icon": "Store"
+            },
+            {
+              "value": "oficina",
+              "label": "Oficina",
+              "icon": "Briefcase"
+            },
+            {
+              "value": "galpon",
+              "label": "Galpón",
+              "icon": "Warehouse"
+            },
+            {
+              "value": "cochera",
+              "label": "Cochera",
+              "icon": "Car"
+            },
+            {
+              "value": "baulera",
+              "label": "Baulera",
+              "icon": "Package"
+            }
+          ]
+        },
+        {
+          "id": "f_name",
+          "kind": "field",
+          "name": "name",
+          "fieldType": "text",
+          "label": "Nombre",
+          "width": "half",
+          "validations": [
+            "required"
+          ],
+          "placeholder": "Ej: Belgrano 1240"
+        },
+        {
+          "id": "f_desc",
+          "kind": "field",
+          "name": "description",
+          "fieldType": "text",
+          "label": "Descripción",
+          "validations": [],
+          "placeholder": "Ej: edificio de 6 unidades, entrada por Belgrano"
+        },
+        {
+          "id": "f_photo",
+          "kind": "field",
+          "name": "photo_url",
+          "fieldType": "text",
+          "label": "Foto (URL)",
+          "width": "half",
+          "validations": [],
+          "placeholder": "https://…"
+        },
+        {
+          "id": "f_year",
+          "kind": "field",
+          "name": "year_built",
+          "fieldType": "number",
+          "label": "Año de construcción",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: 1998"
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Dirección",
+      "icon": "MapPin",
+      "children": [
+        {
+          "id": "f_street",
+          "kind": "field",
+          "name": "street",
+          "fieldType": "text",
+          "label": "Calle",
+          "width": "half",
+          "validations": [
+            "required"
+          ],
+          "placeholder": "Ej: Belgrano"
+        },
+        {
+          "id": "f_number",
+          "kind": "field",
+          "name": "street_number",
+          "fieldType": "text",
+          "label": "Altura",
+          "width": "half",
+          "validations": [
+            "required"
+          ],
+          "placeholder": "Ej: 1240"
+        },
+        {
+          "id": "f_city",
+          "kind": "field",
+          "name": "city",
+          "fieldType": "text",
+          "label": "Localidad",
+          "width": "half",
+          "validations": [
+            "required"
+          ],
+          "placeholder": "Ej: Rosario"
+        },
+        {
+          "id": "f_zip",
+          "kind": "field",
+          "name": "zip_code",
+          "fieldType": "text",
+          "label": "Código postal",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: S2000"
+        },
+        {
+          "id": "f_province",
+          "kind": "field",
+          "name": "province",
+          "fieldType": "enum",
+          "label": "Provincia",
+          "validations": [],
+          "options": [
+            {
+              "value": "buenos_aires",
+              "label": "Buenos Aires"
+            },
+            {
+              "value": "caba",
+              "label": "Ciudad Autónoma de Buenos Aires"
+            },
+            {
+              "value": "catamarca",
+              "label": "Catamarca"
+            },
+            {
+              "value": "chaco",
+              "label": "Chaco"
+            },
+            {
+              "value": "chubut",
+              "label": "Chubut"
+            },
+            {
+              "value": "cordoba",
+              "label": "Córdoba"
+            },
+            {
+              "value": "corrientes",
+              "label": "Corrientes"
+            },
+            {
+              "value": "entre_rios",
+              "label": "Entre Ríos"
+            },
+            {
+              "value": "formosa",
+              "label": "Formosa"
+            },
+            {
+              "value": "jujuy",
+              "label": "Jujuy"
+            },
+            {
+              "value": "la_pampa",
+              "label": "La Pampa"
+            },
+            {
+              "value": "la_rioja",
+              "label": "La Rioja"
+            },
+            {
+              "value": "mendoza",
+              "label": "Mendoza"
+            },
+            {
+              "value": "misiones",
+              "label": "Misiones"
+            },
+            {
+              "value": "neuquen",
+              "label": "Neuquén"
+            },
+            {
+              "value": "rio_negro",
+              "label": "Río Negro"
+            },
+            {
+              "value": "salta",
+              "label": "Salta"
+            },
+            {
+              "value": "san_juan",
+              "label": "San Juan"
+            },
+            {
+              "value": "san_luis",
+              "label": "San Luis"
+            },
+            {
+              "value": "santa_cruz",
+              "label": "Santa Cruz"
+            },
+            {
+              "value": "santa_fe",
+              "label": "Santa Fe"
+            },
+            {
+              "value": "santiago_del_estero",
+              "label": "Santiago del Estero"
+            },
+            {
+              "value": "tierra_del_fuego",
+              "label": "Tierra del Fuego"
+            },
+            {
+              "value": "tucuman",
+              "label": "Tucumán"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Datos registrales",
+      "icon": "FileText",
+      "children": [
+        {
+          "id": "f_cadastral",
+          "kind": "field",
+          "name": "cadastral_ref",
+          "fieldType": "text",
+          "label": "Partida inmobiliaria",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: 11-22-334455"
+        },
+        {
+          "id": "f_ownership",
+          "kind": "field",
+          "name": "ownership_mode",
+          "fieldType": "enum",
+          "label": "Modo de tenencia",
+          "width": "half",
+          "validations": [],
+          "options": [
+            {
+              "value": "propia",
+              "label": "Propia"
+            },
+            {
+              "value": "condominio",
+              "label": "Condominio"
+            },
+            {
+              "value": "sucesion",
+              "label": "Sucesión"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Administración del consorcio",
+      "icon": "Users",
+      "children": [
+        {
+          "id": "f_admin",
+          "kind": "field",
+          "name": "admin_name",
+          "fieldType": "text",
+          "label": "Administrador",
+          "validations": [],
+          "placeholder": "Ej: Consorcio Belgrano SRL"
+        },
+        {
+          "id": "f_admin_phone",
+          "kind": "field",
+          "name": "admin_phone",
+          "fieldType": "text",
+          "label": "Teléfono",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: 341 555-1234"
+        },
+        {
+          "id": "f_admin_email",
+          "kind": "field",
+          "name": "admin_email",
+          "fieldType": "text",
+          "label": "Email",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: admin@consorcio.com.ar"
+        },
+        {
+          "id": "f_notes",
+          "kind": "field",
+          "name": "notes",
+          "fieldType": "text",
+          "label": "Notas",
+          "validations": [],
+          "placeholder": "Ej: la llave del portón la tiene el encargado"
+        }
+      ]
+    }
+  ]
+}

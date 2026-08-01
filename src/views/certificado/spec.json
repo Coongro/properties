@@ -1,0 +1,140 @@
+{
+  "specVersion": 1,
+  "kind": "panel",
+  "title": "Certificado",
+  "data": {
+    "repositoryPrefix": "properties.certificates"
+  },
+  "blocks": [
+    {
+      "id": "s1",
+      "kind": "container",
+      "ctype": "card",
+      "label": "El certificado",
+      "icon": "ShieldCheck",
+      "children": [
+        {
+          "id": "f_type",
+          "kind": "field",
+          "name": "type",
+          "fieldType": "enum",
+          "label": "Tipo",
+          "validations": [
+            "required"
+          ],
+          "options": [
+            {
+              "value": "matafuegos",
+              "label": "Matafuegos",
+              "icon": "FireExtinguisher"
+            },
+            {
+              "value": "gas",
+              "label": "Instalación de gas",
+              "icon": "Flame"
+            },
+            {
+              "value": "ascensor",
+              "label": "Ascensor",
+              "icon": "MoveVertical"
+            },
+            {
+              "value": "electricidad",
+              "label": "Instalación eléctrica",
+              "icon": "Zap"
+            },
+            {
+              "value": "seguro",
+              "label": "Seguro del inmueble",
+              "icon": "Umbrella"
+            },
+            {
+              "value": "otro",
+              "label": "Otro",
+              "icon": "FileText"
+            }
+          ]
+        },
+        {
+          "id": "f_done",
+          "kind": "field",
+          "name": "done_at",
+          "fieldType": "date",
+          "label": "Fecha de realización",
+          "validations": []
+        },
+        {
+          "id": "f_expires",
+          "kind": "field",
+          "name": "expires_at",
+          "fieldType": "date",
+          "label": "Vence",
+          "validations": [
+            "required"
+          ]
+        },
+        {
+          "id": "f_result",
+          "kind": "field",
+          "name": "result",
+          "fieldType": "enum",
+          "label": "Resultado",
+          "validations": [],
+          "options": [
+            {
+              "value": "apto",
+              "label": "Apto",
+              "icon": "CircleCheck"
+            },
+            {
+              "value": "apto_con_observaciones",
+              "label": "Apto con observaciones",
+              "icon": "CircleAlert"
+            },
+            {
+              "value": "rechazado",
+              "label": "Rechazado",
+              "icon": "CircleX"
+            }
+          ]
+        },
+        {
+          "id": "f_file",
+          "kind": "field",
+          "name": "file_url",
+          "fieldType": "text",
+          "label": "Certificado (URL)",
+          "validations": [],
+          "placeholder": "https://…"
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Aviso",
+      "icon": "BellRing",
+      "children": [
+        {
+          "id": "f_alert",
+          "kind": "field",
+          "name": "alert_days",
+          "fieldType": "number",
+          "label": "Avisarme con (días de anticipación)",
+          "validations": [],
+          "placeholder": "Ej: 30"
+        },
+        {
+          "id": "f_notes",
+          "kind": "field",
+          "name": "notes",
+          "fieldType": "text",
+          "label": "Observaciones",
+          "validations": [],
+          "placeholder": "Ej: lo hace la empresa del consorcio"
+        }
+      ]
+    }
+  ]
+}

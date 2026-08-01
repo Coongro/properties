@@ -1,0 +1,512 @@
+{
+  "specVersion": 1,
+  "kind": "blank",
+  "title": "Ficha de propiedad",
+  "blocks": [
+    {
+      "id": "hdr",
+      "kind": "container",
+      "ctype": "header",
+      "alias": "Encabezado",
+      "back": true,
+      "avatar": "B1",
+      "name": "Belgrano 1240",
+      "sub": "Edificio · Belgrano 1240, Rosario · Partida 11-22-334455",
+      "badge": {
+        "text": "6 unidades",
+        "tone": "outline"
+      },
+      "actions": [
+        {
+          "label": "Editar propiedad",
+          "variant": "secondary",
+          "action": {
+            "id": "openForm",
+            "label": "Editar propiedad",
+            "target": "properties.propiedad.open"
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "row_kpi",
+      "kind": "container",
+      "ctype": "columns",
+      "alias": "Resumen",
+      "cols": [
+        {
+          "fr": 0.25,
+          "children": [
+            {
+              "id": "k1",
+              "kind": "component",
+              "comp": "SummaryCard",
+              "props": {
+                "label": "Unidades",
+                "value": "6",
+                "sub": "5 departamentos y 1 local",
+                "icon": "Grid3x3",
+                "tone": "neutral"
+              }
+            }
+          ]
+        },
+        {
+          "fr": 0.25,
+          "children": [
+            {
+              "id": "k2",
+              "kind": "component",
+              "comp": "SummaryCard",
+              "props": {
+                "label": "Ocupadas",
+                "value": "5 de 6",
+                "sub": "1°B vacante desde mayo",
+                "icon": "UserCheck",
+                "tone": "success"
+              }
+            }
+          ]
+        },
+        {
+          "fr": 0.25,
+          "children": [
+            {
+              "id": "k3",
+              "kind": "component",
+              "comp": "SummaryCard",
+              "props": {
+                "label": "Alquiler de referencia",
+                "value": "$2.640.000",
+                "sub": "Suma de las 6 unidades",
+                "icon": "Wallet",
+                "tone": "neutral"
+              }
+            }
+          ]
+        },
+        {
+          "fr": 0.25,
+          "children": [
+            {
+              "id": "k4",
+              "kind": "component",
+              "comp": "SummaryCard",
+              "props": {
+                "label": "Certificados",
+                "value": "1",
+                "sub": "Todos al día",
+                "icon": "ShieldAlert",
+                "tone": "warning"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec_unidades",
+      "kind": "container",
+      "ctype": "section",
+      "label": "Unidades",
+      "icon": "DoorOpen",
+      "children": [
+        {
+          "id": "tbl_unidades",
+          "kind": "component",
+          "comp": "DataTable",
+          "props": {
+            "view": "cards",
+            "cardMin": 260,
+            "cardBand": false,
+            "imageCol": "photo_url",
+            "imageLayout": "cover",
+            "subtitle": "detail",
+            "pageSize": "20",
+            "rowAction": {
+              "id": "openForm",
+              "label": "Editar unidad",
+              "target": "properties.unidad.open"
+            },
+            "columns": [
+              {
+                "key": "name",
+                "label": "Unidad"
+              },
+              {
+                "key": "detail",
+                "label": "Detalle"
+              },
+              {
+                "key": "status",
+                "label": "Estado",
+                "display": "pill",
+                "values": [
+                  {
+                    "value": "ocupada",
+                    "label": "Ocupada",
+                    "tone": "success",
+                    "icon": "UserCheck"
+                  },
+                  {
+                    "value": "vacante",
+                    "label": "Vacante",
+                    "tone": "warning",
+                    "icon": "DoorOpen"
+                  },
+                  {
+                    "value": "en_recambio",
+                    "label": "En recambio",
+                    "tone": "neutral",
+                    "icon": "Paintbrush"
+                  },
+                  {
+                    "value": "con_preaviso",
+                    "label": "Con preaviso",
+                    "tone": "warning",
+                    "icon": "BellRing"
+                  },
+                  {
+                    "value": "no_disponible",
+                    "label": "No disponible",
+                    "tone": "outline",
+                    "icon": "Ban"
+                  }
+                ]
+              },
+              {
+                "key": "reference_rent",
+                "label": "Alquiler de referencia",
+                "display": "mono",
+                "format": "money"
+              },
+              {
+                "key": "photo_url",
+                "label": "Foto",
+                "visible": false
+              }
+            ],
+            "cells": [
+              [
+                "3°B",
+                "3 ambientes · 72 m²",
+                "ocupada",
+                "485000",
+                "3b.jpg"
+              ],
+              [
+                "2°A",
+                "2 ambientes · 58 m²",
+                "ocupada",
+                "460000",
+                "2a.jpg"
+              ],
+              [
+                "4°D",
+                "3 ambientes · 70 m²",
+                "con_preaviso",
+                "420000",
+                "4d.jpg"
+              ],
+              [
+                "1°A",
+                "2 ambientes · 55 m²",
+                "ocupada",
+                "445000",
+                "1a.jpg"
+              ],
+              [
+                "1°B",
+                "1 ambiente · 38 m²",
+                "vacante",
+                "310000",
+                "1b.jpg"
+              ],
+              [
+                "PB Local",
+                "Local a la calle · 45 m²",
+                "ocupada",
+                "520000",
+                "pb.jpg"
+              ]
+            ],
+            "filters": [],
+            "actions": [],
+            "emptyTitle": "Esta propiedad no tiene unidades",
+            "emptySub": "Agregá la primera para poder firmar un contrato."
+          }
+        }
+      ]
+    },
+    {
+      "id": "row_bottom",
+      "kind": "container",
+      "ctype": "columns",
+      "alias": "Expensas, certificados y órdenes",
+      "cols": [
+        {
+          "fr": 0.34,
+          "children": [
+            {
+              "id": "sec_expensas",
+              "kind": "container",
+              "ctype": "section",
+              "label": "Expensas",
+              "icon": "Receipt",
+              "children": [
+                {
+                  "id": "btn_expensa",
+                  "kind": "component",
+                  "comp": "Button",
+                  "align": "right",
+                  "props": {
+                    "label": "Cargar mes",
+                    "variant": "secondary",
+                    "action": {
+                      "id": "openForm",
+                      "label": "Cargar mes",
+                      "target": "properties.expensas-del-mes.open"
+                    }
+                  }
+                },
+                {
+                  "id": "tbl_expensas",
+                  "kind": "component",
+                  "comp": "DataTable",
+                  "props": {
+                    "view": "list",
+                    "subtitle": "status",
+                    "pageSize": "10",
+                    "rowAction": {
+                      "id": "openForm",
+                      "label": "Editar expensas",
+                      "target": "properties.expensas-del-mes.open"
+                    },
+                    "columns": [
+                      {
+                        "key": "period",
+                        "label": "Período"
+                      },
+                      {
+                        "key": "amount",
+                        "label": "Total",
+                        "display": "mono",
+                        "format": "money"
+                      },
+                      {
+                        "key": "status",
+                        "label": "Estado",
+                        "display": "pill",
+                        "values": [
+                          {
+                            "value": "recibida",
+                            "label": "Recibida",
+                            "tone": "neutral",
+                            "icon": "Inbox"
+                          },
+                          {
+                            "value": "pagada",
+                            "label": "Pagada",
+                            "tone": "success",
+                            "icon": "CircleCheck"
+                          }
+                        ]
+                      }
+                    ],
+                    "cells": [
+                      [
+                        "2026-09",
+                        "900000",
+                        "recibida"
+                      ],
+                      [
+                        "2026-08",
+                        "840000",
+                        "pagada"
+                      ],
+                      [
+                        "2026-07",
+                        "780000",
+                        "pagada"
+                      ]
+                    ],
+                    "filters": [],
+                    "actions": [],
+                    "emptyTitle": "Sin expensas cargadas",
+                    "emptySub": "Cargá lo que liquidó el consorcio para que se reparta entre las unidades."
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "fr": 0.33,
+          "children": [
+            {
+              "id": "sec_certs",
+              "kind": "container",
+              "ctype": "section",
+              "label": "Certificados",
+              "icon": "ShieldCheck",
+              "children": [
+                {
+                  "id": "tbl_certs",
+                  "kind": "component",
+                  "comp": "DataTable",
+                  "props": {
+                    "view": "list",
+                    "subtitle": "status",
+                    "pageSize": "10",
+                    "rowAction": {
+                      "id": "openForm",
+                      "label": "Editar certificado",
+                      "target": "properties.certificado.open"
+                    },
+                    "columns": [
+                      {
+                        "key": "type",
+                        "label": "Certificado"
+                      },
+                      {
+                        "key": "status",
+                        "label": "Estado",
+                        "display": "pill",
+                        "values": [
+                          {
+                            "value": "vigente",
+                            "label": "Vigente",
+                            "tone": "success"
+                          },
+                          {
+                            "value": "por_vencer",
+                            "label": "Por vencer",
+                            "tone": "warning"
+                          },
+                          {
+                            "value": "vencido",
+                            "label": "Vencido",
+                            "tone": "danger"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "expires_at",
+                        "label": "Vence",
+                        "format": "date"
+                      }
+                    ],
+                    "cells": [
+                      [
+                        "Matafuegos",
+                        "por_vencer",
+                        "2026-09-05"
+                      ],
+                      [
+                        "Instalación de gas",
+                        "vigente",
+                        "2027-03-20"
+                      ],
+                      [
+                        "Ascensor",
+                        "vigente",
+                        "2026-12-01"
+                      ]
+                    ],
+                    "filters": [],
+                    "actions": [],
+                    "emptyTitle": "Sin certificados cargados",
+                    "emptySub": "Cargá matafuegos, gas o ascensor para que te avise antes del vencimiento."
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "fr": 0.33,
+          "children": [
+            {
+              "id": "sec_ot",
+              "kind": "container",
+              "ctype": "section",
+              "label": "Órdenes de trabajo abiertas",
+              "icon": "Wrench",
+              "children": [
+                {
+                  "id": "tbl_ot",
+                  "kind": "component",
+                  "comp": "DataTable",
+                  "props": {
+                    "view": "list",
+                    "subtitle": "unit",
+                    "pageSize": "10",
+                    "columns": [
+                      {
+                        "key": "title",
+                        "label": "Trabajo"
+                      },
+                      {
+                        "key": "unit",
+                        "label": "Unidad"
+                      },
+                      {
+                        "key": "priority",
+                        "label": "Prioridad",
+                        "display": "pill",
+                        "values": [
+                          {
+                            "value": "urgente",
+                            "label": "Urgente",
+                            "tone": "danger"
+                          },
+                          {
+                            "value": "alta",
+                            "label": "Alta",
+                            "tone": "warning"
+                          },
+                          {
+                            "value": "normal",
+                            "label": "Normal",
+                            "tone": "outline"
+                          },
+                          {
+                            "value": "baja",
+                            "label": "Baja",
+                            "tone": "neutral"
+                          }
+                        ]
+                      }
+                    ],
+                    "cells": [
+                      [
+                        "Pérdida en cocina",
+                        "3°B",
+                        "urgente"
+                      ],
+                      [
+                        "Pintura de 1°B antes de alquilar",
+                        "1°B",
+                        "alta"
+                      ],
+                      [
+                        "Pintura de palier",
+                        "Área común",
+                        "baja"
+                      ]
+                    ],
+                    "filters": [],
+                    "actions": [],
+                    "emptyTitle": "Sin órdenes abiertas",
+                    "emptySub": "Acá vas a ver los arreglos pendientes de esta propiedad."
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

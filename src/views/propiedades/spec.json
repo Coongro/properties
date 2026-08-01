@@ -1,0 +1,209 @@
+{
+  "specVersion": 1,
+  "kind": "blank",
+  "title": "Propiedades",
+  "data": {
+    "repositoryPrefix": "properties.buildings"
+  },
+  "blocks": [
+    {
+      "id": "ph",
+      "kind": "component",
+      "comp": "PageHeader",
+      "props": {
+        "kicker": "ALQUILERES",
+        "title": "Propiedades",
+        "subtitle": "Los edificios y unidades que administrás.",
+        "actionLabel": "Nueva propiedad",
+        "action": {
+          "id": "openForm",
+          "label": "Nueva propiedad",
+          "target": "properties.propiedad.open"
+        }
+      }
+    },
+    {
+      "id": "tbl",
+      "kind": "component",
+      "comp": "DataTable",
+      "props": {
+        "view": "cards",
+        "cardMin": 280,
+        "cardBand": false,
+        "imageCol": "photo_url",
+        "imageLayout": "cover",
+        "subtitle": "address",
+        "pageSize": "20",
+        "rowAction": {
+          "id": "navigate",
+          "label": "Ver ficha",
+          "target": "properties.ficha-de-propiedad.open"
+        },
+        "columns": [
+          {
+            "key": "name",
+            "label": "Propiedad"
+          },
+          {
+            "key": "address",
+            "label": "Dirección"
+          },
+          {
+            "key": "certs",
+            "label": "Certificados",
+            "display": "pill",
+            "values": [
+              {
+                "value": "ok",
+                "label": "Al día",
+                "tone": "success",
+                "icon": "ShieldCheck"
+              },
+              {
+                "value": "soon",
+                "label": "Certificado por vencer",
+                "tone": "warning",
+                "icon": "ShieldAlert"
+              },
+              {
+                "value": "expired",
+                "label": "Certificado vencido",
+                "tone": "danger",
+                "icon": "ShieldX"
+              }
+            ]
+          },
+          {
+            "key": "type",
+            "label": "Tipo",
+            "display": "pill",
+            "tone": "outline",
+            "values": [
+              {
+                "value": "edificio",
+                "label": "Edificio",
+                "icon": "Building2"
+              },
+              {
+                "value": "departamento",
+                "label": "Departamento",
+                "icon": "Building"
+              },
+              {
+                "value": "casa",
+                "label": "Casa",
+                "icon": "House"
+              },
+              {
+                "value": "local",
+                "label": "Local",
+                "icon": "Store"
+              },
+              {
+                "value": "oficina",
+                "label": "Oficina",
+                "icon": "Briefcase"
+              },
+              {
+                "value": "galpon",
+                "label": "Galpón",
+                "icon": "Warehouse"
+              },
+              {
+                "value": "cochera",
+                "label": "Cochera",
+                "icon": "Car"
+              },
+              {
+                "value": "baulera",
+                "label": "Baulera",
+                "icon": "Package"
+              }
+            ]
+          },
+          {
+            "key": "occupancy",
+            "label": "Ocupación",
+            "display": "mono"
+          },
+          {
+            "key": "reference_rent",
+            "label": "Alquiler de referencia",
+            "display": "mono",
+            "format": "money"
+          },
+          {
+            "key": "photo_url",
+            "label": "Foto",
+            "visible": false
+          }
+        ],
+        "cells": [
+          [
+            "Belgrano 1240",
+            "Belgrano 1240, Rosario",
+            "ok",
+            "edificio",
+            "5 de 6",
+            "2640000",
+            "belgrano-1240.jpg"
+          ],
+          [
+            "Salta 870",
+            "Salta 870, Rosario",
+            "soon",
+            "edificio",
+            "1 de 2",
+            "955000",
+            "salta-870.jpg"
+          ],
+          [
+            "Moreno 55",
+            "Moreno 55, Rosario",
+            "expired",
+            "local",
+            "1 de 1",
+            "700000",
+            "moreno-55.jpg"
+          ],
+          [
+            "Rioja 3120",
+            "Rioja 3120, Rosario",
+            "ok",
+            "casa",
+            "1 de 1",
+            "620000",
+            "rioja-3120.jpg"
+          ]
+        ],
+        "filters": [
+          {
+            "column": "type",
+            "label": "Tipo",
+            "kind": "select",
+            "options": []
+          },
+          {
+            "column": "certs",
+            "label": "Certificados",
+            "kind": "select",
+            "options": []
+          }
+        ],
+        "actions": [
+          {
+            "label": "Editar",
+            "icon": "Pencil",
+            "action": {
+              "id": "openForm",
+              "label": "Editar",
+              "target": "properties.propiedad.open"
+            }
+          }
+        ],
+        "emptyTitle": "Todavía no hay propiedades",
+        "emptySub": "Cargá la primera para empezar a registrar unidades y contratos."
+      }
+    }
+  ]
+}

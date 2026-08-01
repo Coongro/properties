@@ -1,0 +1,99 @@
+{
+  "specVersion": 1,
+  "kind": "blank",
+  "title": "Propietarios",
+  "blocks": [
+    {
+      "id": "ph",
+      "kind": "component",
+      "comp": "PageHeader",
+      "props": {
+        "kicker": "ALQUILERES",
+        "title": "Propietarios",
+        "subtitle": "Los titulares de las unidades y sus datos de cobro.",
+        "actionLabel": "Nuevo propietario",
+        "action": {
+          "id": "openForm",
+          "label": "Nuevo propietario",
+          "target": "properties.propietario.open"
+        }
+      }
+    },
+    {
+      "id": "tbl",
+      "kind": "component",
+      "comp": "DataTable",
+      "props": {
+        "view": "list",
+        "imageCol": "photo_url",
+        "imageLayout": "avatar",
+        "subtitle": "document",
+        "pageSize": "20",
+        "columns": [
+          {
+            "key": "name",
+            "label": "Propietario"
+          },
+          {
+            "key": "document",
+            "label": "Documento",
+            "display": "mono",
+            "emptyLabel": "Sin documento"
+          },
+          {
+            "key": "units",
+            "label": "Unidades"
+          },
+          {
+            "key": "cbu",
+            "label": "CBU / alias",
+            "display": "mono",
+            "emptyLabel": "Sin datos de cobro"
+          },
+          {
+            "key": "bank",
+            "label": "Banco",
+            "visible": false
+          },
+          {
+            "key": "photo_url",
+            "label": "Foto",
+            "visible": false
+          }
+        ],
+        "cells": [
+          [
+            "Axel Fernández",
+            "CUIT 20-28994120-5",
+            "4 unidades · 100%",
+            "axel.alquileres",
+            "Banco Nación",
+            ""
+          ],
+          [
+            "Ana María Ruiz",
+            "CUIT 27-11402887-3",
+            "2 unidades · 50%",
+            "ana.ruiz.mp",
+            "Banco Galicia",
+            ""
+          ]
+        ],
+        "filters": [],
+        "actions": [
+          {
+            "label": "Editar",
+            "icon": "Pencil",
+            "action": {
+              "id": "openForm",
+              "label": "Editar",
+              "target": "properties.propietario.open"
+            }
+          }
+        ],
+        "emptyTitle": "Todavía no hay propietarios",
+        "emptySub": "Cargá los titulares para poder repartir lo cobrado."
+      }
+    }
+  ]
+}
