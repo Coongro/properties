@@ -127,6 +127,15 @@ export const customHandlers: CustomHandlers = {
       });
     },
 
+    /** Las liquidaciones DE ESTE edificio: `.list` traería las de todos. */
+    tbl_expensas: ({ execute, record }) => {
+      const buildingId = record?.id as string | undefined;
+      if (!buildingId) return Promise.resolve([]);
+      return execute<Record<string, unknown>[]>('properties.buildingExpenses.forBuilding', {
+        buildingId,
+      });
+    },
+
     // Las órdenes de trabajo llegan con el plugin `maintenance` (F5). Hasta
     // entonces la sección muestra su estado vacío, que ya dice qué va a aparecer.
     tbl_ot: () => Promise.resolve([]),

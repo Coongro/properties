@@ -95,5 +95,15 @@
         "emptySub": "Cargá los titulares para poder repartir lo cobrado."
       }
     }
-  ]
+  ],
+  "headless": {
+    "handlers": [
+      {
+        "hook": "loadData",
+        "mode": "query",
+        "action": "properties.unitOwners.listOwners",
+        "resource": "properties.unitOwners"
+      }
+    ]
+  }
 }

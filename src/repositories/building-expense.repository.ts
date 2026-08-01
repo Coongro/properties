@@ -1,5 +1,5 @@
 import type { ModuleDatabaseAPI } from '@coongro/plugin-sdk';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 
 import { buildingExpenseTable } from '../schema/building-expense.js';
 import type { BuildingExpenseRow, NewBuildingExpenseRow } from '../schema/building-expense.js';
@@ -28,6 +28,26 @@ export class BuildingExpenseRepository {
         .where(
           and(eq(buildingExpenseTable.period, period), isNull(buildingExpenseTable.deleted_at))
         )
+    );
+  }
+
+  /**
+   * Las liquidaciones de UN edificio, de la más reciente a la más vieja — lo que
+   * muestra su ficha. Ordenar por período descendente es lo que espera quien mira:
+   * el mes que acaba de llegar arriba.
+   */
+  async forBuilding({ buildingId }: { buildingId: string }): Promise<BuildingExpenseRow[]> {
+    return this.db.ormQuery((tx) =>
+      tx
+        .select()
+        .from(buildingExpenseTable)
+        .where(
+          and(
+            eq(buildingExpenseTable.building_id, buildingId),
+            isNull(buildingExpenseTable.deleted_at)
+          )
+        )
+        .orderBy(desc(buildingExpenseTable.period))
     );
   }
 

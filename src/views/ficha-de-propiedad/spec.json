@@ -508,5 +508,45 @@
         }
       ]
     }
-  ]
+  ],
+  "headless": {
+    "handlers": [
+      {
+        "hook": "loadLiveValues",
+        "mode": "query",
+        "action": "properties.buildings.getSummary",
+        "resource": "properties.buildings"
+      },
+      {
+        "hook": "loadDataFor",
+        "key": "tbl_unidades",
+        "mode": "query",
+        "action": "properties.units.listByBuilding",
+        "resource": "properties.units",
+        "outputBlockId": "tbl_unidades"
+      },
+      {
+        "hook": "loadDataFor",
+        "key": "tbl_certs",
+        "mode": "query",
+        "action": "properties.certificates.listByBuilding",
+        "resource": "properties.certificates",
+        "outputBlockId": "tbl_certs"
+      },
+      {
+        "hook": "loadDataFor",
+        "key": "tbl_expensas",
+        "mode": "query",
+        "action": "properties.buildingExpenses.forBuilding",
+        "resource": "properties.buildingExpenses",
+        "outputBlockId": "tbl_expensas"
+      },
+      {
+        "hook": "loadDataFor",
+        "key": "tbl_ot",
+        "mode": "uiOnly",
+        "reason": "Las órdenes de trabajo llegan con el plugin maintenance (F5); hasta entonces la tabla muestra su estado vacío."
+      }
+    ]
+  }
 }
