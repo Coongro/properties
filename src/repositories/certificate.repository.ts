@@ -4,8 +4,8 @@ import { and, asc, eq, getTableColumns, isNull, or, sql } from 'drizzle-orm';
 import { certificateTable } from '../schema/certificate.js';
 import type { CertificateRow, NewCertificateRow } from '../schema/certificate.js';
 import { unitTable } from '../schema/unit.js';
-
-/** Días de anticipación con que un certificado empieza a mostrarse "por vencer". */
+// Días de anticipación con que cada tipo de certificado empieza a mostrarse «por vencer»:
+// la tabla vive con los tipos, que son de este plugin, y el barrido de leases la importa.
 import {
   CERTIFICATE_HORIZONS,
   DEFAULT_CERTIFICATE_HORIZON,
