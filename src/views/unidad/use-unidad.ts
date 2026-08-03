@@ -26,6 +26,7 @@ export function useUnidadView() {
     };
   }, []);
   const [values, setValues] = useState<Record<string, any>>({
+    building_id: null,
     name: null,
     rooms: null,
     bathrooms: null,
@@ -87,9 +88,31 @@ export function useUnidadView() {
     });
     // deps intencionalmente fijas: el efecto corre una sola vez
   }, []);
+  const [refOptions, setRefOptions] = useState<Record<string, any[]>>({});
+  const refLabel =
+    customHandlers.refLabel ?? ((r: any) => String(r?.name ?? r?.title ?? r?.label ?? r?.id ?? ''));
+  useEffect(() => {
+    void Promise.all([
+      actions
+        .execute<any[]>('properties.buildings.list')
+        .then((r) => {
+          if (mounted.current)
+            setRefOptions((o: any) => ({ ...o, building_id: Array.isArray(r) ? r : [] }));
+        })
+        .catch(() => {}),
+    ]);
+    // deps intencionalmente fijas: el efecto corre una sola vez
+  }, []);
 
   const validate = useCallback((): Record<string, string> => {
     const errs: Record<string, string> = {};
+    if (
+      values['building_id'] === null ||
+      values['building_id'] === undefined ||
+      values['building_id'] === '' ||
+      values['building_id'] === false
+    )
+      errs['building_id'] = '«Propiedad» es requerido';
     if (
       values['name'] === null ||
       values['name'] === undefined ||
@@ -133,6 +156,7 @@ export function useUnidadView() {
       toast.success(editingId ? 'Actualizado' : 'Guardado', 'El registro se guardó correctamente');
       setEditingId(null);
       setValues({
+        building_id: null,
         name: null,
         rooms: null,
         bathrooms: null,
@@ -150,5 +174,5 @@ export function useUnidadView() {
     // deps intencionalmente fijas: el efecto corre una sola vez
   }, [values, validate, editingId]);
 
-  return { values, errors, setField, editingId, submit };
+  return { values, errors, setField, editingId, refOptions, refLabel, submit };
 }

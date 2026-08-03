@@ -1,4 +1,5 @@
-import { contactTable } from '@coongro/contacts/server';
+import { ContactRepository, contactTable } from '@coongro/contacts/server';
+import type { NewContactRow } from '@coongro/contacts/server';
 import type { ModuleDatabaseAPI } from '@coongro/plugin-sdk';
 import { and, asc, eq, isNull, sql } from 'drizzle-orm';
 
@@ -205,29 +206,25 @@ export class UnitOwnerRepository {
       metadata,
     };
 
+    // Escribir es del dueño de la entidad: un contacto lo crea y lo edita
+    // `ContactRepository`, no esta tabla. Cuando escribíamos el `insert` a mano, cada
+    // invariante que agregaba `contacts` nos rompía de a una —primero `is_active`,
+    // después `id`— y solo nos enterábamos cuando fallaba un alta.
+    //
+    // Las LECTURAS de más arriba sí siguen resolviéndose con join: traer el listado de
+    // propietarios registro por registro sería una consulta por fila.
+    const contactos = new ContactRepository(this.db);
+
     if (id) {
       // Al actualizar NO se toca `type`: la misma persona puede ser propietaria de una
       // unidad e inquilina de otra, y `contacts.type` guarda un solo rol.
-      await this.db.ormQuery((tx) =>
-        tx
-          .update(contactTable)
-          .set(columnas as never)
-          .where(eq(contactTable.id, id))
-      );
+      await contactos.update({ id, data: columnas as Partial<NewContactRow> });
       return { id, created: false };
     }
 
-    const creados = await this.db.ormQuery((tx) =>
-      tx
-        .insert(contactTable)
-        .values({
-          ...columnas,
-          type: 'owner',
-          // `is_active` es NOT NULL y no tiene default: sin esto el insert muere.
-          is_active: true,
-        } as never)
-        .returning({ id: contactTable.id })
-    );
+    const creados = await contactos.create({
+      data: { ...columnas, type: 'owner' } as NewContactRow,
+    });
     const nuevo = creados[0]?.id;
     if (!nuevo) throw new Error('No se pudo crear el propietario.');
     return { id: String(nuevo), created: true };

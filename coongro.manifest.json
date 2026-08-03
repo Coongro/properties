@@ -78,27 +78,77 @@
       {
         "module": "./dist/repositories/building.repository.js",
         "export": "BuildingRepository",
-        "prefix": "properties.buildings"
+        "prefix": "properties.buildings",
+        "actions": [
+          "list",
+          "getSummary",
+          "selectWithSummary",
+          "getById",
+          "create",
+          "update",
+          "delete",
+          "restore"
+        ]
       },
       {
         "module": "./dist/repositories/unit.repository.js",
         "export": "UnitRepository",
-        "prefix": "properties.units"
+        "prefix": "properties.units",
+        "actions": [
+          "list",
+          "listByBuilding",
+          "getById",
+          "create",
+          "update",
+          "delete",
+          "restore"
+        ]
       },
       {
         "module": "./dist/repositories/certificate.repository.js",
         "export": "CertificateRepository",
-        "prefix": "properties.certificates"
+        "prefix": "properties.certificates",
+        "actions": [
+          "list",
+          "listByBuilding",
+          "getById",
+          "create",
+          "update",
+          "delete",
+          "restore"
+        ]
       },
       {
         "module": "./dist/repositories/unit-owner.repository.js",
         "export": "UnitOwnerRepository",
-        "prefix": "properties.unitOwners"
+        "prefix": "properties.unitOwners",
+        "actions": [
+          "list",
+          "listOwners",
+          "getById",
+          "getOwner",
+          "saveOwner",
+          "contactoPorId",
+          "create",
+          "update",
+          "delete",
+          "restore"
+        ]
       },
       {
         "module": "./dist/repositories/building-expense.repository.js",
         "export": "BuildingExpenseRepository",
-        "prefix": "properties.buildingExpenses"
+        "prefix": "properties.buildingExpenses",
+        "actions": [
+          "list",
+          "forPeriod",
+          "forBuilding",
+          "getById",
+          "create",
+          "update",
+          "delete",
+          "restore"
+        ]
       }
     ],
     "settings": {
@@ -1068,6 +1118,11 @@
               "type": "object",
               "description": "Datos de Unidad a crear.",
               "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
                 "name": { "type": "string", "description": "Nombre o número" },
                 "rooms": { "type": "integer", "description": "Ambientes" },
                 "bathrooms": { "type": "integer", "description": "Baños" },
@@ -1100,7 +1155,7 @@
                 },
                 "notes": { "type": "string", "description": "Notas" }
               },
-              "required": ["name", "status"],
+              "required": ["building_id", "name", "status"],
               "additionalProperties": false
             }
           },
@@ -1161,6 +1216,11 @@
               "type": "object",
               "description": "Campos de Unidad a modificar.",
               "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
                 "name": { "type": "string", "description": "Nombre o número" },
                 "rooms": { "type": "integer", "description": "Ambientes" },
                 "bathrooms": { "type": "integer", "description": "Baños" },
