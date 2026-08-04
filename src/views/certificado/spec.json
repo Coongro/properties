@@ -7,6 +7,38 @@
   },
   "blocks": [
     {
+      "id": "s0",
+      "kind": "container",
+      "ctype": "card",
+      "label": "De qué inmueble",
+      "icon": "Building2",
+      "children": [
+        {
+          "id": "f_building",
+          "kind": "field",
+          "name": "building_id",
+          "fieldType": "ref",
+          "label": "Propiedad",
+          "refEntity": "properties.buildings",
+          "width": "half",
+          "validations": [
+            "required"
+          ]
+        },
+        {
+          "id": "f_unit",
+          "kind": "field",
+          "name": "unit_id",
+          "fieldType": "ref",
+          "label": "Unidad",
+          "refEntity": "properties.units",
+          "width": "half",
+          "validations": [],
+          "help": "Solo si el certificado es de una unidad puntual. Vacío = alcanza a toda la propiedad."
+        }
+      ]
+    },
+    {
       "id": "s1",
       "kind": "container",
       "ctype": "card",
@@ -61,6 +93,7 @@
           "name": "done_at",
           "fieldType": "date",
           "label": "Fecha de realización",
+          "width": "half",
           "validations": []
         },
         {
@@ -69,6 +102,7 @@
           "name": "expires_at",
           "fieldType": "date",
           "label": "Vence",
+          "width": "half",
           "validations": [
             "required"
           ]
@@ -123,7 +157,8 @@
           "fieldType": "number",
           "label": "Avisarme con (días de anticipación)",
           "validations": [],
-          "placeholder": "Ej: 30"
+          "placeholder": "Ej: 30",
+          "help": "Vacío = el que corresponde al tipo (matafuegos 30, gas 45, ascensor 60)."
         },
         {
           "id": "f_notes",
@@ -136,5 +171,13 @@
         }
       ]
     }
-  ]
+  ],
+  "headless": {
+    "handlers": [
+      {
+        "hook": "refLabel",
+        "mode": "presentation"
+      }
+    ]
+  }
 }

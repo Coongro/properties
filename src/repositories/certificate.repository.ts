@@ -4,9 +4,14 @@ import { and, asc, eq, getTableColumns, isNull, or, sql } from 'drizzle-orm';
 import { certificateTable } from '../schema/certificate.js';
 import type { CertificateRow, NewCertificateRow } from '../schema/certificate.js';
 import { unitTable } from '../schema/unit.js';
+// Días de anticipación con que cada tipo de certificado empieza a mostrarse «por vencer»:
+// la tabla vive con los tipos, que son de este plugin, y el barrido de leases la importa.
+import {
+  CERTIFICATE_HORIZONS,
+  DEFAULT_CERTIFICATE_HORIZON,
+} from '../services/certificate-horizons.js';
 
-/** Días de anticipación con que un certificado empieza a mostrarse "por vencer". */
-const DEFAULT_ALERT_DAYS = 30;
+const DEFAULT_ALERT_DAYS = DEFAULT_CERTIFICATE_HORIZON;
 
 /** Un certificado con su estado ya resuelto contra la fecha de hoy. */
 export interface CertificateWithStatus extends CertificateRow {
@@ -39,7 +44,22 @@ export class CertificateRepository {
     // `expires_at` es un DateKey (YYYY-MM-DD): ordena bien como texto, así que se
     // compara contra hoy en el mismo formato en vez de castear a date.
     const today = sql`to_char(now(), 'YYYY-MM-DD')`;
-    const horizon = sql`to_char(now() + make_interval(days => ${alertDays}), 'YYYY-MM-DD')`;
+    // Cuántos días antes se avisa: los propios del certificado si los tiene, si no los
+    // de su tipo. El mapa es el MISMO que usa el barrido de vencimientos, así que la
+    // ficha y la lista no pueden decir cosas distintas del mismo certificado.
+    const dias = sql.join(
+      [
+        sql`coalesce(${certificateTable.alert_days}, (case ${certificateTable.type}`,
+        ...Object.entries(CERTIFICATE_HORIZONS).map(([tipo, d]) => sql`when ${tipo} then ${d}`),
+        // El `::int` no es decorativo: los días viajan como parámetros y Postgres
+        // los infiere `text`, así que sin el cast el coalesce choca contra
+        // `alert_days` (integer) y la consulta entera falla — la ficha mostraba
+        // «sin certificados» aunque los hubiera.
+        sql`else ${alertDays} end)::int)`,
+      ],
+      sql` `
+    );
+    const horizon = sql`to_char(now() + make_interval(days => ${dias}), 'YYYY-MM-DD')`;
     // Con alias: interpolar `${unitTable.id}` emite `"id"` pelado y, dentro del
     // subquery, esa columna resuelve contra la tabla equivocada.
     const unitsOfBuilding = sql`(

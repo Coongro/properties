@@ -14,6 +14,17 @@
       "icon": "DoorOpen",
       "children": [
         {
+          "id": "f_building",
+          "kind": "field",
+          "name": "building_id",
+          "fieldType": "ref",
+          "label": "Propiedad",
+          "refEntity": "properties.buildings",
+          "validations": [
+            "required"
+          ]
+        },
+        {
           "id": "f_name",
           "kind": "field",
           "name": "name",
@@ -63,11 +74,10 @@
         {
           "id": "f_photo",
           "kind": "field",
-          "name": "photo_url",
-          "fieldType": "text",
-          "label": "Foto (URL)",
-          "validations": [],
-          "placeholder": "https://…"
+          "name": "photos",
+          "fieldType": "gallery",
+          "label": "Fotos",
+          "validations": []
         }
       ]
     },

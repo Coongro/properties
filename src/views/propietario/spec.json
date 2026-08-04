@@ -175,5 +175,21 @@
         }
       ]
     }
-  ]
+  ],
+  "headless": {
+    "handlers": [
+      {
+        "hook": "onInit",
+        "mode": "query",
+        "action": "properties.unitOwners.getOwner"
+      },
+      {
+        "hook": "onSubmit",
+        "mode": "command",
+        "action": "properties.unitOwners.saveOwner",
+        "effect": "write",
+        "confirmation": "always"
+      }
+    ]
+  }
 }

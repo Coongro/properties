@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   numeric,
   pgTable,
   text,
@@ -29,7 +30,8 @@ export const unitTable = pgTable(
     status: text('status').notNull(),
     /** Valor de referencia para publicar o proponer un alquiler. El precio real lo fija el contrato. */
     reference_rent: numeric('reference_rent'),
-    photo_url: text('photo_url'),
+    /** Fotos de la unidad, en orden: `[{ url, caption? }]`. La primera va en la tarjeta. */
+    photos: jsonb('photos').$type<{ url: string; caption?: string }[]>(),
     notes: text('notes'),
     created_at: timestamp('created_at', { mode: 'string' })
       .notNull()

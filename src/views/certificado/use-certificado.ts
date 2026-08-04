@@ -26,6 +26,8 @@ export function useCertificadoView() {
     };
   }, []);
   const [values, setValues] = useState<Record<string, any>>({
+    building_id: null,
+    unit_id: null,
     type: null,
     done_at: null,
     expires_at: null,
@@ -48,6 +50,7 @@ export function useCertificadoView() {
       },
       editingId,
       record: initialRecord,
+      parentRecord,
     })
       .then((initial) => {
         if (!initial || !mounted.current) return;
@@ -66,6 +69,10 @@ export function useCertificadoView() {
   // record con el que se abrió la vista (views.open(id, { record })), si hubo — lo
   // reciben los handlers en onSubmit (ej. una acción de fila que necesita el id).
   const initialRecord = ((views.params as any)?.record ?? null) as Record<string, any> | null;
+  // Contexto padre (views.open(id, { parentRecord })): el registro DESDE el que
+  // se abrió — «Nueva unidad» desde la ficha del edificio. A diferencia de
+  // { record }, NUNCA activa el modo edición ni el prefill general de campos.
+  const parentRecord = ((views.params as any)?.parentRecord ?? null) as Record<string, any> | null;
   // Abierta con { record } → modo edición: guardar actualiza, no crea
   const [editingId, setEditingId] = useState<string | null>(
     initialRecord?.id !== null && initialRecord?.id !== undefined ? String(initialRecord.id) : null
@@ -85,9 +92,53 @@ export function useCertificadoView() {
     });
     // deps intencionalmente fijas: el efecto corre una sola vez
   }, []);
+  // entidad del padre → campo ref que lo referencia (solo matches únicos)
+  const PARENT_REF_FIELD: Record<string, string> = {
+    'properties.buildings': 'building_id',
+    'properties.units': 'unit_id',
+  };
+  useEffect(() => {
+    const parentEntity = ((views.params as any)?.parentEntity ?? null) as string | null;
+    const linkField = parentEntity ? PARENT_REF_FIELD[parentEntity] : undefined;
+    if (!linkField || !parentRecord || parentRecord.id === null || parentRecord.id === undefined)
+      return;
+    setValues((prev: any) =>
+      prev[linkField] ? prev : { ...prev, [linkField]: String(parentRecord.id) }
+    );
+    // deps intencionalmente fijas: el efecto corre una sola vez
+  }, []);
+  const [refOptions, setRefOptions] = useState<Record<string, any[]>>({});
+  const refLabel =
+    customHandlers.refLabel ?? ((r: any) => String(r?.name ?? r?.title ?? r?.label ?? r?.id ?? ''));
+  useEffect(() => {
+    void Promise.all([
+      actions
+        .execute<any[]>('properties.buildings.list')
+        .then((r) => {
+          if (mounted.current)
+            setRefOptions((o: any) => ({ ...o, building_id: Array.isArray(r) ? r : [] }));
+        })
+        .catch(() => {}),
+      actions
+        .execute<any[]>('properties.units.list')
+        .then((r) => {
+          if (mounted.current)
+            setRefOptions((o: any) => ({ ...o, unit_id: Array.isArray(r) ? r : [] }));
+        })
+        .catch(() => {}),
+    ]);
+    // deps intencionalmente fijas: el efecto corre una sola vez
+  }, []);
 
   const validate = useCallback((): Record<string, string> => {
     const errs: Record<string, string> = {};
+    if (
+      values['building_id'] === null ||
+      values['building_id'] === undefined ||
+      values['building_id'] === '' ||
+      values['building_id'] === false
+    )
+      errs['building_id'] = '«Propiedad» es requerido';
     if (
       values['type'] === null ||
       values['type'] === undefined ||
@@ -121,6 +172,7 @@ export function useCertificadoView() {
           toast,
           editingId,
           record: initialRecord,
+          parentRecord,
         };
         await customHandlers.onSubmit(values, ctx);
       } else if (editingId) {
@@ -131,6 +183,8 @@ export function useCertificadoView() {
       toast.success(editingId ? 'Actualizado' : 'Guardado', 'El registro se guardó correctamente');
       setEditingId(null);
       setValues({
+        building_id: null,
+        unit_id: null,
         type: null,
         done_at: null,
         expires_at: null,
@@ -146,5 +200,5 @@ export function useCertificadoView() {
     // deps intencionalmente fijas: el efecto corre una sola vez
   }, [values, validate, editingId]);
 
-  return { values, errors, setField, editingId, submit };
+  return { values, errors, setField, editingId, refOptions, refLabel, submit };
 }

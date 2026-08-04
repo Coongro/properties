@@ -78,27 +78,75 @@
       {
         "module": "./dist/repositories/building.repository.js",
         "export": "BuildingRepository",
-        "prefix": "properties.buildings"
+        "prefix": "properties.buildings",
+        "actions": [
+          "list",
+          "getSummary",
+          "getById",
+          "create",
+          "update",
+          "delete",
+          "restore"
+        ]
       },
       {
         "module": "./dist/repositories/unit.repository.js",
         "export": "UnitRepository",
-        "prefix": "properties.units"
+        "prefix": "properties.units",
+        "actions": [
+          "list",
+          "listByBuilding",
+          "getById",
+          "create",
+          "update",
+          "delete",
+          "restore"
+        ]
       },
       {
         "module": "./dist/repositories/certificate.repository.js",
         "export": "CertificateRepository",
-        "prefix": "properties.certificates"
+        "prefix": "properties.certificates",
+        "actions": [
+          "list",
+          "listByBuilding",
+          "getById",
+          "create",
+          "update",
+          "delete",
+          "restore"
+        ]
       },
       {
         "module": "./dist/repositories/unit-owner.repository.js",
         "export": "UnitOwnerRepository",
-        "prefix": "properties.unitOwners"
+        "prefix": "properties.unitOwners",
+        "actions": [
+          "list",
+          "listOwners",
+          "getById",
+          "getOwner",
+          "saveOwner",
+          "create",
+          "update",
+          "delete",
+          "restore"
+        ]
       },
       {
         "module": "./dist/repositories/building-expense.repository.js",
         "export": "BuildingExpenseRepository",
-        "prefix": "properties.buildingExpenses"
+        "prefix": "properties.buildingExpenses",
+        "actions": [
+          "list",
+          "forPeriod",
+          "forBuilding",
+          "getById",
+          "create",
+          "update",
+          "delete",
+          "restore"
+        ]
       }
     ],
     "settings": {
@@ -142,11 +190,341 @@
     },
     "copilotCapabilities": [
       {
+        "id": "properties.certificates.list",
+        "action": "properties.certificates.list",
+        "generatedBy": "builder",
+        "title": "Listar Certificado",
+        "description": "Obtiene Certificado disponibles para el cliente actual.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Cantidad de resultados a devolver. Default 20; máximo 50."
+            },
+            "offset": {
+              "type": "integer",
+              "description": "Cantidad de resultados a saltear para pedir la página siguiente."
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Certificado",
+              "format": "text",
+              "values": [
+                { "value": "matafuegos", "label": "Matafuegos" },
+                { "value": "gas", "label": "Instalación de gas" },
+                { "value": "ascensor", "label": "Ascensor" },
+                { "value": "electricidad", "label": "Instalación eléctrica" },
+                { "value": "seguro", "label": "Seguro del inmueble" },
+                { "value": "otro", "label": "Otro" }
+              ]
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "vigente", "label": "Vigente" },
+                { "value": "por_vencer", "label": "Por vencer" },
+                { "value": "vencido", "label": "Vencido" }
+              ]
+            },
+            {
+              "key": "expires_at",
+              "name": "expiresAt",
+              "label": "Vence",
+              "format": "date"
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 10,
+          "maxLimit": 50
+        }
+      },
+      {
+        "id": "properties.certificates.getById",
+        "action": "properties.certificates.getById",
+        "generatedBy": "builder",
+        "title": "Consultar Certificado",
+        "description": "Obtiene un registro de Certificado por su ID.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid", "description": "ID" }
+          },
+          "required": ["id"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Certificado",
+              "format": "text",
+              "values": [
+                { "value": "matafuegos", "label": "Matafuegos" },
+                { "value": "gas", "label": "Instalación de gas" },
+                { "value": "ascensor", "label": "Ascensor" },
+                { "value": "electricidad", "label": "Instalación eléctrica" },
+                { "value": "seguro", "label": "Seguro del inmueble" },
+                { "value": "otro", "label": "Otro" }
+              ]
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "vigente", "label": "Vigente" },
+                { "value": "por_vencer", "label": "Por vencer" },
+                { "value": "vencido", "label": "Vencido" }
+              ]
+            },
+            {
+              "key": "expires_at",
+              "name": "expiresAt",
+              "label": "Vence",
+              "format": "date"
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
+        "id": "properties.certificates.create",
+        "action": "properties.certificates.create",
+        "generatedBy": "builder",
+        "title": "Crear Certificado",
+        "description": "Crea Certificado con los mismos campos disponibles en el formulario del cliente.",
+        "effect": "write",
+        "confirmation": "always",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "description": "Datos de Certificado a crear.",
+              "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
+                "unit_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Unidad"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "matafuegos",
+                    "gas",
+                    "ascensor",
+                    "electricidad",
+                    "seguro",
+                    "otro"
+                  ],
+                  "description": "Tipo. Opciones: matafuegos (Matafuegos), gas (Instalación de gas), ascensor (Ascensor), electricidad (Instalación eléctrica), seguro (Seguro del inmueble), otro (Otro)."
+                },
+                "done_at": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Fecha de realización"
+                },
+                "expires_at": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Vence"
+                },
+                "result": {
+                  "type": "string",
+                  "enum": ["apto", "apto_con_observaciones", "rechazado"],
+                  "description": "Resultado. Opciones: apto (Apto), apto_con_observaciones (Apto con observaciones), rechazado (Rechazado)."
+                },
+                "file_url": {
+                  "type": "string",
+                  "description": "Certificado (URL)"
+                },
+                "alert_days": {
+                  "type": "integer",
+                  "description": "Avisarme con (días de anticipación)"
+                },
+                "notes": { "type": "string", "description": "Observaciones" }
+              },
+              "required": ["building_id", "type", "expires_at"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["data"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Certificado",
+              "format": "text",
+              "values": [
+                { "value": "matafuegos", "label": "Matafuegos" },
+                { "value": "gas", "label": "Instalación de gas" },
+                { "value": "ascensor", "label": "Ascensor" },
+                { "value": "electricidad", "label": "Instalación eléctrica" },
+                { "value": "seguro", "label": "Seguro del inmueble" },
+                { "value": "otro", "label": "Otro" }
+              ]
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "vigente", "label": "Vigente" },
+                { "value": "por_vencer", "label": "Por vencer" },
+                { "value": "vencido", "label": "Vencido" }
+              ]
+            },
+            {
+              "key": "expires_at",
+              "name": "expiresAt",
+              "label": "Vence",
+              "format": "date"
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
+        "id": "properties.certificates.update",
+        "action": "properties.certificates.update",
+        "generatedBy": "builder",
+        "title": "Actualizar Certificado",
+        "description": "Actualiza los campos editables de Certificado.",
+        "effect": "write",
+        "confirmation": "always",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid", "description": "ID" },
+            "data": {
+              "type": "object",
+              "description": "Campos de Certificado a modificar.",
+              "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
+                "unit_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Unidad"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "matafuegos",
+                    "gas",
+                    "ascensor",
+                    "electricidad",
+                    "seguro",
+                    "otro"
+                  ],
+                  "description": "Tipo. Opciones: matafuegos (Matafuegos), gas (Instalación de gas), ascensor (Ascensor), electricidad (Instalación eléctrica), seguro (Seguro del inmueble), otro (Otro)."
+                },
+                "done_at": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Fecha de realización"
+                },
+                "expires_at": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Vence"
+                },
+                "result": {
+                  "type": "string",
+                  "enum": ["apto", "apto_con_observaciones", "rechazado"],
+                  "description": "Resultado. Opciones: apto (Apto), apto_con_observaciones (Apto con observaciones), rechazado (Rechazado)."
+                },
+                "file_url": {
+                  "type": "string",
+                  "description": "Certificado (URL)"
+                },
+                "alert_days": {
+                  "type": "integer",
+                  "description": "Avisarme con (días de anticipación)"
+                },
+                "notes": { "type": "string", "description": "Observaciones" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["id", "data"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Certificado",
+              "format": "text",
+              "values": [
+                { "value": "matafuegos", "label": "Matafuegos" },
+                { "value": "gas", "label": "Instalación de gas" },
+                { "value": "ascensor", "label": "Ascensor" },
+                { "value": "electricidad", "label": "Instalación eléctrica" },
+                { "value": "seguro", "label": "Seguro del inmueble" },
+                { "value": "otro", "label": "Otro" }
+              ]
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "vigente", "label": "Vigente" },
+                { "value": "por_vencer", "label": "Por vencer" },
+                { "value": "vencido", "label": "Vencido" }
+              ]
+            },
+            {
+              "key": "expires_at",
+              "name": "expiresAt",
+              "label": "Vence",
+              "format": "date"
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
         "id": "properties.buildings.list",
         "action": "properties.buildings.list",
         "generatedBy": "builder",
-        "title": "Listar Propiedades",
-        "description": "Obtiene Propiedades disponibles para el cliente actual.",
+        "title": "Listar Propiedad",
+        "description": "Obtiene Propiedad disponibles para el cliente actual.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
@@ -298,6 +676,354 @@
         }
       },
       {
+        "id": "properties.buildings.create",
+        "action": "properties.buildings.create",
+        "generatedBy": "builder",
+        "title": "Crear Propiedad",
+        "description": "Crea Propiedad con los mismos campos disponibles en el formulario del cliente.",
+        "effect": "write",
+        "confirmation": "always",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "description": "Datos de Propiedad a crear.",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "edificio",
+                    "departamento",
+                    "casa",
+                    "local",
+                    "oficina",
+                    "galpon",
+                    "cochera",
+                    "baulera"
+                  ],
+                  "description": "Tipo. Opciones: edificio (Edificio), departamento (Departamento), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera)."
+                },
+                "name": { "type": "string", "description": "Nombre" },
+                "description": {
+                  "type": "string",
+                  "description": "Descripción"
+                },
+                "year_built": {
+                  "type": "integer",
+                  "description": "Año de construcción"
+                },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "Una foto de la lista.",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "description": "Dirección de la foto, no el archivo."
+                      },
+                      "caption": {
+                        "type": "string",
+                        "description": "Qué se ve en la foto."
+                      }
+                    },
+                    "required": ["url"],
+                    "additionalProperties": false
+                  },
+                  "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
+                },
+                "street": { "type": "string", "description": "Calle" },
+                "street_number": { "type": "string", "description": "Altura" },
+                "city": { "type": "string", "description": "Localidad" },
+                "zip_code": { "type": "string", "description": "Código postal" },
+                "province": {
+                  "type": "string",
+                  "enum": [
+                    "buenos_aires",
+                    "caba",
+                    "catamarca",
+                    "chaco",
+                    "chubut",
+                    "cordoba",
+                    "corrientes",
+                    "entre_rios",
+                    "formosa",
+                    "jujuy",
+                    "la_pampa",
+                    "la_rioja",
+                    "mendoza",
+                    "misiones",
+                    "neuquen",
+                    "rio_negro",
+                    "salta",
+                    "san_juan",
+                    "san_luis",
+                    "santa_cruz",
+                    "santa_fe",
+                    "santiago_del_estero",
+                    "tierra_del_fuego",
+                    "tucuman"
+                  ],
+                  "description": "Provincia. Opciones: buenos_aires (Buenos Aires), caba (Ciudad Autónoma de Buenos Aires), catamarca (Catamarca), chaco (Chaco), chubut (Chubut), cordoba (Córdoba), corrientes (Corrientes), entre_rios (Entre Ríos), formosa (Formosa), jujuy (Jujuy), la_pampa (La Pampa), la_rioja (La Rioja), mendoza (Mendoza), misiones (Misiones), neuquen (Neuquén), rio_negro (Río Negro), salta (Salta), san_juan (San Juan), san_luis (San Luis), santa_cruz (Santa Cruz), santa_fe (Santa Fe), sant…"
+                },
+                "cadastral_ref": {
+                  "type": "string",
+                  "description": "Partida inmobiliaria"
+                },
+                "ownership_mode": {
+                  "type": "string",
+                  "enum": ["propia", "condominio", "sucesion"],
+                  "description": "Modo de tenencia. Opciones: propia (Propia), condominio (Condominio), sucesion (Sucesión)."
+                },
+                "admin_name": {
+                  "type": "string",
+                  "description": "Administrador"
+                },
+                "admin_phone": { "type": "string", "description": "Teléfono" },
+                "admin_email": { "type": "string", "description": "Email" },
+                "notes": { "type": "string", "description": "Notas" }
+              },
+              "required": ["type", "name", "street", "street_number", "city"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["data"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Propiedad",
+              "format": "text"
+            },
+            {
+              "key": "address",
+              "name": "address",
+              "label": "Dirección",
+              "format": "text"
+            },
+            {
+              "key": "certs",
+              "name": "certs",
+              "label": "Certificados",
+              "format": "text",
+              "values": [
+                { "value": "ok", "label": "Al día" },
+                { "value": "soon", "label": "Certificado por vencer" },
+                { "value": "expired", "label": "Certificado vencido" }
+              ]
+            },
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Tipo",
+              "format": "text",
+              "values": [
+                { "value": "edificio", "label": "Edificio" },
+                { "value": "departamento", "label": "Departamento" },
+                { "value": "casa", "label": "Casa" },
+                { "value": "local", "label": "Local" },
+                { "value": "oficina", "label": "Oficina" },
+                { "value": "galpon", "label": "Galpón" },
+                { "value": "cochera", "label": "Cochera" },
+                { "value": "baulera", "label": "Baulera" }
+              ]
+            },
+            {
+              "key": "occupancy",
+              "name": "occupancy",
+              "label": "Ocupación",
+              "format": "text"
+            },
+            {
+              "key": "reference_rent",
+              "name": "referenceRent",
+              "label": "Alquiler de referencia",
+              "format": "money"
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
+        "id": "properties.buildings.update",
+        "action": "properties.buildings.update",
+        "generatedBy": "builder",
+        "title": "Actualizar Propiedad",
+        "description": "Actualiza los campos editables de Propiedad.",
+        "effect": "write",
+        "confirmation": "always",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid", "description": "ID" },
+            "data": {
+              "type": "object",
+              "description": "Campos de Propiedad a modificar.",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "edificio",
+                    "departamento",
+                    "casa",
+                    "local",
+                    "oficina",
+                    "galpon",
+                    "cochera",
+                    "baulera"
+                  ],
+                  "description": "Tipo. Opciones: edificio (Edificio), departamento (Departamento), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera)."
+                },
+                "name": { "type": "string", "description": "Nombre" },
+                "description": {
+                  "type": "string",
+                  "description": "Descripción"
+                },
+                "year_built": {
+                  "type": "integer",
+                  "description": "Año de construcción"
+                },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "Una foto de la lista.",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "description": "Dirección de la foto, no el archivo."
+                      },
+                      "caption": {
+                        "type": "string",
+                        "description": "Qué se ve en la foto."
+                      }
+                    },
+                    "required": ["url"],
+                    "additionalProperties": false
+                  },
+                  "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
+                },
+                "street": { "type": "string", "description": "Calle" },
+                "street_number": { "type": "string", "description": "Altura" },
+                "city": { "type": "string", "description": "Localidad" },
+                "zip_code": { "type": "string", "description": "Código postal" },
+                "province": {
+                  "type": "string",
+                  "enum": [
+                    "buenos_aires",
+                    "caba",
+                    "catamarca",
+                    "chaco",
+                    "chubut",
+                    "cordoba",
+                    "corrientes",
+                    "entre_rios",
+                    "formosa",
+                    "jujuy",
+                    "la_pampa",
+                    "la_rioja",
+                    "mendoza",
+                    "misiones",
+                    "neuquen",
+                    "rio_negro",
+                    "salta",
+                    "san_juan",
+                    "san_luis",
+                    "santa_cruz",
+                    "santa_fe",
+                    "santiago_del_estero",
+                    "tierra_del_fuego",
+                    "tucuman"
+                  ],
+                  "description": "Provincia. Opciones: buenos_aires (Buenos Aires), caba (Ciudad Autónoma de Buenos Aires), catamarca (Catamarca), chaco (Chaco), chubut (Chubut), cordoba (Córdoba), corrientes (Corrientes), entre_rios (Entre Ríos), formosa (Formosa), jujuy (Jujuy), la_pampa (La Pampa), la_rioja (La Rioja), mendoza (Mendoza), misiones (Misiones), neuquen (Neuquén), rio_negro (Río Negro), salta (Salta), san_juan (San Juan), san_luis (San Luis), santa_cruz (Santa Cruz), santa_fe (Santa Fe), sant…"
+                },
+                "cadastral_ref": {
+                  "type": "string",
+                  "description": "Partida inmobiliaria"
+                },
+                "ownership_mode": {
+                  "type": "string",
+                  "enum": ["propia", "condominio", "sucesion"],
+                  "description": "Modo de tenencia. Opciones: propia (Propia), condominio (Condominio), sucesion (Sucesión)."
+                },
+                "admin_name": {
+                  "type": "string",
+                  "description": "Administrador"
+                },
+                "admin_phone": { "type": "string", "description": "Teléfono" },
+                "admin_email": { "type": "string", "description": "Email" },
+                "notes": { "type": "string", "description": "Notas" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["id", "data"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Propiedad",
+              "format": "text"
+            },
+            {
+              "key": "address",
+              "name": "address",
+              "label": "Dirección",
+              "format": "text"
+            },
+            {
+              "key": "certs",
+              "name": "certs",
+              "label": "Certificados",
+              "format": "text",
+              "values": [
+                { "value": "ok", "label": "Al día" },
+                { "value": "soon", "label": "Certificado por vencer" },
+                { "value": "expired", "label": "Certificado vencido" }
+              ]
+            },
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Tipo",
+              "format": "text",
+              "values": [
+                { "value": "edificio", "label": "Edificio" },
+                { "value": "departamento", "label": "Departamento" },
+                { "value": "casa", "label": "Casa" },
+                { "value": "local", "label": "Local" },
+                { "value": "oficina", "label": "Oficina" },
+                { "value": "galpon", "label": "Galpón" },
+                { "value": "cochera", "label": "Cochera" },
+                { "value": "baulera", "label": "Baulera" }
+              ]
+            },
+            {
+              "key": "occupancy",
+              "name": "occupancy",
+              "label": "Ocupación",
+              "format": "text"
+            },
+            {
+              "key": "reference_rent",
+              "name": "referenceRent",
+              "label": "Alquiler de referencia",
+              "format": "money"
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
         "id": "properties.units.list",
         "action": "properties.units.list",
         "generatedBy": "builder",
@@ -318,6 +1044,45 @@
             }
           },
           "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
+              "key": "detail",
+              "name": "detail",
+              "label": "Detalle",
+              "format": "text"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "ocupada", "label": "Ocupada" },
+                { "value": "vacante", "label": "Vacante" },
+                { "value": "en_recambio", "label": "En recambio" },
+                { "value": "con_preaviso", "label": "Con preaviso" },
+                { "value": "no_disponible", "label": "No disponible" }
+              ]
+            },
+            {
+              "key": "reference_rent",
+              "name": "referenceRent",
+              "label": "Alquiler de referencia",
+              "format": "money"
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 20,
+          "maxLimit": 50
         }
       },
       {
@@ -335,46 +1100,275 @@
           },
           "required": ["id"],
           "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
+              "key": "detail",
+              "name": "detail",
+              "label": "Detalle",
+              "format": "text"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "ocupada", "label": "Ocupada" },
+                { "value": "vacante", "label": "Vacante" },
+                { "value": "en_recambio", "label": "En recambio" },
+                { "value": "con_preaviso", "label": "Con preaviso" },
+                { "value": "no_disponible", "label": "No disponible" }
+              ]
+            },
+            {
+              "key": "reference_rent",
+              "name": "referenceRent",
+              "label": "Alquiler de referencia",
+              "format": "money"
+            }
+          ],
+          "identifierKey": "id"
         }
       },
       {
-        "id": "properties.certificates.list",
-        "action": "properties.certificates.list",
+        "id": "properties.units.create",
+        "action": "properties.units.create",
         "generatedBy": "builder",
-        "title": "Listar Certificado",
-        "description": "Obtiene Certificado disponibles para el cliente actual.",
-        "effect": "read",
-        "confirmation": "never",
+        "title": "Crear Unidad",
+        "description": "Crea Unidad con los mismos campos disponibles en el formulario del cliente.",
+        "effect": "write",
+        "confirmation": "always",
         "inputSchema": {
           "type": "object",
           "properties": {
-            "limit": {
-              "type": "integer",
-              "description": "Cantidad de resultados a devolver. Default 20; máximo 50."
-            },
-            "offset": {
-              "type": "integer",
-              "description": "Cantidad de resultados a saltear para pedir la página siguiente."
+            "data": {
+              "type": "object",
+              "description": "Datos de Unidad a crear.",
+              "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
+                "name": { "type": "string", "description": "Nombre o número" },
+                "rooms": { "type": "integer", "description": "Ambientes" },
+                "bathrooms": { "type": "integer", "description": "Baños" },
+                "surface_m2": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                  "description": "Superficie (m²)"
+                },
+                "share_pct": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                  "description": "Alícuota de expensas (%)"
+                },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "Una foto de la lista.",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "description": "Dirección de la foto, no el archivo."
+                      },
+                      "caption": {
+                        "type": "string",
+                        "description": "Qué se ve en la foto."
+                      }
+                    },
+                    "required": ["url"],
+                    "additionalProperties": false
+                  },
+                  "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "vacante",
+                    "ocupada",
+                    "en_recambio",
+                    "con_preaviso",
+                    "no_disponible"
+                  ],
+                  "description": "Estado. Opciones: vacante (Vacante), ocupada (Ocupada), en_recambio (En recambio), con_preaviso (Con preaviso), no_disponible (No disponible)."
+                },
+                "reference_rent": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                  "description": "Alquiler de referencia"
+                },
+                "notes": { "type": "string", "description": "Notas" }
+              },
+              "required": ["building_id", "name", "status"],
+              "additionalProperties": false
             }
           },
+          "required": ["data"],
           "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
+              "key": "detail",
+              "name": "detail",
+              "label": "Detalle",
+              "format": "text"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "ocupada", "label": "Ocupada" },
+                { "value": "vacante", "label": "Vacante" },
+                { "value": "en_recambio", "label": "En recambio" },
+                { "value": "con_preaviso", "label": "Con preaviso" },
+                { "value": "no_disponible", "label": "No disponible" }
+              ]
+            },
+            {
+              "key": "reference_rent",
+              "name": "referenceRent",
+              "label": "Alquiler de referencia",
+              "format": "money"
+            }
+          ],
+          "identifierKey": "id"
         }
       },
       {
-        "id": "properties.certificates.getById",
-        "action": "properties.certificates.getById",
+        "id": "properties.units.update",
+        "action": "properties.units.update",
         "generatedBy": "builder",
-        "title": "Consultar Certificado",
-        "description": "Obtiene un registro de Certificado por su ID.",
-        "effect": "read",
-        "confirmation": "never",
+        "title": "Actualizar Unidad",
+        "description": "Actualiza los campos editables de Unidad.",
+        "effect": "write",
+        "confirmation": "always",
         "inputSchema": {
           "type": "object",
           "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" }
+            "id": { "type": "string", "format": "uuid", "description": "ID" },
+            "data": {
+              "type": "object",
+              "description": "Campos de Unidad a modificar.",
+              "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
+                "name": { "type": "string", "description": "Nombre o número" },
+                "rooms": { "type": "integer", "description": "Ambientes" },
+                "bathrooms": { "type": "integer", "description": "Baños" },
+                "surface_m2": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                  "description": "Superficie (m²)"
+                },
+                "share_pct": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                  "description": "Alícuota de expensas (%)"
+                },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "Una foto de la lista.",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "description": "Dirección de la foto, no el archivo."
+                      },
+                      "caption": {
+                        "type": "string",
+                        "description": "Qué se ve en la foto."
+                      }
+                    },
+                    "required": ["url"],
+                    "additionalProperties": false
+                  },
+                  "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "vacante",
+                    "ocupada",
+                    "en_recambio",
+                    "con_preaviso",
+                    "no_disponible"
+                  ],
+                  "description": "Estado. Opciones: vacante (Vacante), ocupada (Ocupada), en_recambio (En recambio), con_preaviso (Con preaviso), no_disponible (No disponible)."
+                },
+                "reference_rent": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                  "description": "Alquiler de referencia"
+                },
+                "notes": { "type": "string", "description": "Notas" }
+              },
+              "additionalProperties": false
+            }
           },
-          "required": ["id"],
+          "required": ["id", "data"],
           "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
+              "key": "detail",
+              "name": "detail",
+              "label": "Detalle",
+              "format": "text"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "ocupada", "label": "Ocupada" },
+                { "value": "vacante", "label": "Vacante" },
+                { "value": "en_recambio", "label": "En recambio" },
+                { "value": "con_preaviso", "label": "Con preaviso" },
+                { "value": "no_disponible", "label": "No disponible" }
+              ]
+            },
+            {
+              "key": "reference_rent",
+              "name": "referenceRent",
+              "label": "Alquiler de referencia",
+              "format": "money"
+            }
+          ],
+          "identifierKey": "id"
         }
       },
       {
@@ -398,6 +1392,36 @@
             }
           },
           "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "period",
+              "name": "period",
+              "label": "Período",
+              "format": "text"
+            },
+            {
+              "key": "amount",
+              "name": "amount",
+              "label": "Total",
+              "format": "money"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "recibida", "label": "Recibida" },
+                { "value": "pagada", "label": "Pagada" }
+              ]
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 10,
+          "maxLimit": 50
         }
       },
       {
@@ -415,7 +1439,592 @@
           },
           "required": ["id"],
           "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "period",
+              "name": "period",
+              "label": "Período",
+              "format": "text"
+            },
+            {
+              "key": "amount",
+              "name": "amount",
+              "label": "Total",
+              "format": "money"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "recibida", "label": "Recibida" },
+                { "value": "pagada", "label": "Pagada" }
+              ]
+            }
+          ],
+          "identifierKey": "id"
         }
+      },
+      {
+        "id": "properties.buildingExpenses.create",
+        "action": "properties.buildingExpenses.create",
+        "generatedBy": "builder",
+        "title": "Crear Expensas del mes",
+        "description": "Crea Expensas del mes con los mismos campos disponibles en el formulario del cliente.",
+        "effect": "write",
+        "confirmation": "always",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "description": "Datos de Expensas del mes a crear.",
+              "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
+                "period": { "type": "string", "description": "Período" },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                  "description": "Total liquidado"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["recibida", "pagada"],
+                  "description": "Estado. Opciones: recibida (Recibida), pagada (Pagada).",
+                  "default": "recibida"
+                },
+                "paid_at": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Fecha de pago"
+                },
+                "document_url": {
+                  "type": "string",
+                  "description": "Link a la liquidación"
+                },
+                "notes": { "type": "string", "description": "Observaciones" }
+              },
+              "required": ["building_id", "period", "amount"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["data"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "period",
+              "name": "period",
+              "label": "Período",
+              "format": "text"
+            },
+            {
+              "key": "amount",
+              "name": "amount",
+              "label": "Total",
+              "format": "money"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "recibida", "label": "Recibida" },
+                { "value": "pagada", "label": "Pagada" }
+              ]
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
+        "id": "properties.buildingExpenses.update",
+        "action": "properties.buildingExpenses.update",
+        "generatedBy": "builder",
+        "title": "Actualizar Expensas del mes",
+        "description": "Actualiza los campos editables de Expensas del mes.",
+        "effect": "write",
+        "confirmation": "always",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid", "description": "ID" },
+            "data": {
+              "type": "object",
+              "description": "Campos de Expensas del mes a modificar.",
+              "properties": {
+                "building_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Propiedad"
+                },
+                "period": { "type": "string", "description": "Período" },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                  "description": "Total liquidado"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["recibida", "pagada"],
+                  "description": "Estado. Opciones: recibida (Recibida), pagada (Pagada).",
+                  "default": "recibida"
+                },
+                "paid_at": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Fecha de pago"
+                },
+                "document_url": {
+                  "type": "string",
+                  "description": "Link a la liquidación"
+                },
+                "notes": { "type": "string", "description": "Observaciones" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["id", "data"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "period",
+              "name": "period",
+              "label": "Período",
+              "format": "text"
+            },
+            {
+              "key": "amount",
+              "name": "amount",
+              "label": "Total",
+              "format": "money"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "recibida", "label": "Recibida" },
+                { "value": "pagada", "label": "Pagada" }
+              ]
+            }
+          ],
+          "identifierKey": "id"
+        }
+      },
+      {
+        "id": "properties.buildings.getSummary",
+        "action": "properties.buildings.getSummary",
+        "title": "Ficha de propiedad",
+        "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Propiedad",
+              "format": "text"
+            },
+            {
+              "key": "address",
+              "name": "address",
+              "label": "Dirección",
+              "format": "text"
+            },
+            {
+              "key": "certs",
+              "name": "certs",
+              "label": "Certificados",
+              "format": "text",
+              "values": [
+                { "value": "ok", "label": "Al día" },
+                { "value": "soon", "label": "Certificado por vencer" },
+                { "value": "expired", "label": "Certificado vencido" }
+              ]
+            },
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Tipo",
+              "format": "text",
+              "values": [
+                { "value": "edificio", "label": "Edificio" },
+                { "value": "departamento", "label": "Departamento" },
+                { "value": "casa", "label": "Casa" },
+                { "value": "local", "label": "Local" },
+                { "value": "oficina", "label": "Oficina" },
+                { "value": "galpon", "label": "Galpón" },
+                { "value": "cochera", "label": "Cochera" },
+                { "value": "baulera", "label": "Baulera" }
+              ]
+            },
+            {
+              "key": "occupancy",
+              "name": "occupancy",
+              "label": "Ocupación",
+              "format": "text"
+            },
+            {
+              "key": "reference_rent",
+              "name": "referenceRent",
+              "label": "Alquiler de referencia",
+              "format": "money"
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 20,
+          "maxLimit": 50
+        },
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.units.listByBuilding",
+        "action": "properties.units.listByBuilding",
+        "title": "Ficha de propiedad",
+        "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
+              "key": "detail",
+              "name": "detail",
+              "label": "Detalle",
+              "format": "text"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "ocupada", "label": "Ocupada" },
+                { "value": "vacante", "label": "Vacante" },
+                { "value": "en_recambio", "label": "En recambio" },
+                { "value": "con_preaviso", "label": "Con preaviso" },
+                { "value": "no_disponible", "label": "No disponible" }
+              ]
+            },
+            {
+              "key": "reference_rent",
+              "name": "referenceRent",
+              "label": "Alquiler de referencia",
+              "format": "money"
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 20,
+          "maxLimit": 50
+        },
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.certificates.listByBuilding",
+        "action": "properties.certificates.listByBuilding",
+        "title": "Ficha de propiedad",
+        "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Certificado",
+              "format": "text",
+              "values": [
+                { "value": "matafuegos", "label": "Matafuegos" },
+                { "value": "gas", "label": "Instalación de gas" },
+                { "value": "ascensor", "label": "Ascensor" },
+                { "value": "electricidad", "label": "Instalación eléctrica" },
+                { "value": "seguro", "label": "Seguro del inmueble" },
+                { "value": "otro", "label": "Otro" }
+              ]
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "vigente", "label": "Vigente" },
+                { "value": "por_vencer", "label": "Por vencer" },
+                { "value": "vencido", "label": "Vencido" }
+              ]
+            },
+            {
+              "key": "expires_at",
+              "name": "expiresAt",
+              "label": "Vence",
+              "format": "date"
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 10,
+          "maxLimit": 50
+        },
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.buildingExpenses.forBuilding",
+        "action": "properties.buildingExpenses.forBuilding",
+        "title": "Ficha de propiedad",
+        "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "period",
+              "name": "period",
+              "label": "Período",
+              "format": "text"
+            },
+            {
+              "key": "amount",
+              "name": "amount",
+              "label": "Total",
+              "format": "money"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "recibida", "label": "Recibida" },
+                { "value": "pagada", "label": "Pagada" }
+              ]
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 10,
+          "maxLimit": 50
+        },
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.unitOwners.getOwner",
+        "action": "properties.unitOwners.getOwner",
+        "title": "Propietario",
+        "description": "Propietario: capacidad declarada por el Builder.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Propietario",
+              "format": "text"
+            },
+            {
+              "key": "document",
+              "name": "document",
+              "label": "Documento",
+              "format": "text"
+            },
+            {
+              "key": "units",
+              "name": "units",
+              "label": "Unidades",
+              "format": "text"
+            },
+            {
+              "key": "cbu",
+              "name": "cbu",
+              "label": "CBU / alias",
+              "format": "text"
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 20,
+          "maxLimit": 50
+        },
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.unitOwners.saveOwner",
+        "action": "properties.unitOwners.saveOwner",
+        "title": "Propietario",
+        "description": "Propietario: capacidad declarada por el Builder.",
+        "effect": "write",
+        "confirmation": "always",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "description": "Datos de Propietario a crear.",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Nombre y apellido o razón social"
+                },
+                "document_type": {
+                  "type": "string",
+                  "enum": ["cuit", "cuil", "dni"],
+                  "description": "Documento. Opciones: cuit (CUIT), cuil (CUIL), dni (DNI)."
+                },
+                "document_number": { "type": "string", "description": "Número" },
+                "tax_condition": {
+                  "type": "string",
+                  "enum": [
+                    "monotributo",
+                    "responsable_inscripto",
+                    "exento",
+                    "consumidor_final"
+                  ],
+                  "description": "Condición frente al IVA. Opciones: monotributo (Monotributo), responsable_inscripto (Responsable inscripto), exento (Exento), consumidor_final (Consumidor final)."
+                },
+                "email": { "type": "string", "description": "Email" },
+                "phone": { "type": "string", "description": "Teléfono" },
+                "address": { "type": "string", "description": "Domicilio" },
+                "bank": { "type": "string", "description": "Banco" },
+                "account": {
+                  "type": "string",
+                  "description": "Tipo y número de cuenta"
+                },
+                "cbu": { "type": "string", "description": "CBU" },
+                "alias": { "type": "string", "description": "Alias" }
+              },
+              "required": ["name", "document_type", "document_number"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["data"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Propietario",
+              "format": "text"
+            },
+            {
+              "key": "document",
+              "name": "document",
+              "label": "Documento",
+              "format": "text"
+            },
+            {
+              "key": "units",
+              "name": "units",
+              "label": "Unidades",
+              "format": "text"
+            },
+            {
+              "key": "cbu",
+              "name": "cbu",
+              "label": "CBU / alias",
+              "format": "text"
+            }
+          ],
+          "identifierKey": "id"
+        },
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.unitOwners.listOwners",
+        "action": "properties.unitOwners.listOwners",
+        "title": "Propietarios",
+        "description": "Propietarios: capacidad declarada por el Builder.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Propietario",
+              "format": "text"
+            },
+            {
+              "key": "document",
+              "name": "document",
+              "label": "Documento",
+              "format": "text"
+            },
+            {
+              "key": "units",
+              "name": "units",
+              "label": "Unidades",
+              "format": "text"
+            },
+            {
+              "key": "cbu",
+              "name": "cbu",
+              "label": "CBU / alias",
+              "format": "text"
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 20,
+          "maxLimit": 50
+        },
+        "generatedBy": "builder"
       }
     ]
   },

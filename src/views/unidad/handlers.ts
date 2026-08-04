@@ -7,7 +7,20 @@
  * existen — acá va lo que el diseño no puede expresar.
  */
 
-import type { CustomHandlers } from '@coongro/plugin-sdk';
+import { files, type CustomHandlers } from '@coongro/plugin-sdk';
+
 export const customHandlers: CustomHandlers = {
-  // onSubmit: async (values, { execute, toast }) => { ... },
+  // NO va un `onInit` que herede la propiedad desde la ficha: el botón de alta
+  // pasa el edificio como `parentRecord` y el codegen del Builder llena solo
+  // `building_id` (único campo ref hacia esa entidad). Escribirlo acá sería
+  // duplicar ese auto-fill.
+
+  /**
+   * Guarda la foto en el storage del tenant y devuelve su dirección.
+   *
+   * Sin este handler el campo de fotos solo aceptaría pegar direcciones de
+   * imágenes que viven en otro servidor — y el día que las borren de ahí, la
+   * unidad se queda sin foto.
+   */
+  uploadImage: (file) => files.upload(file),
 };

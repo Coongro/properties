@@ -4,7 +4,14 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { actions, getHostReact, usePlugin, views, type LiveValues } from '@coongro/plugin-sdk';
+import {
+  actions,
+  events,
+  getHostReact,
+  usePlugin,
+  views,
+  type LiveValues,
+} from '@coongro/plugin-sdk';
 
 import { customHandlers } from './handlers.js';
 
@@ -66,7 +73,7 @@ export function useFichaDePropiedadView() {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '');
 
-  // ── tabla 1: estado propio en su scope (mismos nombres, sin colisión) ──
+  // ── tabla 1 — properties.buildings: estado propio en su scope (mismos nombres, sin colisión) ──
   const useTable1 = () => {
     const [rows, setRows] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -86,7 +93,7 @@ export function useFichaDePropiedadView() {
           ? await byBlock(ctx)
           : customHandlers.loadData
             ? await customHandlers.loadData(ctx)
-            : [];
+            : await actions.execute<any[]>('properties.buildings.list');
         if (mounted.current) setRows(Array.isArray(data) ? data : []);
       } catch {
         if (mounted.current) {
@@ -100,6 +107,21 @@ export function useFichaDePropiedadView() {
     }, []);
     useEffect(() => {
       void load();
+    }, [load]);
+    useEffect(() => {
+      const offs = [
+        'properties.buildings.create',
+        'properties.buildings.update',
+        'properties.buildings.delete',
+        'properties.buildings.restore',
+      ].map((id) =>
+        events.on(id, () => {
+          void load();
+        })
+      );
+      return () => {
+        for (const off of offs) off();
+      };
     }, [load]);
 
     // columnas de la tabla: key + label (+ ref/refDisplay/refPath/ref2/display/values/prefix/suffix/format/iconFrom/empty*)
@@ -140,7 +162,7 @@ export function useFichaDePropiedadView() {
     const SUB_COL = COLUMNS.find((c) => c.key === 'detail');
     const ITEM_COLS = COLUMNS.filter((c) => c.key !== 'detail');
     // imagen del registro: su URL sale de esta columna (puede estar oculta)
-    const IMAGE_COL: (typeof COLUMNS)[number] = { key: 'photo_url', label: 'Foto' };
+    const IMAGE_COL: (typeof COLUMNS)[number] = { key: 'photos', label: 'Fotos' };
     const cellValue = (
       row: any,
       c: { key: string; ref?: string; refDisplay?: string; refPath?: string; ref2?: string }
@@ -236,12 +258,29 @@ export function useFichaDePropiedadView() {
       () => visibleRows.slice((page - 1) * 20, page * 20),
       [visibleRows, page]
     );
-    const removeRow = useCallback((_row: any) => {
-      toast.warning(
-        'Sin entidad',
-        'Conectá un repositorio (binding de datos) en el Builder o implementá onAction en handlers.ts'
-      );
+    const [pendingDelete, setPendingDelete] = useState<any>(null);
+    const [deleting, setDeleting] = useState(false);
+    const removeRow = useCallback((row: any) => {
+      setPendingDelete(row ?? null);
     }, []);
+    const cancelDelete = useCallback(() => {
+      if (!deleting) setPendingDelete(null);
+    }, [deleting]);
+    const confirmDelete = useCallback(async () => {
+      if (!pendingDelete) return;
+      setDeleting(true);
+      try {
+        await actions.execute('properties.buildings.delete', { id: pendingDelete.id });
+        toast.success('Eliminado', 'El registro se eliminó correctamente');
+        setPendingDelete(null);
+        void load();
+      } catch {
+        toast.error('Error', 'No se pudo eliminar');
+      } finally {
+        setDeleting(false);
+      }
+      // deps intencionalmente fijas: el efecto corre una sola vez
+    }, [pendingDelete, load]);
     return {
       sort,
       onSortChange,
@@ -253,6 +292,10 @@ export function useFichaDePropiedadView() {
       page,
       setPage,
       pagedRows,
+      pendingDelete,
+      deleting,
+      confirmDelete,
+      cancelDelete,
       loading,
       search,
       setSearch,
@@ -268,7 +311,7 @@ export function useFichaDePropiedadView() {
   };
   const t1 = useTable1();
 
-  // ── tabla 2: estado propio en su scope (mismos nombres, sin colisión) ──
+  // ── tabla 2 — properties.buildings: estado propio en su scope (mismos nombres, sin colisión) ──
   const useTable2 = () => {
     const [rows, setRows] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -284,7 +327,9 @@ export function useFichaDePropiedadView() {
           record: viewRecord,
         };
         const byBlock = customHandlers.loadDataFor?.['tbl_expensas'];
-        const data = byBlock ? await byBlock(ctx) : [];
+        const data = byBlock
+          ? await byBlock(ctx)
+          : await actions.execute<any[]>('properties.buildings.list');
         if (mounted.current) setRows(Array.isArray(data) ? data : []);
       } catch {
         if (mounted.current) {
@@ -298,6 +343,21 @@ export function useFichaDePropiedadView() {
     }, []);
     useEffect(() => {
       void load();
+    }, [load]);
+    useEffect(() => {
+      const offs = [
+        'properties.buildings.create',
+        'properties.buildings.update',
+        'properties.buildings.delete',
+        'properties.buildings.restore',
+      ].map((id) =>
+        events.on(id, () => {
+          void load();
+        })
+      );
+      return () => {
+        for (const off of offs) off();
+      };
     }, [load]);
 
     // columnas de la tabla: key + label (+ ref/refDisplay/refPath/ref2/display/values/prefix/suffix/format/iconFrom/empty*)
@@ -426,12 +486,29 @@ export function useFichaDePropiedadView() {
       () => visibleRows.slice((page - 1) * 10, page * 10),
       [visibleRows, page]
     );
-    const removeRow = useCallback((_row: any) => {
-      toast.warning(
-        'Sin entidad',
-        'Conectá un repositorio (binding de datos) en el Builder o implementá onAction en handlers.ts'
-      );
+    const [pendingDelete, setPendingDelete] = useState<any>(null);
+    const [deleting, setDeleting] = useState(false);
+    const removeRow = useCallback((row: any) => {
+      setPendingDelete(row ?? null);
     }, []);
+    const cancelDelete = useCallback(() => {
+      if (!deleting) setPendingDelete(null);
+    }, [deleting]);
+    const confirmDelete = useCallback(async () => {
+      if (!pendingDelete) return;
+      setDeleting(true);
+      try {
+        await actions.execute('properties.buildings.delete', { id: pendingDelete.id });
+        toast.success('Eliminado', 'El registro se eliminó correctamente');
+        setPendingDelete(null);
+        void load();
+      } catch {
+        toast.error('Error', 'No se pudo eliminar');
+      } finally {
+        setDeleting(false);
+      }
+      // deps intencionalmente fijas: el efecto corre una sola vez
+    }, [pendingDelete, load]);
     return {
       sort,
       onSortChange,
@@ -443,6 +520,10 @@ export function useFichaDePropiedadView() {
       page,
       setPage,
       pagedRows,
+      pendingDelete,
+      deleting,
+      confirmDelete,
+      cancelDelete,
       loading,
       search,
       setSearch,
@@ -457,7 +538,7 @@ export function useFichaDePropiedadView() {
   };
   const t2 = useTable2();
 
-  // ── tabla 3: estado propio en su scope (mismos nombres, sin colisión) ──
+  // ── tabla 3 — properties.buildings: estado propio en su scope (mismos nombres, sin colisión) ──
   const useTable3 = () => {
     const [rows, setRows] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -473,7 +554,9 @@ export function useFichaDePropiedadView() {
           record: viewRecord,
         };
         const byBlock = customHandlers.loadDataFor?.['tbl_certs'];
-        const data = byBlock ? await byBlock(ctx) : [];
+        const data = byBlock
+          ? await byBlock(ctx)
+          : await actions.execute<any[]>('properties.buildings.list');
         if (mounted.current) setRows(Array.isArray(data) ? data : []);
       } catch {
         if (mounted.current) {
@@ -487,6 +570,21 @@ export function useFichaDePropiedadView() {
     }, []);
     useEffect(() => {
       void load();
+    }, [load]);
+    useEffect(() => {
+      const offs = [
+        'properties.buildings.create',
+        'properties.buildings.update',
+        'properties.buildings.delete',
+        'properties.buildings.restore',
+      ].map((id) =>
+        events.on(id, () => {
+          void load();
+        })
+      );
+      return () => {
+        for (const off of offs) off();
+      };
     }, [load]);
 
     // columnas de la tabla: key + label (+ ref/refDisplay/refPath/ref2/display/values/prefix/suffix/format/iconFrom/empty*)
@@ -507,7 +605,19 @@ export function useFichaDePropiedadView() {
       emptyLabel?: string;
       emptyIcon?: string;
     }[] = [
-      { key: 'type', label: 'Certificado' },
+      {
+        key: 'type',
+        label: 'Certificado',
+        display: 'pill',
+        values: [
+          { value: 'matafuegos', label: 'Matafuegos', tone: 'outline', icon: 'FireExtinguisher' },
+          { value: 'gas', label: 'Instalación de gas', tone: 'outline', icon: 'Flame' },
+          { value: 'ascensor', label: 'Ascensor', tone: 'outline', icon: 'MoveVertical' },
+          { value: 'electricidad', label: 'Instalación eléctrica', tone: 'outline', icon: 'Zap' },
+          { value: 'seguro', label: 'Seguro del inmueble', tone: 'outline', icon: 'Umbrella' },
+          { value: 'otro', label: 'Otro', tone: 'outline', icon: 'FileText' },
+        ],
+      },
       {
         key: 'status',
         label: 'Estado',
@@ -616,12 +726,29 @@ export function useFichaDePropiedadView() {
       () => visibleRows.slice((page - 1) * 10, page * 10),
       [visibleRows, page]
     );
-    const removeRow = useCallback((_row: any) => {
-      toast.warning(
-        'Sin entidad',
-        'Conectá un repositorio (binding de datos) en el Builder o implementá onAction en handlers.ts'
-      );
+    const [pendingDelete, setPendingDelete] = useState<any>(null);
+    const [deleting, setDeleting] = useState(false);
+    const removeRow = useCallback((row: any) => {
+      setPendingDelete(row ?? null);
     }, []);
+    const cancelDelete = useCallback(() => {
+      if (!deleting) setPendingDelete(null);
+    }, [deleting]);
+    const confirmDelete = useCallback(async () => {
+      if (!pendingDelete) return;
+      setDeleting(true);
+      try {
+        await actions.execute('properties.buildings.delete', { id: pendingDelete.id });
+        toast.success('Eliminado', 'El registro se eliminó correctamente');
+        setPendingDelete(null);
+        void load();
+      } catch {
+        toast.error('Error', 'No se pudo eliminar');
+      } finally {
+        setDeleting(false);
+      }
+      // deps intencionalmente fijas: el efecto corre una sola vez
+    }, [pendingDelete, load]);
     return {
       sort,
       onSortChange,
@@ -633,6 +760,10 @@ export function useFichaDePropiedadView() {
       page,
       setPage,
       pagedRows,
+      pendingDelete,
+      deleting,
+      confirmDelete,
+      cancelDelete,
       loading,
       search,
       setSearch,
@@ -647,7 +778,7 @@ export function useFichaDePropiedadView() {
   };
   const t3 = useTable3();
 
-  // ── tabla 4: estado propio en su scope (mismos nombres, sin colisión) ──
+  // ── tabla 4 — properties.buildings: estado propio en su scope (mismos nombres, sin colisión) ──
   const useTable4 = () => {
     const [rows, setRows] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -663,7 +794,9 @@ export function useFichaDePropiedadView() {
           record: viewRecord,
         };
         const byBlock = customHandlers.loadDataFor?.['tbl_ot'];
-        const data = byBlock ? await byBlock(ctx) : [];
+        const data = byBlock
+          ? await byBlock(ctx)
+          : await actions.execute<any[]>('properties.buildings.list');
         if (mounted.current) setRows(Array.isArray(data) ? data : []);
       } catch {
         if (mounted.current) {
@@ -677,6 +810,21 @@ export function useFichaDePropiedadView() {
     }, []);
     useEffect(() => {
       void load();
+    }, [load]);
+    useEffect(() => {
+      const offs = [
+        'properties.buildings.create',
+        'properties.buildings.update',
+        'properties.buildings.delete',
+        'properties.buildings.restore',
+      ].map((id) =>
+        events.on(id, () => {
+          void load();
+        })
+      );
+      return () => {
+        for (const off of offs) off();
+      };
     }, [load]);
 
     // columnas de la tabla: key + label (+ ref/refDisplay/refPath/ref2/display/values/prefix/suffix/format/iconFrom/empty*)
@@ -807,12 +955,29 @@ export function useFichaDePropiedadView() {
       () => visibleRows.slice((page - 1) * 10, page * 10),
       [visibleRows, page]
     );
-    const removeRow = useCallback((_row: any) => {
-      toast.warning(
-        'Sin entidad',
-        'Conectá un repositorio (binding de datos) en el Builder o implementá onAction en handlers.ts'
-      );
+    const [pendingDelete, setPendingDelete] = useState<any>(null);
+    const [deleting, setDeleting] = useState(false);
+    const removeRow = useCallback((row: any) => {
+      setPendingDelete(row ?? null);
     }, []);
+    const cancelDelete = useCallback(() => {
+      if (!deleting) setPendingDelete(null);
+    }, [deleting]);
+    const confirmDelete = useCallback(async () => {
+      if (!pendingDelete) return;
+      setDeleting(true);
+      try {
+        await actions.execute('properties.buildings.delete', { id: pendingDelete.id });
+        toast.success('Eliminado', 'El registro se eliminó correctamente');
+        setPendingDelete(null);
+        void load();
+      } catch {
+        toast.error('Error', 'No se pudo eliminar');
+      } finally {
+        setDeleting(false);
+      }
+      // deps intencionalmente fijas: el efecto corre una sola vez
+    }, [pendingDelete, load]);
     return {
       sort,
       onSortChange,
@@ -824,6 +989,10 @@ export function useFichaDePropiedadView() {
       page,
       setPage,
       pagedRows,
+      pendingDelete,
+      deleting,
+      confirmDelete,
+      cancelDelete,
       loading,
       search,
       setSearch,

@@ -1,4 +1,5 @@
-import { contactTable } from '@coongro/contacts/server';
+import { ContactRepository, contactTable } from '@coongro/contacts/server';
+import type { NewContactRow } from '@coongro/contacts/server';
 import type { ModuleDatabaseAPI } from '@coongro/plugin-sdk';
 import { and, asc, eq, isNull, sql } from 'drizzle-orm';
 
@@ -24,6 +25,30 @@ export interface OwnerListRow {
   bank: string | null;
   photo_url: string | null;
 }
+
+/**
+ * Datos de cobro y condición fiscal: son vocabulario de alquileres, y `contacts` es un
+ * plugin compartido que también usa la veterinaria. Por eso viajan en `metadata` y no
+ * como columnas.
+ */
+const OWNER_METADATA_KEYS = ['tax_condition', 'bank', 'account', 'cbu', 'alias'] as const;
+
+/** Lo que manda el formulario de propietario: columnas del contacto + sus extras. */
+export interface OwnerInput {
+  name?: unknown;
+  document_type?: unknown;
+  document_number?: unknown;
+  email?: unknown;
+  phone?: unknown;
+  address?: unknown;
+  tax_condition?: unknown;
+  bank?: unknown;
+  account?: unknown;
+  cbu?: unknown;
+  alias?: unknown;
+}
+
+const texto = (v: unknown): string => String(v ?? '').trim();
 
 export class UnitOwnerRepository {
   constructor(private readonly db: ModuleDatabaseAPI) {}
@@ -101,6 +126,122 @@ export class UnitOwnerRepository {
       tx.select().from(unitOwnerTable).where(eq(unitOwnerTable.id, id)).limit(1)
     );
     return rows[0];
+  }
+
+  /**
+   * Un propietario con la forma que espera su formulario: las columnas del contacto y
+   * los datos de cobro sacados de `metadata`, todos al mismo nivel.
+   *
+   * Aplanar acá y no en la vista es lo que permite que el Copilot lea un propietario
+   * igual que la pantalla, sin saber que hay un `metadata` de por medio.
+   */
+  async getOwner({ id }: { id: string }): Promise<Record<string, unknown>> {
+    const rows = await this.db.ormQuery((tx) =>
+      tx
+        .select({
+          id: contactTable.id,
+          name: contactTable.name,
+          document_type: contactTable.document_type,
+          document_number: contactTable.document_number,
+          email: contactTable.email,
+          phone: contactTable.phone,
+          address: contactTable.address,
+          metadata: contactTable.metadata,
+        })
+        .from(contactTable)
+        .where(eq(contactTable.id, id))
+        .limit(1)
+    );
+    const fila = rows[0] as
+      | (Record<string, unknown> & { metadata?: Record<string, unknown> })
+      | undefined;
+    if (!fila) return {};
+
+    const { metadata, ...columnas } = fila;
+    const extras: Record<string, unknown> = {};
+    for (const clave of OWNER_METADATA_KEYS) {
+      const valor = (metadata ?? {})[clave];
+      if (valor !== null && valor !== undefined) extras[clave] = valor;
+    }
+    return { ...columnas, ...extras };
+  }
+
+  /**
+   * Alta y edición de un propietario, en una sola operación.
+   *
+   * Es un comando y no un CRUD porque guardar un propietario no es escribir una fila:
+   * hay que decidir qué va en columnas y qué en `metadata`, respetar lo que otro rol le
+   * puso a ese mismo contacto, y fijar el tipo solo cuando nace. Con CRUD suelto, cada
+   * cliente (la web, el Copilot, un import) tendría que repetir esas tres reglas — y la
+   * primera vez que una se olvide, se borran datos de alguien.
+   */
+  async saveOwner({
+    id,
+    data,
+  }: {
+    id?: string | null;
+    data: OwnerInput;
+  }): Promise<{ id: string; created: boolean }> {
+    const nombre = texto(data.name);
+    if (!nombre) throw new Error('El propietario necesita un nombre.');
+
+    // `metadata` es de todo el contacto, no de este formulario: ahí conviven los datos
+    // que le cargó «Inquilino» y lo que guarde cualquier otro kit. Se parte de la
+    // actual y solo se tocan las claves propias — vaciar una acá sí la quita.
+    const actual = id ? await this.contactoPorId(id) : undefined;
+    const metadata: Record<string, unknown> = { ...(actual?.metadata ?? {}) };
+    for (const clave of OWNER_METADATA_KEYS) {
+      const valor = texto(data[clave]);
+      if (valor) metadata[clave] = valor;
+      else delete metadata[clave];
+    }
+
+    const columnas = {
+      name: nombre,
+      document_type: texto(data.document_type) || null,
+      document_number: texto(data.document_number) || null,
+      email: texto(data.email) || null,
+      phone: texto(data.phone) || null,
+      address: texto(data.address) || null,
+      metadata,
+    };
+
+    // Escribir es del dueño de la entidad: un contacto lo crea y lo edita
+    // `ContactRepository`, no esta tabla. Cuando escribíamos el `insert` a mano, cada
+    // invariante que agregaba `contacts` nos rompía de a una —primero `is_active`,
+    // después `id`— y solo nos enterábamos cuando fallaba un alta.
+    //
+    // Las LECTURAS de más arriba sí siguen resolviéndose con join: traer el listado de
+    // propietarios registro por registro sería una consulta por fila.
+    const contactos = new ContactRepository(this.db);
+
+    if (id) {
+      // Al actualizar NO se toca `type`: la misma persona puede ser propietaria de una
+      // unidad e inquilina de otra, y `contacts.type` guarda un solo rol.
+      await contactos.update({ id, data: columnas as Partial<NewContactRow> });
+      return { id, created: false };
+    }
+
+    const creados = await contactos.create({
+      data: { ...columnas, type: 'owner' } as NewContactRow,
+    });
+    const nuevo = creados[0]?.id;
+    if (!nuevo) throw new Error('No se pudo crear el propietario.');
+    return { id: String(nuevo), created: true };
+  }
+
+  /** El contacto crudo, para saber qué había en `metadata` antes de tocarla. */
+  private async contactoPorId(
+    id: string
+  ): Promise<{ metadata?: Record<string, unknown> } | undefined> {
+    const rows = await this.db.ormQuery((tx) =>
+      tx
+        .select({ metadata: contactTable.metadata })
+        .from(contactTable)
+        .where(eq(contactTable.id, id))
+        .limit(1)
+    );
+    return rows[0] as { metadata?: Record<string, unknown> } | undefined;
   }
 
   async create({ data }: { data: NewUnitOwnerRow }): Promise<UnitOwnerRow[]> {

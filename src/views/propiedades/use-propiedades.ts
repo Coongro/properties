@@ -133,7 +133,7 @@ export function usePropiedadesView() {
   const SUB_COL = COLUMNS.find((c) => c.key === 'address');
   const ITEM_COLS = COLUMNS.filter((c) => c.key !== 'address');
   // imagen del registro: su URL sale de esta columna (puede estar oculta)
-  const IMAGE_COL: (typeof COLUMNS)[number] = { key: 'photo_url', label: 'Foto' };
+  const IMAGE_COL: (typeof COLUMNS)[number] = { key: 'photos', label: 'Fotos' };
   const cellValue = (
     row: any,
     c: { key: string; ref?: string; refDisplay?: string; refPath?: string; ref2?: string }
