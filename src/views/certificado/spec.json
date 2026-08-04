@@ -175,11 +175,6 @@
   "headless": {
     "handlers": [
       {
-        "hook": "onInit",
-        "mode": "uiOnly",
-        "reason": "Prellena la propiedad cuando el alta se abre desde su ficha; no consulta ni modifica datos."
-      },
-      {
         "hook": "refLabel",
         "mode": "presentation"
       }
