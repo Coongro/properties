@@ -74,11 +74,10 @@
         {
           "id": "f_photo",
           "kind": "field",
-          "name": "photo_url",
-          "fieldType": "text",
-          "label": "Foto (URL)",
-          "validations": [],
-          "placeholder": "https://…"
+          "name": "photos",
+          "fieldType": "gallery",
+          "label": "Fotos",
+          "validations": []
         }
       ]
     },

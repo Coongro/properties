@@ -30,7 +30,7 @@
         "view": "cards",
         "cardMin": 280,
         "cardBand": false,
-        "imageCol": "photo_url",
+        "imageCol": "photos",
         "imageLayout": "cover",
         "subtitle": "address",
         "pageSize": "20",
@@ -133,8 +133,8 @@
             "format": "money"
           },
           {
-            "key": "photo_url",
-            "label": "Foto",
+            "key": "photos",
+            "label": "Fotos",
             "visible": false
           }
         ],

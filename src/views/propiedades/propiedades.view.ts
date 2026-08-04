@@ -237,7 +237,22 @@ export function PropiedadesView() {
         actions: ROW_ACTIONS,
         view: 'cards' as const,
         cardMinWidth: 280,
-        itemImage: (row: any) => cellText(row, IMAGE_COL),
+        itemImage: (row: any) => {
+          let v: any = cellValue(row, IMAGE_COL);
+          if (typeof v === 'string' && v.trim().startsWith('[')) {
+            try {
+              v = JSON.parse(v);
+            } catch {
+              /* no era JSON: se usa como URL */
+            }
+          }
+          // La lista se devuelve ENTERA, no solo la primera: con varias fotos la
+          // tarjeta las pasa con flechas, y recortar acá dejaría el resto invisible.
+          if (Array.isArray(v))
+            return v.filter((it: any) => it && (typeof it === 'string' || it.url));
+          if (v && typeof v === 'object') v = v.url;
+          return typeof v === 'string' ? v : '';
+        },
         imageLayout: 'cover' as const,
         renderItem: (row: any) =>
           h(

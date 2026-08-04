@@ -30,7 +30,7 @@ export function FichaDePropiedadView() {
     })[tone] ?? fallback;
   const { t1, t2, t3, t4, metric } = useFichaDePropiedadView();
 
-  // ── tabla 1: render propio sobre su estado t1 ──
+  // ── tabla 1 — properties.buildings: render propio sobre su estado t1 ──
   const renderTable1 = (() => {
     const {
       loading,
@@ -210,7 +210,22 @@ export function FichaDePropiedadView() {
           },
           view: 'cards' as const,
           cardMinWidth: 260,
-          itemImage: (row: any) => cellText(row, IMAGE_COL),
+          itemImage: (row: any) => {
+            let v: any = cellValue(row, IMAGE_COL);
+            if (typeof v === 'string' && v.trim().startsWith('[')) {
+              try {
+                v = JSON.parse(v);
+              } catch {
+                /* no era JSON: se usa como URL */
+              }
+            }
+            // La lista se devuelve ENTERA, no solo la primera: con varias fotos la
+            // tarjeta las pasa con flechas, y recortar acá dejaría el resto invisible.
+            if (Array.isArray(v))
+              return v.filter((it: any) => it && (typeof it === 'string' || it.url));
+            if (v && typeof v === 'object') v = v.url;
+            return typeof v === 'string' ? v : '';
+          },
           imageLayout: 'cover' as const,
           renderItem: (row: any) =>
             h(
@@ -281,7 +296,7 @@ export function FichaDePropiedadView() {
       );
     return renderTable;
   })();
-  // ── tabla 2: render propio sobre su estado t2 ──
+  // ── tabla 2 — properties.buildings: render propio sobre su estado t2 ──
   const renderTable2 = (() => {
     const {
       loading,
@@ -541,7 +556,7 @@ export function FichaDePropiedadView() {
       );
     return renderTable;
   })();
-  // ── tabla 3: render propio sobre su estado t3 ──
+  // ── tabla 3 — properties.buildings: render propio sobre su estado t3 ──
   const renderTable3 = (() => {
     const {
       loading,
@@ -808,7 +823,7 @@ export function FichaDePropiedadView() {
       );
     return renderTable;
   })();
-  // ── tabla 4: render propio sobre su estado t4 ──
+  // ── tabla 4 — properties.buildings: render propio sobre su estado t4 ──
   const renderTable4 = (() => {
     const {
       loading,
@@ -1580,6 +1595,31 @@ export function FichaDePropiedadView() {
             },
             h(
               'div',
+              { 'data-cg-block-id': 'btn_unidad', style: { display: 'contents' } },
+              h(
+                'div',
+                { style: { display: 'flex', justifyContent: 'flex-end' } },
+                h(
+                  UI.Button,
+                  {
+                    variant: 'secondary',
+                    onClick: () => {
+                      views.open(
+                        'properties.unidad.open',
+                        {
+                          parentRecord: (views.params as any)?.record ?? null,
+                          parentEntity: 'properties.buildings',
+                        },
+                        { mode: 'sheet' }
+                      );
+                    },
+                  },
+                  'Nueva unidad'
+                )
+              )
+            ),
+            h(
+              'div',
               { 'data-cg-block-id': 'tbl_unidades', style: { display: 'contents' } },
               renderTable1()
             )
@@ -1676,9 +1716,14 @@ export function FichaDePropiedadView() {
                         {
                           variant: 'secondary',
                           onClick: () => {
-                            views.open('properties.expensas-del-mes.open', undefined, {
-                              mode: 'dialog',
-                            });
+                            views.open(
+                              'properties.expensas-del-mes.open',
+                              {
+                                parentRecord: (views.params as any)?.record ?? null,
+                                parentEntity: 'properties.buildings',
+                              },
+                              { mode: 'dialog' }
+                            );
                           },
                         },
                         'Cargar mes'
@@ -1769,7 +1814,14 @@ export function FichaDePropiedadView() {
                         {
                           variant: 'secondary',
                           onClick: () => {
-                            views.open('properties.certificado.open', undefined, { mode: 'sheet' });
+                            views.open(
+                              'properties.certificado.open',
+                              {
+                                parentRecord: (views.params as any)?.record ?? null,
+                                parentEntity: 'properties.buildings',
+                              },
+                              { mode: 'sheet' }
+                            );
                           },
                         },
                         'Registrar certificado'

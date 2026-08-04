@@ -82,7 +82,6 @@
         "actions": [
           "list",
           "getSummary",
-          "selectWithSummary",
           "getById",
           "create",
           "update",
@@ -128,7 +127,6 @@
           "getById",
           "getOwner",
           "saveOwner",
-          "contactoPorId",
           "create",
           "update",
           "delete",
@@ -711,10 +709,29 @@
                   "type": "string",
                   "description": "Descripción"
                 },
-                "photo_url": { "type": "string", "description": "Foto (URL)" },
                 "year_built": {
                   "type": "integer",
                   "description": "Año de construcción"
+                },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "Una foto de la lista.",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "description": "Dirección de la foto, no el archivo."
+                      },
+                      "caption": {
+                        "type": "string",
+                        "description": "Qué se ve en la foto."
+                      }
+                    },
+                    "required": ["url"],
+                    "additionalProperties": false
+                  },
+                  "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
                 },
                 "street": { "type": "string", "description": "Calle" },
                 "street_number": { "type": "string", "description": "Altura" },
@@ -867,10 +884,29 @@
                   "type": "string",
                   "description": "Descripción"
                 },
-                "photo_url": { "type": "string", "description": "Foto (URL)" },
                 "year_built": {
                   "type": "integer",
                   "description": "Año de construcción"
+                },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "Una foto de la lista.",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "description": "Dirección de la foto, no el archivo."
+                      },
+                      "caption": {
+                        "type": "string",
+                        "description": "Qué se ve en la foto."
+                      }
+                    },
+                    "required": ["url"],
+                    "additionalProperties": false
+                  },
+                  "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
                 },
                 "street": { "type": "string", "description": "Calle" },
                 "street_number": { "type": "string", "description": "Altura" },
@@ -1136,7 +1172,26 @@
                   "pattern": "^-?\\d+(?:\\.\\d+)?$",
                   "description": "Alícuota de expensas (%)"
                 },
-                "photo_url": { "type": "string", "description": "Foto (URL)" },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "Una foto de la lista.",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "description": "Dirección de la foto, no el archivo."
+                      },
+                      "caption": {
+                        "type": "string",
+                        "description": "Qué se ve en la foto."
+                      }
+                    },
+                    "required": ["url"],
+                    "additionalProperties": false
+                  },
+                  "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
+                },
                 "status": {
                   "type": "string",
                   "enum": [
@@ -1234,7 +1289,26 @@
                   "pattern": "^-?\\d+(?:\\.\\d+)?$",
                   "description": "Alícuota de expensas (%)"
                 },
-                "photo_url": { "type": "string", "description": "Foto (URL)" },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "Una foto de la lista.",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "description": "Dirección de la foto, no el archivo."
+                      },
+                      "caption": {
+                        "type": "string",
+                        "description": "Qué se ve en la foto."
+                      }
+                    },
+                    "required": ["url"],
+                    "additionalProperties": false
+                  },
+                  "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
+                },
                 "status": {
                   "type": "string",
                   "enum": [

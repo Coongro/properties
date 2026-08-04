@@ -6,6 +6,7 @@
  */
 import { getHostReact, getHostUI, usePlugin } from '@coongro/plugin-sdk';
 
+import { customHandlers } from './handlers.js';
 import { useUnidadView } from './use-unidad.js';
 
 const React = getHostReact();
@@ -225,21 +226,32 @@ export function UnidadView() {
                 { style: { flex: '1 1 100%', minWidth: 0 } },
                 h(
                   UI.Label,
-                  { htmlFor: 'photo_url', style: { display: 'block', marginBottom: '6px' } },
-                  'Foto (URL)'
+                  { htmlFor: 'photos', style: { display: 'block', marginBottom: '6px' } },
+                  'Fotos'
                 ),
-                h(UI.Input, {
-                  id: 'photo_url',
-                  type: 'text',
-                  value: String(values['photo_url'] ?? ''),
-                  placeholder: 'https://…',
-                  onChange: (e: any) => setField('photo_url', e.target.value),
+                h(UI.ImageInput, {
+                  id: 'photos',
+                  multiple: true,
+                  value: (() => {
+                    const raw = values['photos'];
+                    if (Array.isArray(raw)) return raw;
+                    if (typeof raw === 'string' && raw.trim().startsWith('[')) {
+                      try {
+                        return JSON.parse(raw);
+                      } catch {
+                        return [];
+                      }
+                    }
+                    return raw ? [raw] : [];
+                  })(),
+                  onChange: (v: any) => setField('photos', v),
+                  onUpload: customHandlers.uploadImage,
                 }),
-                errors['photo_url']
+                errors['photos']
                   ? h(
                       'div',
                       { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
-                      errors['photo_url']
+                      errors['photos']
                     )
                   : null
               )

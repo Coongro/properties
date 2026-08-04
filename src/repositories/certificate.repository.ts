@@ -49,9 +49,13 @@ export class CertificateRepository {
     // ficha y la lista no pueden decir cosas distintas del mismo certificado.
     const dias = sql.join(
       [
-        sql`coalesce(${certificateTable.alert_days}, case ${certificateTable.type}`,
+        sql`coalesce(${certificateTable.alert_days}, (case ${certificateTable.type}`,
         ...Object.entries(CERTIFICATE_HORIZONS).map(([tipo, d]) => sql`when ${tipo} then ${d}`),
-        sql`else ${alertDays} end)`,
+        // El `::int` no es decorativo: los días viajan como parámetros y Postgres
+        // los infiere `text`, así que sin el cast el coalesce choca contra
+        // `alert_days` (integer) y la consulta entera falla — la ficha mostraba
+        // «sin certificados» aunque los hubiera.
+        sql`else ${alertDays} end)::int)`,
       ],
       sql` `
     );

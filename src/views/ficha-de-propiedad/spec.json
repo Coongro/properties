@@ -2,6 +2,9 @@
   "specVersion": 1,
   "kind": "blank",
   "title": "Ficha de propiedad",
+  "data": {
+    "repositoryPrefix": "properties.buildings"
+  },
   "blocks": [
     {
       "id": "hdr",
@@ -113,6 +116,21 @@
       "icon": "DoorOpen",
       "children": [
         {
+          "id": "btn_unidad",
+          "kind": "component",
+          "comp": "Button",
+          "align": "right",
+          "props": {
+            "label": "Nueva unidad",
+            "variant": "secondary",
+            "action": {
+              "id": "openForm",
+              "label": "Nueva unidad",
+              "target": "properties.unidad.open"
+            }
+          }
+        },
+        {
           "id": "tbl_unidades",
           "kind": "component",
           "comp": "DataTable",
@@ -120,7 +138,7 @@
             "view": "cards",
             "cardMin": 260,
             "cardBand": false,
-            "imageCol": "photo_url",
+            "imageCol": "photos",
             "imageLayout": "cover",
             "subtitle": "detail",
             "pageSize": "20",
@@ -182,8 +200,8 @@
                 "format": "money"
               },
               {
-                "key": "photo_url",
-                "label": "Foto",
+                "key": "photos",
+                "label": "Fotos",
                 "visible": false
               }
             ],

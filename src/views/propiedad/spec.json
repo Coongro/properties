@@ -88,16 +88,6 @@
           "placeholder": "Ej: edificio de 6 unidades, entrada por Belgrano"
         },
         {
-          "id": "f_photo",
-          "kind": "field",
-          "name": "photo_url",
-          "fieldType": "text",
-          "label": "Foto (URL)",
-          "width": "half",
-          "validations": [],
-          "placeholder": "https://…"
-        },
-        {
           "id": "f_year",
           "kind": "field",
           "name": "year_built",
@@ -106,6 +96,14 @@
           "width": "half",
           "validations": [],
           "placeholder": "Ej: 1998"
+        },
+        {
+          "id": "f_photo",
+          "kind": "field",
+          "name": "photos",
+          "fieldType": "gallery",
+          "label": "Fotos",
+          "validations": []
         }
       ]
     },

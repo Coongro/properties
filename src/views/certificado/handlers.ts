@@ -10,21 +10,11 @@
 import type { CustomHandlers } from '@coongro/plugin-sdk';
 
 export const customHandlers: CustomHandlers = {
-  /**
-   * Cuando el alta se abre desde la ficha de una propiedad, esa propiedad ya está
-   * elegida: pedirla de nuevo es hacer repetir un dato que la pantalla sabe.
-   *
-   * El campo igual existe y es obligatorio, porque el certificado tiene que saber a qué
-   * inmueble pertenece aunque se cargue desde otro lado —y porque así también lo ve
-   * quien no tiene pantalla. Un certificado sin propiedad no aparece en ninguna ficha
-   * ni en ningún vencimiento: queda cargado y perdido.
-   *
-   * Al editar no se toca nada: los valores son los del certificado guardado.
-   */
-  onInit: ({ editingId, record }) => {
-    if (editingId || !record?.id) return Promise.resolve({});
-    return Promise.resolve({ building_id: String(record.id) });
-  },
+  // El vínculo con la propiedad NO se llena acá: cuando el alta se abre desde la
+  // ficha, el edificio llega como `parentRecord` y el codegen del Builder carga
+  // solo `building_id` (único campo ref hacia esa entidad). Un `onInit` que lea
+  // `record` para esto está muerto — `record` significa «estás editando» y el
+  // alta nunca lo trae.
 
   /**
    * Cómo se lee una propiedad o una unidad en el desplegable. Sin esto el select
