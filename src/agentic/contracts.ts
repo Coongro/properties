@@ -1,0 +1,2565 @@
+/**
+ * Action Contracts de properties.
+ *
+ * El contrato vive JUNTO al handler y es el MISMO objeto que valida en
+ * runtime: por eso lo que se publica no puede desincronizarse de lo que la
+ * implementación acepta. Un input vacío se declara con `none()`; no poder
+ * inferir los parámetros es un error, no un schema vacío.
+ */
+
+import { defineAction, none } from '@coongro/plugin-sdk/agentic';
+
+export const listCertificates = defineAction({
+  id: 'properties.certificates.list',
+  title: 'Listar certificados',
+  description:
+    'Todos los certificados obligatorios cargados —matafuegos, gas, ascensor, instalación eléctrica, seguro— con la fecha en que vencen. Para los de una propiedad puntual conviene «Certificados de una propiedad», que además resuelve si cada uno está vigente, por vencer o vencido.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      limit: {
+        type: 'integer',
+        description: 'Cantidad de resultados a devolver. Default 20; máximo 50.',
+      },
+      offset: {
+        type: 'integer',
+        description: 'Cantidad de resultados a saltear para pedir la página siguiente.',
+      },
+    },
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Certificado',
+        format: 'text',
+        values: [
+          {
+            value: 'matafuegos',
+            label: 'Matafuegos',
+          },
+          {
+            value: 'gas',
+            label: 'Instalación de gas',
+          },
+          {
+            value: 'ascensor',
+            label: 'Ascensor',
+          },
+          {
+            value: 'electricidad',
+            label: 'Instalación eléctrica',
+          },
+          {
+            value: 'seguro',
+            label: 'Seguro del inmueble',
+          },
+          {
+            value: 'otro',
+            label: 'Otro',
+          },
+        ],
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'vigente',
+            label: 'Vigente',
+          },
+          {
+            value: 'por_vencer',
+            label: 'Por vencer',
+          },
+          {
+            value: 'vencido',
+            label: 'Vencido',
+          },
+        ],
+      },
+      {
+        key: 'expires_at',
+        name: 'expiresAt',
+        label: 'Vence',
+        format: 'date',
+      },
+    ],
+    identifierKey: 'id',
+    defaultLimit: 10,
+    maxLimit: 50,
+  },
+});
+
+export const getByIdCertificates = defineAction({
+  id: 'properties.certificates.getById',
+  title: 'Ver un certificado',
+  description:
+    'Un certificado por su id: de qué es, cuándo se hizo, cuándo vence, con qué resultado y las observaciones que se le cargaron.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description: 'El certificado que se quiere ver.',
+        ref: { resource: 'properties.certificates' },
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Certificado',
+        format: 'text',
+        values: [
+          {
+            value: 'matafuegos',
+            label: 'Matafuegos',
+          },
+          {
+            value: 'gas',
+            label: 'Instalación de gas',
+          },
+          {
+            value: 'ascensor',
+            label: 'Ascensor',
+          },
+          {
+            value: 'electricidad',
+            label: 'Instalación eléctrica',
+          },
+          {
+            value: 'seguro',
+            label: 'Seguro del inmueble',
+          },
+          {
+            value: 'otro',
+            label: 'Otro',
+          },
+        ],
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'vigente',
+            label: 'Vigente',
+          },
+          {
+            value: 'por_vencer',
+            label: 'Por vencer',
+          },
+          {
+            value: 'vencido',
+            label: 'Vencido',
+          },
+        ],
+      },
+      {
+        key: 'expires_at',
+        name: 'expiresAt',
+        label: 'Vence',
+        format: 'date',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const createCertificates = defineAction({
+  id: 'properties.certificates.create',
+  title: 'Registrar un certificado',
+  description:
+    'Deja asentado un certificado de seguridad que YA se hizo, sobre una propiedad o sobre una unidad. Es el registro de algo que pasó, no un pedido de inspección: la fecha de vencimiento que se cargue acá es la que después dispara los avisos.',
+  effect: 'write',
+  confirmation: 'always',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      data: {
+        type: 'object',
+        description: 'Datos del certificado a registrar.',
+        properties: {
+          building_id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'La propiedad a la que pertenece el certificado.',
+            ref: { resource: 'properties.buildings' },
+          },
+          unit_id: {
+            type: 'string',
+            format: 'uuid',
+            description:
+              'Solo si el certificado es de UNA unidad y no de la propiedad entera. En ese caso va junto con la propiedad a la que esa unidad pertenece.',
+            ref: { resource: 'properties.units' },
+          },
+          type: {
+            type: 'string',
+            enum: ['matafuegos', 'gas', 'ascensor', 'electricidad', 'seguro', 'otro'],
+            description:
+              'Tipo. Opciones: matafuegos (Matafuegos), gas (Instalación de gas), ascensor (Ascensor), electricidad (Instalación eléctrica), seguro (Seguro del inmueble), otro (Otro).',
+          },
+          done_at: {
+            type: 'string',
+            format: 'date',
+            description: 'Fecha de realización',
+          },
+          expires_at: {
+            type: 'string',
+            format: 'date',
+            description: 'Vence',
+          },
+          result: {
+            type: 'string',
+            enum: ['apto', 'apto_con_observaciones', 'rechazado'],
+            description:
+              'Resultado. Opciones: apto (Apto), apto_con_observaciones (Apto con observaciones), rechazado (Rechazado).',
+          },
+          file_url: {
+            type: 'string',
+            description: 'Certificado (URL)',
+          },
+          alert_days: {
+            type: 'integer',
+            description: 'Avisarme con (días de anticipación)',
+          },
+          notes: {
+            type: 'string',
+            description: 'Observaciones',
+          },
+        },
+        required: ['building_id', 'type', 'expires_at'],
+        additionalProperties: false,
+      },
+    },
+    required: ['data'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Certificado',
+        format: 'text',
+        values: [
+          {
+            value: 'matafuegos',
+            label: 'Matafuegos',
+          },
+          {
+            value: 'gas',
+            label: 'Instalación de gas',
+          },
+          {
+            value: 'ascensor',
+            label: 'Ascensor',
+          },
+          {
+            value: 'electricidad',
+            label: 'Instalación eléctrica',
+          },
+          {
+            value: 'seguro',
+            label: 'Seguro del inmueble',
+          },
+          {
+            value: 'otro',
+            label: 'Otro',
+          },
+        ],
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'vigente',
+            label: 'Vigente',
+          },
+          {
+            value: 'por_vencer',
+            label: 'Por vencer',
+          },
+          {
+            value: 'vencido',
+            label: 'Vencido',
+          },
+        ],
+      },
+      {
+        key: 'expires_at',
+        name: 'expiresAt',
+        label: 'Vence',
+        format: 'date',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const updateCertificates = defineAction({
+  id: 'properties.certificates.update',
+  title: 'Corregir un certificado',
+  description:
+    'Modifica un certificado ya registrado — típicamente para corregir la fecha de vencimiento o el resultado. Una renovación NO va acá: el certificado nuevo se registra aparte, así queda el historial de qué se hizo y cuándo.',
+  effect: 'write',
+  confirmation: 'always',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description: 'El certificado a corregir.',
+        ref: { resource: 'properties.certificates' },
+      },
+      data: {
+        type: 'object',
+        description: 'Los campos del certificado que se quieren cambiar.',
+        properties: {
+          building_id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'La propiedad a la que pertenece el certificado.',
+            ref: { resource: 'properties.buildings' },
+          },
+          unit_id: {
+            type: 'string',
+            format: 'uuid',
+            description:
+              'Solo si el certificado es de UNA unidad y no de la propiedad entera. En ese caso va junto con la propiedad a la que esa unidad pertenece.',
+            ref: { resource: 'properties.units' },
+          },
+          type: {
+            type: 'string',
+            enum: ['matafuegos', 'gas', 'ascensor', 'electricidad', 'seguro', 'otro'],
+            description:
+              'Tipo. Opciones: matafuegos (Matafuegos), gas (Instalación de gas), ascensor (Ascensor), electricidad (Instalación eléctrica), seguro (Seguro del inmueble), otro (Otro).',
+          },
+          done_at: {
+            type: 'string',
+            format: 'date',
+            description: 'Fecha de realización',
+          },
+          expires_at: {
+            type: 'string',
+            format: 'date',
+            description: 'Vence',
+          },
+          result: {
+            type: 'string',
+            enum: ['apto', 'apto_con_observaciones', 'rechazado'],
+            description:
+              'Resultado. Opciones: apto (Apto), apto_con_observaciones (Apto con observaciones), rechazado (Rechazado).',
+          },
+          file_url: {
+            type: 'string',
+            description: 'Certificado (URL)',
+          },
+          alert_days: {
+            type: 'integer',
+            description: 'Avisarme con (días de anticipación)',
+          },
+          notes: {
+            type: 'string',
+            description: 'Observaciones',
+          },
+        },
+        additionalProperties: false,
+      },
+    },
+    required: ['id', 'data'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Certificado',
+        format: 'text',
+        values: [
+          {
+            value: 'matafuegos',
+            label: 'Matafuegos',
+          },
+          {
+            value: 'gas',
+            label: 'Instalación de gas',
+          },
+          {
+            value: 'ascensor',
+            label: 'Ascensor',
+          },
+          {
+            value: 'electricidad',
+            label: 'Instalación eléctrica',
+          },
+          {
+            value: 'seguro',
+            label: 'Seguro del inmueble',
+          },
+          {
+            value: 'otro',
+            label: 'Otro',
+          },
+        ],
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'vigente',
+            label: 'Vigente',
+          },
+          {
+            value: 'por_vencer',
+            label: 'Por vencer',
+          },
+          {
+            value: 'vencido',
+            label: 'Vencido',
+          },
+        ],
+      },
+      {
+        key: 'expires_at',
+        name: 'expiresAt',
+        label: 'Vence',
+        format: 'date',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const listBuildings = defineAction({
+  id: 'properties.buildings.list',
+  title: 'Listar propiedades',
+  description:
+    'La cartera completa: cada propiedad con su dirección, cuántas unidades tiene, cuántas están ocupadas, el alquiler de referencia sumado y si sus certificados están al día.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      limit: {
+        type: 'integer',
+        description: 'Cantidad de resultados a devolver. Default 20; máximo 50.',
+      },
+      offset: {
+        type: 'integer',
+        description: 'Cantidad de resultados a saltear para pedir la página siguiente.',
+      },
+    },
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Propiedad',
+        format: 'text',
+      },
+      {
+        key: 'address',
+        name: 'address',
+        label: 'Dirección',
+        format: 'text',
+      },
+      {
+        key: 'certs',
+        name: 'certs',
+        label: 'Certificados',
+        format: 'text',
+        values: [
+          {
+            value: 'ok',
+            label: 'Al día',
+          },
+          {
+            value: 'soon',
+            label: 'Certificado por vencer',
+          },
+          {
+            value: 'expired',
+            label: 'Certificado vencido',
+          },
+        ],
+      },
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Tipo',
+        format: 'text',
+        values: [
+          {
+            value: 'edificio',
+            label: 'Edificio',
+          },
+          {
+            value: 'departamento',
+            label: 'Departamento',
+          },
+          {
+            value: 'casa',
+            label: 'Casa',
+          },
+          {
+            value: 'local',
+            label: 'Local',
+          },
+          {
+            value: 'oficina',
+            label: 'Oficina',
+          },
+          {
+            value: 'galpon',
+            label: 'Galpón',
+          },
+          {
+            value: 'cochera',
+            label: 'Cochera',
+          },
+          {
+            value: 'baulera',
+            label: 'Baulera',
+          },
+        ],
+      },
+      {
+        key: 'occupancy',
+        name: 'occupancy',
+        label: 'Ocupación',
+        format: 'text',
+      },
+      {
+        key: 'reference_rent',
+        name: 'referenceRent',
+        label: 'Alquiler de referencia',
+        format: 'money',
+      },
+    ],
+    identifierKey: 'id',
+    defaultLimit: 20,
+    maxLimit: 50,
+  },
+});
+
+export const getByIdBuildings = defineAction({
+  id: 'properties.buildings.getById',
+  title: 'Ver una propiedad',
+  description:
+    'Los datos cargados de una propiedad: tipo, dirección, partida inmobiliaria, modo de tenencia, administración y notas. No trae unidades ni ocupación — para eso está «Resumen de una propiedad».',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description: 'La propiedad que se quiere ver.',
+        ref: { resource: 'properties.buildings' },
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Propiedad',
+        format: 'text',
+      },
+      {
+        key: 'address',
+        name: 'address',
+        label: 'Dirección',
+        format: 'text',
+      },
+      {
+        key: 'certs',
+        name: 'certs',
+        label: 'Certificados',
+        format: 'text',
+        values: [
+          {
+            value: 'ok',
+            label: 'Al día',
+          },
+          {
+            value: 'soon',
+            label: 'Certificado por vencer',
+          },
+          {
+            value: 'expired',
+            label: 'Certificado vencido',
+          },
+        ],
+      },
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Tipo',
+        format: 'text',
+        values: [
+          {
+            value: 'edificio',
+            label: 'Edificio',
+          },
+          {
+            value: 'departamento',
+            label: 'Departamento',
+          },
+          {
+            value: 'casa',
+            label: 'Casa',
+          },
+          {
+            value: 'local',
+            label: 'Local',
+          },
+          {
+            value: 'oficina',
+            label: 'Oficina',
+          },
+          {
+            value: 'galpon',
+            label: 'Galpón',
+          },
+          {
+            value: 'cochera',
+            label: 'Cochera',
+          },
+          {
+            value: 'baulera',
+            label: 'Baulera',
+          },
+        ],
+      },
+      {
+        key: 'occupancy',
+        name: 'occupancy',
+        label: 'Ocupación',
+        format: 'text',
+      },
+      {
+        key: 'reference_rent',
+        name: 'referenceRent',
+        label: 'Alquiler de referencia',
+        format: 'money',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const createBuildings = defineAction({
+  id: 'properties.buildings.create',
+  title: 'Dar de alta una propiedad',
+  description:
+    'Registra una propiedad en la cartera: un edificio, una casa, un local, una cochera. Las unidades que se alquilan NO se crean acá — se agregan después, una por una, con «Dar de alta una unidad».',
+  effect: 'write',
+  confirmation: 'always',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      data: {
+        type: 'object',
+        description: 'Datos de Propiedad a crear.',
+        properties: {
+          type: {
+            type: 'string',
+            enum: [
+              'edificio',
+              'departamento',
+              'casa',
+              'local',
+              'oficina',
+              'galpon',
+              'cochera',
+              'baulera',
+            ],
+            description:
+              'Tipo. Opciones: edificio (Edificio), departamento (Departamento), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera).',
+          },
+          name: {
+            type: 'string',
+            description: 'Nombre',
+          },
+          description: {
+            type: 'string',
+            description: 'Descripción',
+          },
+          year_built: {
+            type: 'integer',
+            description: 'Año de construcción',
+          },
+          photos: {
+            type: 'array',
+            items: {
+              type: 'object',
+              description: 'Una foto de la lista.',
+              properties: {
+                url: {
+                  type: 'string',
+                  description: 'Dirección de la foto, no el archivo.',
+                },
+                caption: {
+                  type: 'string',
+                  description: 'Qué se ve en la foto.',
+                },
+              },
+              required: ['url'],
+              additionalProperties: false,
+            },
+            description: 'Fotos (lista de fotos, en orden: la primera es la principal)',
+          },
+          street: {
+            type: 'string',
+            description: 'Calle',
+          },
+          street_number: {
+            type: 'string',
+            description: 'Altura',
+          },
+          city: {
+            type: 'string',
+            description: 'Localidad',
+          },
+          zip_code: {
+            type: 'string',
+            description: 'Código postal',
+          },
+          province: {
+            type: 'string',
+            enum: [
+              'buenos_aires',
+              'caba',
+              'catamarca',
+              'chaco',
+              'chubut',
+              'cordoba',
+              'corrientes',
+              'entre_rios',
+              'formosa',
+              'jujuy',
+              'la_pampa',
+              'la_rioja',
+              'mendoza',
+              'misiones',
+              'neuquen',
+              'rio_negro',
+              'salta',
+              'san_juan',
+              'san_luis',
+              'santa_cruz',
+              'santa_fe',
+              'santiago_del_estero',
+              'tierra_del_fuego',
+              'tucuman',
+            ],
+            description:
+              'Provincia. Opciones: buenos_aires (Buenos Aires), caba (Ciudad Autónoma de Buenos Aires), catamarca (Catamarca), chaco (Chaco), chubut (Chubut), cordoba (Córdoba), corrientes (Corrientes), entre_rios (Entre Ríos), formosa (Formosa), jujuy (Jujuy), la_pampa (La Pampa), la_rioja (La Rioja), mendoza (Mendoza), misiones (Misiones), neuquen (Neuquén), rio_negro (Río Negro), salta (Salta), san_juan (San Juan), san_luis (San Luis), santa_cruz (Santa Cruz), santa_fe (Santa Fe), sant…',
+          },
+          cadastral_ref: {
+            type: 'string',
+            description: 'Partida inmobiliaria',
+          },
+          ownership_mode: {
+            type: 'string',
+            enum: ['propia', 'condominio', 'sucesion'],
+            description:
+              'Modo de tenencia. Opciones: propia (Propia), condominio (Condominio), sucesion (Sucesión).',
+          },
+          admin_name: {
+            type: 'string',
+            description: 'Administrador',
+          },
+          admin_phone: {
+            type: 'string',
+            description: 'Teléfono',
+          },
+          admin_email: {
+            type: 'string',
+            description: 'Email',
+          },
+          notes: {
+            type: 'string',
+            description: 'Notas',
+          },
+        },
+        required: ['type', 'name', 'street', 'street_number', 'city'],
+        additionalProperties: false,
+      },
+    },
+    required: ['data'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Propiedad',
+        format: 'text',
+      },
+      {
+        key: 'address',
+        name: 'address',
+        label: 'Dirección',
+        format: 'text',
+      },
+      {
+        key: 'certs',
+        name: 'certs',
+        label: 'Certificados',
+        format: 'text',
+        values: [
+          {
+            value: 'ok',
+            label: 'Al día',
+          },
+          {
+            value: 'soon',
+            label: 'Certificado por vencer',
+          },
+          {
+            value: 'expired',
+            label: 'Certificado vencido',
+          },
+        ],
+      },
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Tipo',
+        format: 'text',
+        values: [
+          {
+            value: 'edificio',
+            label: 'Edificio',
+          },
+          {
+            value: 'departamento',
+            label: 'Departamento',
+          },
+          {
+            value: 'casa',
+            label: 'Casa',
+          },
+          {
+            value: 'local',
+            label: 'Local',
+          },
+          {
+            value: 'oficina',
+            label: 'Oficina',
+          },
+          {
+            value: 'galpon',
+            label: 'Galpón',
+          },
+          {
+            value: 'cochera',
+            label: 'Cochera',
+          },
+          {
+            value: 'baulera',
+            label: 'Baulera',
+          },
+        ],
+      },
+      {
+        key: 'occupancy',
+        name: 'occupancy',
+        label: 'Ocupación',
+        format: 'text',
+      },
+      {
+        key: 'reference_rent',
+        name: 'referenceRent',
+        label: 'Alquiler de referencia',
+        format: 'money',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const updateBuildings = defineAction({
+  id: 'properties.buildings.update',
+  title: 'Editar una propiedad',
+  description:
+    'Cambia los datos de una propiedad ya cargada: dirección, administración, partida inmobiliaria, notas o fotos.',
+  effect: 'write',
+  confirmation: 'always',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description: 'La propiedad a editar.',
+        ref: { resource: 'properties.buildings' },
+      },
+      data: {
+        type: 'object',
+        description: 'Los campos de la propiedad que se quieren cambiar.',
+        properties: {
+          type: {
+            type: 'string',
+            enum: [
+              'edificio',
+              'departamento',
+              'casa',
+              'local',
+              'oficina',
+              'galpon',
+              'cochera',
+              'baulera',
+            ],
+            description:
+              'Tipo. Opciones: edificio (Edificio), departamento (Departamento), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera).',
+          },
+          name: {
+            type: 'string',
+            description: 'Nombre',
+          },
+          description: {
+            type: 'string',
+            description: 'Descripción',
+          },
+          year_built: {
+            type: 'integer',
+            description: 'Año de construcción',
+          },
+          photos: {
+            type: 'array',
+            items: {
+              type: 'object',
+              description: 'Una foto de la lista.',
+              properties: {
+                url: {
+                  type: 'string',
+                  description: 'Dirección de la foto, no el archivo.',
+                },
+                caption: {
+                  type: 'string',
+                  description: 'Qué se ve en la foto.',
+                },
+              },
+              required: ['url'],
+              additionalProperties: false,
+            },
+            description: 'Fotos (lista de fotos, en orden: la primera es la principal)',
+          },
+          street: {
+            type: 'string',
+            description: 'Calle',
+          },
+          street_number: {
+            type: 'string',
+            description: 'Altura',
+          },
+          city: {
+            type: 'string',
+            description: 'Localidad',
+          },
+          zip_code: {
+            type: 'string',
+            description: 'Código postal',
+          },
+          province: {
+            type: 'string',
+            enum: [
+              'buenos_aires',
+              'caba',
+              'catamarca',
+              'chaco',
+              'chubut',
+              'cordoba',
+              'corrientes',
+              'entre_rios',
+              'formosa',
+              'jujuy',
+              'la_pampa',
+              'la_rioja',
+              'mendoza',
+              'misiones',
+              'neuquen',
+              'rio_negro',
+              'salta',
+              'san_juan',
+              'san_luis',
+              'santa_cruz',
+              'santa_fe',
+              'santiago_del_estero',
+              'tierra_del_fuego',
+              'tucuman',
+            ],
+            description:
+              'Provincia. Opciones: buenos_aires (Buenos Aires), caba (Ciudad Autónoma de Buenos Aires), catamarca (Catamarca), chaco (Chaco), chubut (Chubut), cordoba (Córdoba), corrientes (Corrientes), entre_rios (Entre Ríos), formosa (Formosa), jujuy (Jujuy), la_pampa (La Pampa), la_rioja (La Rioja), mendoza (Mendoza), misiones (Misiones), neuquen (Neuquén), rio_negro (Río Negro), salta (Salta), san_juan (San Juan), san_luis (San Luis), santa_cruz (Santa Cruz), santa_fe (Santa Fe), sant…',
+          },
+          cadastral_ref: {
+            type: 'string',
+            description: 'Partida inmobiliaria',
+          },
+          ownership_mode: {
+            type: 'string',
+            enum: ['propia', 'condominio', 'sucesion'],
+            description:
+              'Modo de tenencia. Opciones: propia (Propia), condominio (Condominio), sucesion (Sucesión).',
+          },
+          admin_name: {
+            type: 'string',
+            description: 'Administrador',
+          },
+          admin_phone: {
+            type: 'string',
+            description: 'Teléfono',
+          },
+          admin_email: {
+            type: 'string',
+            description: 'Email',
+          },
+          notes: {
+            type: 'string',
+            description: 'Notas',
+          },
+        },
+        additionalProperties: false,
+      },
+    },
+    required: ['id', 'data'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Propiedad',
+        format: 'text',
+      },
+      {
+        key: 'address',
+        name: 'address',
+        label: 'Dirección',
+        format: 'text',
+      },
+      {
+        key: 'certs',
+        name: 'certs',
+        label: 'Certificados',
+        format: 'text',
+        values: [
+          {
+            value: 'ok',
+            label: 'Al día',
+          },
+          {
+            value: 'soon',
+            label: 'Certificado por vencer',
+          },
+          {
+            value: 'expired',
+            label: 'Certificado vencido',
+          },
+        ],
+      },
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Tipo',
+        format: 'text',
+        values: [
+          {
+            value: 'edificio',
+            label: 'Edificio',
+          },
+          {
+            value: 'departamento',
+            label: 'Departamento',
+          },
+          {
+            value: 'casa',
+            label: 'Casa',
+          },
+          {
+            value: 'local',
+            label: 'Local',
+          },
+          {
+            value: 'oficina',
+            label: 'Oficina',
+          },
+          {
+            value: 'galpon',
+            label: 'Galpón',
+          },
+          {
+            value: 'cochera',
+            label: 'Cochera',
+          },
+          {
+            value: 'baulera',
+            label: 'Baulera',
+          },
+        ],
+      },
+      {
+        key: 'occupancy',
+        name: 'occupancy',
+        label: 'Ocupación',
+        format: 'text',
+      },
+      {
+        key: 'reference_rent',
+        name: 'referenceRent',
+        label: 'Alquiler de referencia',
+        format: 'money',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const listUnits = defineAction({
+  id: 'properties.units.list',
+  title: 'Listar unidades',
+  description:
+    'Todas las unidades alquilables de la cartera, sin importar de qué propiedad son. Para las de una propiedad puntual, «Unidades de una propiedad».',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      limit: {
+        type: 'integer',
+        description: 'Cantidad de resultados a devolver. Default 20; máximo 50.',
+      },
+      offset: {
+        type: 'integer',
+        description: 'Cantidad de resultados a saltear para pedir la página siguiente.',
+      },
+    },
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        key: 'detail',
+        name: 'detail',
+        label: 'Detalle',
+        format: 'text',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'ocupada',
+            label: 'Ocupada',
+          },
+          {
+            value: 'vacante',
+            label: 'Vacante',
+          },
+          {
+            value: 'en_recambio',
+            label: 'En recambio',
+          },
+          {
+            value: 'con_preaviso',
+            label: 'Con preaviso',
+          },
+          {
+            value: 'no_disponible',
+            label: 'No disponible',
+          },
+        ],
+      },
+      {
+        key: 'reference_rent',
+        name: 'referenceRent',
+        label: 'Alquiler de referencia',
+        format: 'money',
+      },
+    ],
+    identifierKey: 'id',
+    defaultLimit: 20,
+    maxLimit: 50,
+  },
+});
+
+export const getByIdUnits = defineAction({
+  id: 'properties.units.getById',
+  title: 'Ver una unidad',
+  description:
+    'Los datos de una unidad: ambientes, baños, superficie, alícuota de expensas, estado de ocupación y alquiler de referencia.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description: 'La unidad que se quiere ver.',
+        ref: { resource: 'properties.units' },
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        key: 'detail',
+        name: 'detail',
+        label: 'Detalle',
+        format: 'text',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'ocupada',
+            label: 'Ocupada',
+          },
+          {
+            value: 'vacante',
+            label: 'Vacante',
+          },
+          {
+            value: 'en_recambio',
+            label: 'En recambio',
+          },
+          {
+            value: 'con_preaviso',
+            label: 'Con preaviso',
+          },
+          {
+            value: 'no_disponible',
+            label: 'No disponible',
+          },
+        ],
+      },
+      {
+        key: 'reference_rent',
+        name: 'referenceRent',
+        label: 'Alquiler de referencia',
+        format: 'money',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const createUnits = defineAction({
+  id: 'properties.units.create',
+  title: 'Dar de alta una unidad',
+  description:
+    'Agrega una unidad alquilable a una propiedad. El alquiler que se cobra NO se define acá: sale del contrato. El «alquiler de referencia» es solo el valor con el que se publica mientras está vacante.',
+  effect: 'write',
+  confirmation: 'always',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      data: {
+        type: 'object',
+        description: 'Datos de la unidad a crear.',
+        properties: {
+          building_id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'La propiedad a la que pertenece la unidad.',
+            ref: { resource: 'properties.buildings' },
+          },
+          name: {
+            type: 'string',
+            description: 'Nombre o número',
+          },
+          rooms: {
+            type: 'integer',
+            description: 'Ambientes',
+          },
+          bathrooms: {
+            type: 'integer',
+            description: 'Baños',
+          },
+          surface_m2: {
+            type: 'string',
+            pattern: '^-?\\d+(?:\\.\\d+)?$',
+            description: 'Superficie (m²)',
+          },
+          share_pct: {
+            type: 'string',
+            pattern: '^-?\\d+(?:\\.\\d+)?$',
+            description: 'Alícuota de expensas (%)',
+          },
+          photos: {
+            type: 'array',
+            items: {
+              type: 'object',
+              description: 'Una foto de la lista.',
+              properties: {
+                url: {
+                  type: 'string',
+                  description: 'Dirección de la foto, no el archivo.',
+                },
+                caption: {
+                  type: 'string',
+                  description: 'Qué se ve en la foto.',
+                },
+              },
+              required: ['url'],
+              additionalProperties: false,
+            },
+            description: 'Fotos (lista de fotos, en orden: la primera es la principal)',
+          },
+          status: {
+            type: 'string',
+            enum: ['vacante', 'ocupada', 'en_recambio', 'con_preaviso', 'no_disponible'],
+            description:
+              'Estado. Opciones: vacante (Vacante), ocupada (Ocupada), en_recambio (En recambio), con_preaviso (Con preaviso), no_disponible (No disponible).',
+          },
+          reference_rent: {
+            type: 'string',
+            pattern: '^-?\\d+(?:\\.\\d+)?$',
+            description: 'Alquiler de referencia',
+          },
+          notes: {
+            type: 'string',
+            description: 'Notas',
+          },
+        },
+        required: ['building_id', 'name', 'status'],
+        additionalProperties: false,
+      },
+    },
+    required: ['data'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        key: 'detail',
+        name: 'detail',
+        label: 'Detalle',
+        format: 'text',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'ocupada',
+            label: 'Ocupada',
+          },
+          {
+            value: 'vacante',
+            label: 'Vacante',
+          },
+          {
+            value: 'en_recambio',
+            label: 'En recambio',
+          },
+          {
+            value: 'con_preaviso',
+            label: 'Con preaviso',
+          },
+          {
+            value: 'no_disponible',
+            label: 'No disponible',
+          },
+        ],
+      },
+      {
+        key: 'reference_rent',
+        name: 'referenceRent',
+        label: 'Alquiler de referencia',
+        format: 'money',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const updateUnits = defineAction({
+  id: 'properties.units.update',
+  title: 'Editar una unidad',
+  description:
+    'Cambia los datos de una unidad. Cuidado con el estado: la ocupación la escribe el contrato al firmarse, renovarse o rescindirse. Ponerlo a mano acá deja la unidad diciendo una cosa y el alquiler otra.',
+  effect: 'write',
+  confirmation: 'always',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description: 'La unidad a editar.',
+        ref: { resource: 'properties.units' },
+      },
+      data: {
+        type: 'object',
+        description: 'Los campos de la unidad que se quieren cambiar.',
+        properties: {
+          building_id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'Mover la unidad a otra propiedad. Normalmente no se toca.',
+            ref: { resource: 'properties.buildings' },
+          },
+          name: {
+            type: 'string',
+            description: 'Nombre o número',
+          },
+          rooms: {
+            type: 'integer',
+            description: 'Ambientes',
+          },
+          bathrooms: {
+            type: 'integer',
+            description: 'Baños',
+          },
+          surface_m2: {
+            type: 'string',
+            pattern: '^-?\\d+(?:\\.\\d+)?$',
+            description: 'Superficie (m²)',
+          },
+          share_pct: {
+            type: 'string',
+            pattern: '^-?\\d+(?:\\.\\d+)?$',
+            description: 'Alícuota de expensas (%)',
+          },
+          photos: {
+            type: 'array',
+            items: {
+              type: 'object',
+              description: 'Una foto de la lista.',
+              properties: {
+                url: {
+                  type: 'string',
+                  description: 'Dirección de la foto, no el archivo.',
+                },
+                caption: {
+                  type: 'string',
+                  description: 'Qué se ve en la foto.',
+                },
+              },
+              required: ['url'],
+              additionalProperties: false,
+            },
+            description: 'Fotos (lista de fotos, en orden: la primera es la principal)',
+          },
+          status: {
+            type: 'string',
+            enum: ['vacante', 'ocupada', 'en_recambio', 'con_preaviso', 'no_disponible'],
+            description:
+              'Estado. Opciones: vacante (Vacante), ocupada (Ocupada), en_recambio (En recambio), con_preaviso (Con preaviso), no_disponible (No disponible).',
+          },
+          reference_rent: {
+            type: 'string',
+            pattern: '^-?\\d+(?:\\.\\d+)?$',
+            description: 'Alquiler de referencia',
+          },
+          notes: {
+            type: 'string',
+            description: 'Notas',
+          },
+        },
+        additionalProperties: false,
+      },
+    },
+    required: ['id', 'data'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        key: 'detail',
+        name: 'detail',
+        label: 'Detalle',
+        format: 'text',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'ocupada',
+            label: 'Ocupada',
+          },
+          {
+            value: 'vacante',
+            label: 'Vacante',
+          },
+          {
+            value: 'en_recambio',
+            label: 'En recambio',
+          },
+          {
+            value: 'con_preaviso',
+            label: 'Con preaviso',
+          },
+          {
+            value: 'no_disponible',
+            label: 'No disponible',
+          },
+        ],
+      },
+      {
+        key: 'reference_rent',
+        name: 'referenceRent',
+        label: 'Alquiler de referencia',
+        format: 'money',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const listBuildingExpenses = defineAction({
+  id: 'properties.buildingExpenses.list',
+  title: 'Listar liquidaciones de expensas',
+  description:
+    'Todas las liquidaciones de expensas cargadas, de cualquier propiedad y cualquier mes. Para acotar, «Expensas de una propiedad» o «Expensas liquidadas de un mes».',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      limit: {
+        type: 'integer',
+        description: 'Cantidad de resultados a devolver. Default 20; máximo 50.',
+      },
+      offset: {
+        type: 'integer',
+        description: 'Cantidad de resultados a saltear para pedir la página siguiente.',
+      },
+    },
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'period',
+        name: 'period',
+        label: 'Período',
+        format: 'text',
+      },
+      {
+        key: 'amount',
+        name: 'amount',
+        label: 'Total',
+        format: 'money',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'recibida',
+            label: 'Recibida',
+          },
+          {
+            value: 'pagada',
+            label: 'Pagada',
+          },
+        ],
+      },
+    ],
+    identifierKey: 'id',
+    defaultLimit: 10,
+    maxLimit: 50,
+  },
+});
+
+export const getByIdBuildingExpenses = defineAction({
+  id: 'properties.buildingExpenses.getById',
+  title: 'Ver una liquidación de expensas',
+  description:
+    'Una liquidación por su id: de qué propiedad y qué mes es, cuánto liquidó el consorcio, cuándo llegó y si ya se pagó.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description: 'La liquidación que se quiere ver.',
+        ref: { resource: 'properties.buildingExpenses' },
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'period',
+        name: 'period',
+        label: 'Período',
+        format: 'text',
+      },
+      {
+        key: 'amount',
+        name: 'amount',
+        label: 'Total',
+        format: 'money',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'recibida',
+            label: 'Recibida',
+          },
+          {
+            value: 'pagada',
+            label: 'Pagada',
+          },
+        ],
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const createBuildingExpenses = defineAction({
+  id: 'properties.buildingExpenses.create',
+  title: 'Cargar la liquidación de expensas',
+  description:
+    'Registra lo que el consorcio liquidó a una propiedad por un mes. Ese total es el que después se reparte entre las unidades según su alícuota, así que cargar dos veces el mismo mes duplica el reparto: antes de cargar, conviene mirar si ya está con «Expensas de una propiedad».',
+  effect: 'write',
+  confirmation: 'always',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      data: {
+        type: 'object',
+        description: 'Datos de la liquidación a cargar.',
+        properties: {
+          building_id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'La propiedad a la que el consorcio le liquidó estas expensas.',
+            ref: { resource: 'properties.buildings' },
+          },
+          period: {
+            type: 'string',
+            description: 'Período',
+          },
+          amount: {
+            type: 'string',
+            pattern: '^-?\\d+(?:\\.\\d+)?$',
+            description: 'Total liquidado',
+          },
+          status: {
+            type: 'string',
+            enum: ['recibida', 'pagada'],
+            description: 'Estado. Opciones: recibida (Recibida), pagada (Pagada).',
+            default: 'recibida',
+          },
+          paid_at: {
+            type: 'string',
+            format: 'date',
+            description: 'Fecha de pago',
+          },
+          document_url: {
+            type: 'string',
+            description: 'Link a la liquidación',
+          },
+          notes: {
+            type: 'string',
+            description: 'Observaciones',
+          },
+        },
+        required: ['building_id', 'period', 'amount'],
+        additionalProperties: false,
+      },
+    },
+    required: ['data'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'period',
+        name: 'period',
+        label: 'Período',
+        format: 'text',
+      },
+      {
+        key: 'amount',
+        name: 'amount',
+        label: 'Total',
+        format: 'money',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'recibida',
+            label: 'Recibida',
+          },
+          {
+            value: 'pagada',
+            label: 'Pagada',
+          },
+        ],
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const updateBuildingExpenses = defineAction({
+  id: 'properties.buildingExpenses.update',
+  title: 'Corregir una liquidación de expensas',
+  description:
+    'Cambia el importe, las fechas o el estado de una liquidación ya cargada. Ojo: si ese mes ya se repartió a los inquilinos, corregir acá NO corrige los cargos que ya se emitieron.',
+  effect: 'write',
+  confirmation: 'always',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description: 'La liquidación a corregir.',
+        ref: { resource: 'properties.buildingExpenses' },
+      },
+      data: {
+        type: 'object',
+        description: 'Los campos de la liquidación que se quieren cambiar.',
+        properties: {
+          building_id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'La propiedad a la que corresponde la liquidación.',
+            ref: { resource: 'properties.buildings' },
+          },
+          period: {
+            type: 'string',
+            description: 'Período',
+          },
+          amount: {
+            type: 'string',
+            pattern: '^-?\\d+(?:\\.\\d+)?$',
+            description: 'Total liquidado',
+          },
+          status: {
+            type: 'string',
+            enum: ['recibida', 'pagada'],
+            description: 'Estado. Opciones: recibida (Recibida), pagada (Pagada).',
+            default: 'recibida',
+          },
+          paid_at: {
+            type: 'string',
+            format: 'date',
+            description: 'Fecha de pago',
+          },
+          document_url: {
+            type: 'string',
+            description: 'Link a la liquidación',
+          },
+          notes: {
+            type: 'string',
+            description: 'Observaciones',
+          },
+        },
+        additionalProperties: false,
+      },
+    },
+    required: ['id', 'data'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'period',
+        name: 'period',
+        label: 'Período',
+        format: 'text',
+      },
+      {
+        key: 'amount',
+        name: 'amount',
+        label: 'Total',
+        format: 'money',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'recibida',
+            label: 'Recibida',
+          },
+          {
+            value: 'pagada',
+            label: 'Pagada',
+          },
+        ],
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const getSummaryBuildings = defineAction({
+  id: 'properties.buildings.getSummary',
+  title: 'Resumen de una propiedad',
+  description:
+    'Una propiedad con lo que no está en su fila: la dirección armada, cuántas unidades tiene, cuántas están ocupadas, el alquiler de referencia sumado y si sus certificados están al día.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description: 'La propiedad de la que se quiere el resumen.',
+        ref: { resource: 'properties.buildings' },
+      },
+      alertDays: {
+        type: 'integer',
+        description:
+          'Con cuántos días de anticipación contar un certificado como «por vencer». Si se omite, 30.',
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Propiedad',
+        format: 'text',
+      },
+      {
+        key: 'address',
+        name: 'address',
+        label: 'Dirección',
+        format: 'text',
+      },
+      {
+        key: 'certs',
+        name: 'certs',
+        label: 'Certificados',
+        format: 'text',
+        values: [
+          {
+            value: 'ok',
+            label: 'Al día',
+          },
+          {
+            value: 'soon',
+            label: 'Certificado por vencer',
+          },
+          {
+            value: 'expired',
+            label: 'Certificado vencido',
+          },
+        ],
+      },
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Tipo',
+        format: 'text',
+        values: [
+          {
+            value: 'edificio',
+            label: 'Edificio',
+          },
+          {
+            value: 'departamento',
+            label: 'Departamento',
+          },
+          {
+            value: 'casa',
+            label: 'Casa',
+          },
+          {
+            value: 'local',
+            label: 'Local',
+          },
+          {
+            value: 'oficina',
+            label: 'Oficina',
+          },
+          {
+            value: 'galpon',
+            label: 'Galpón',
+          },
+          {
+            value: 'cochera',
+            label: 'Cochera',
+          },
+          {
+            value: 'baulera',
+            label: 'Baulera',
+          },
+        ],
+      },
+      {
+        key: 'occupancy',
+        name: 'occupancy',
+        label: 'Ocupación',
+        format: 'text',
+      },
+      {
+        key: 'reference_rent',
+        name: 'referenceRent',
+        label: 'Alquiler de referencia',
+        format: 'money',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const listByBuildingUnits = defineAction({
+  id: 'properties.units.listByBuilding',
+  title: 'Unidades de una propiedad',
+  description:
+    'Las unidades alquilables de una propiedad, ordenadas por nombre, con su estado de ocupación.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      buildingId: {
+        type: 'string',
+        description: 'La propiedad cuyas unidades se quieren listar.',
+        ref: { resource: 'properties.buildings' },
+      },
+    },
+    required: ['buildingId'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        key: 'detail',
+        name: 'detail',
+        label: 'Detalle',
+        format: 'text',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'ocupada',
+            label: 'Ocupada',
+          },
+          {
+            value: 'vacante',
+            label: 'Vacante',
+          },
+          {
+            value: 'en_recambio',
+            label: 'En recambio',
+          },
+          {
+            value: 'con_preaviso',
+            label: 'Con preaviso',
+          },
+          {
+            value: 'no_disponible',
+            label: 'No disponible',
+          },
+        ],
+      },
+      {
+        key: 'reference_rent',
+        name: 'referenceRent',
+        label: 'Alquiler de referencia',
+        format: 'money',
+      },
+    ],
+    identifierKey: 'id',
+    defaultLimit: 20,
+    maxLimit: 50,
+  },
+});
+
+export const listByBuildingCertificates = defineAction({
+  id: 'properties.certificates.listByBuilding',
+  title: 'Certificados de una propiedad',
+  description:
+    'Los certificados que alcanzan a una propiedad —los suyos y los de sus unidades—, con el estado ya resuelto contra la fecha de hoy: vigente, por vencer o vencido. Lo que vence primero viene primero.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      buildingId: {
+        type: 'string',
+        description: 'La propiedad cuyos certificados se quieren ver.',
+        ref: { resource: 'properties.buildings' },
+      },
+      alertDays: {
+        type: 'integer',
+        description:
+          'Con cuántos días de anticipación marcar un certificado como «por vencer». Si se omite, cada tipo usa su propio horizonte.',
+      },
+    },
+    required: ['buildingId'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Certificado',
+        format: 'text',
+        values: [
+          {
+            value: 'matafuegos',
+            label: 'Matafuegos',
+          },
+          {
+            value: 'gas',
+            label: 'Instalación de gas',
+          },
+          {
+            value: 'ascensor',
+            label: 'Ascensor',
+          },
+          {
+            value: 'electricidad',
+            label: 'Instalación eléctrica',
+          },
+          {
+            value: 'seguro',
+            label: 'Seguro del inmueble',
+          },
+          {
+            value: 'otro',
+            label: 'Otro',
+          },
+        ],
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'vigente',
+            label: 'Vigente',
+          },
+          {
+            value: 'por_vencer',
+            label: 'Por vencer',
+          },
+          {
+            value: 'vencido',
+            label: 'Vencido',
+          },
+        ],
+      },
+      {
+        key: 'expires_at',
+        name: 'expiresAt',
+        label: 'Vence',
+        format: 'date',
+      },
+    ],
+    identifierKey: 'id',
+    defaultLimit: 10,
+    maxLimit: 50,
+  },
+});
+
+export const forBuildingBuildingExpenses = defineAction({
+  id: 'properties.buildingExpenses.forBuilding',
+  title: 'Expensas de una propiedad',
+  description:
+    'Las liquidaciones de expensas de una propiedad, del mes más reciente al más viejo, con el total que liquidó el consorcio y si ya se pagó.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      buildingId: {
+        type: 'string',
+        description: 'La propiedad cuyas liquidaciones se quieren ver.',
+        ref: { resource: 'properties.buildings' },
+      },
+    },
+    required: ['buildingId'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'period',
+        name: 'period',
+        label: 'Período',
+        format: 'text',
+      },
+      {
+        key: 'amount',
+        name: 'amount',
+        label: 'Total',
+        format: 'money',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'recibida',
+            label: 'Recibida',
+          },
+          {
+            value: 'pagada',
+            label: 'Pagada',
+          },
+        ],
+      },
+    ],
+    identifierKey: 'id',
+    defaultLimit: 10,
+    maxLimit: 50,
+  },
+});
+
+export const getOwnerUnitOwners = defineAction({
+  id: 'properties.unitOwners.getOwner',
+  title: 'Ver un propietario',
+  description:
+    'Un propietario con sus datos de contacto y de cobro juntos: documento, condición fiscal, banco, CBU y alias. Los datos de cobro se guardan aparte de las columnas del contacto y esta capacidad ya los devuelve al mismo nivel.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description:
+          'El propietario que se quiere ver, tal como lo devuelve «Listar propietarios».',
+        ref: { resource: 'properties.unitOwners' },
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Propietario',
+        format: 'text',
+      },
+      {
+        key: 'document_number',
+        name: 'documentNumber',
+        label: 'Documento',
+        format: 'text',
+      },
+      {
+        key: 'email',
+        name: 'email',
+        label: 'Email',
+        format: 'text',
+      },
+      {
+        key: 'phone',
+        name: 'phone',
+        label: 'Teléfono',
+        format: 'text',
+      },
+      {
+        key: 'address',
+        name: 'address',
+        label: 'Domicilio',
+        format: 'text',
+      },
+      {
+        key: 'tax_condition',
+        name: 'taxCondition',
+        label: 'Condición frente al IVA',
+        format: 'text',
+        values: [
+          {
+            value: 'monotributo',
+            label: 'Monotributo',
+          },
+          {
+            value: 'responsable_inscripto',
+            label: 'Responsable inscripto',
+          },
+          {
+            value: 'exento',
+            label: 'Exento',
+          },
+          {
+            value: 'consumidor_final',
+            label: 'Consumidor final',
+          },
+        ],
+      },
+      {
+        key: 'bank',
+        name: 'bank',
+        label: 'Banco',
+        format: 'text',
+      },
+      {
+        key: 'cbu',
+        name: 'cbu',
+        label: 'CBU',
+        format: 'text',
+      },
+      {
+        key: 'alias',
+        name: 'alias',
+        label: 'Alias',
+        format: 'text',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const saveOwnerUnitOwners = defineAction({
+  id: 'properties.unitOwners.saveOwner',
+  title: 'Guardar un propietario',
+  description:
+    'Da de alta un propietario o edita uno que ya existe: con «id» edita ese, sin «id» crea uno nuevo. Necesita nombre y documento (CUIT, CUIL o DNI) — sin documento no se le puede liquidar. Es el único camino correcto para escribir un propietario: decide qué va en las columnas del contacto y qué en sus datos de cobro, y conserva lo que otro rol le haya cargado a esa misma persona. Al editar no cambia el rol, porque alguien puede ser propietario de una unidad e inquilino de otra.',
+  effect: 'write',
+  confirmation: 'always',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      id: {
+        type: 'string',
+        description:
+          'El propietario a editar. Omitilo para crear uno nuevo; mandarlo con un id inexistente no crea nada.',
+        ref: { resource: 'properties.unitOwners' },
+      },
+      data: {
+        type: 'object',
+        description: 'Datos de Propietario a crear.',
+        properties: {
+          name: {
+            type: 'string',
+            description: 'Nombre y apellido o razón social',
+          },
+          document_type: {
+            type: 'string',
+            enum: ['cuit', 'cuil', 'dni'],
+            description: 'Documento. Opciones: cuit (CUIT), cuil (CUIL), dni (DNI).',
+          },
+          document_number: {
+            type: 'string',
+            description: 'Número',
+          },
+          tax_condition: {
+            type: 'string',
+            enum: ['monotributo', 'responsable_inscripto', 'exento', 'consumidor_final'],
+            description:
+              'Condición frente al IVA. Opciones: monotributo (Monotributo), responsable_inscripto (Responsable inscripto), exento (Exento), consumidor_final (Consumidor final).',
+          },
+          email: {
+            type: 'string',
+            description: 'Email',
+          },
+          phone: {
+            type: 'string',
+            description: 'Teléfono',
+          },
+          address: {
+            type: 'string',
+            description: 'Domicilio',
+          },
+          bank: {
+            type: 'string',
+            description: 'Banco',
+          },
+          account: {
+            type: 'string',
+            description: 'Tipo y número de cuenta',
+          },
+          cbu: {
+            type: 'string',
+            description: 'CBU',
+          },
+          alias: {
+            type: 'string',
+            description: 'Alias',
+          },
+        },
+        // El handler solo exige nombre, pero el canal agentic valida contra el
+        // mismo formulario que la pantalla, que además pide documento. Declarar
+        // acá solo el nombre haría que el catálogo prometa algo que después se
+        // rechaza — verificado en la certificación live. Y el documento no es
+        // burocracia: sin CUIT o DNI no se le puede liquidar al propietario.
+        required: ['name', 'document_type', 'document_number'],
+        additionalProperties: false,
+      },
+    },
+    required: ['data'],
+    additionalProperties: false,
+  },
+  // saveOwner devuelve a quién guardó y si nació en esta llamada — no la fila
+  // completa del propietario. Para leerlo entero, «Ver un propietario».
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'created',
+        name: 'created',
+        label: 'Se creó como propietario nuevo',
+        format: 'boolean',
+      },
+    ],
+    identifierKey: 'id',
+  },
+});
+
+export const listOwnersUnitOwners = defineAction({
+  id: 'properties.unitOwners.listOwners',
+  title: 'Listar propietarios',
+  description:
+    'Los propietarios de la cartera: cuántas unidades tiene cada uno y con qué participación, más los datos con los que se le transfiere (alias o CBU). Incluye a los registrados como propietarios aunque todavía no tengan ninguna unidad a su nombre.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: none(),
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Propietario',
+        format: 'text',
+      },
+      {
+        key: 'document',
+        name: 'document',
+        label: 'Documento',
+        format: 'text',
+      },
+      {
+        key: 'units',
+        name: 'units',
+        label: 'Unidades',
+        format: 'text',
+      },
+      {
+        key: 'cbu',
+        name: 'cbu',
+        label: 'CBU / alias',
+        format: 'text',
+      },
+    ],
+    identifierKey: 'id',
+    defaultLimit: 20,
+    maxLimit: 50,
+  },
+});
+
+/**
+ * No tiene pantalla propia: la consume la generación de cargos de `leases`, que
+ * necesita el total liquidado del mes para repartirlo por alícuota. El borrador
+ * la marcó como escritura porque no pudo inferirla desde ninguna vista; es un
+ * `select` por período.
+ */
+export const forPeriodBuildingExpenses = defineAction({
+  id: 'properties.buildingExpenses.forPeriod',
+  title: 'Expensas liquidadas de un mes',
+  description:
+    'Las liquidaciones de expensas de un mes, de todas las propiedades. Es el total que el consorcio liquidó y que después se reparte entre las unidades según su alícuota.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      period: {
+        type: 'string',
+        pattern: '^\\d{4}-\\d{2}$',
+        description: 'El mes a consultar, como «2026-08». Las expensas son mensuales.',
+      },
+    },
+    required: ['period'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'period',
+        name: 'period',
+        label: 'Período',
+        format: 'text',
+      },
+      {
+        key: 'amount',
+        name: 'amount',
+        label: 'Total',
+        format: 'money',
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'recibida',
+            label: 'Recibida',
+          },
+          {
+            value: 'pagada',
+            label: 'Pagada',
+          },
+        ],
+      },
+      {
+        key: 'building_id',
+        name: 'buildingId',
+        label: 'Propiedad',
+        format: 'text',
+        reference: {
+          action: 'properties.buildings.getById',
+          displayField: 'name',
+        },
+      },
+    ],
+    identifierKey: 'id',
+    defaultLimit: 20,
+    maxLimit: 50,
+  },
+});

@@ -192,9 +192,8 @@
       {
         "id": "properties.certificates.list",
         "action": "properties.certificates.list",
-        "generatedBy": "builder",
-        "title": "Listar Certificado",
-        "description": "Obtiene Certificado disponibles para el cliente actual.",
+        "title": "Listar certificados",
+        "description": "Todos los certificados obligatorios cargados —matafuegos, gas, ascensor, instalación eléctrica, seguro— con la fecha en que vencen. Para los de una propiedad puntual conviene «Certificados de una propiedad», que además resuelve si cada uno está vigente, por vencer o vencido.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
@@ -249,20 +248,32 @@
           "identifierKey": "id",
           "defaultLimit": 10,
           "maxLimit": 50
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.certificates.getById",
         "action": "properties.certificates.getById",
-        "generatedBy": "builder",
-        "title": "Consultar Certificado",
-        "description": "Obtiene un registro de Certificado por su ID.",
+        "title": "Ver un certificado",
+        "description": "Un certificado por su id: de qué es, cuándo se hizo, cuándo vence, con qué resultado y las observaciones que se le cargaron.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
           "type": "object",
           "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" }
+            "id": {
+              "type": "string",
+              "description": "El certificado que se quiere ver.",
+              "ref": { "resource": "properties.certificates" }
+            }
           },
           "required": ["id"],
           "additionalProperties": false
@@ -303,14 +314,22 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.certificates.create",
         "action": "properties.certificates.create",
-        "generatedBy": "builder",
-        "title": "Crear Certificado",
-        "description": "Crea Certificado con los mismos campos disponibles en el formulario del cliente.",
+        "title": "Registrar un certificado",
+        "description": "Deja asentado un certificado de seguridad que YA se hizo, sobre una propiedad o sobre una unidad. Es el registro de algo que pasó, no un pedido de inspección: la fecha de vencimiento que se cargue acá es la que después dispara los avisos.",
         "effect": "write",
         "confirmation": "always",
         "inputSchema": {
@@ -318,17 +337,19 @@
           "properties": {
             "data": {
               "type": "object",
-              "description": "Datos de Certificado a crear.",
+              "description": "Datos del certificado a registrar.",
               "properties": {
                 "building_id": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Propiedad"
+                  "description": "La propiedad a la que pertenece el certificado.",
+                  "ref": { "resource": "properties.buildings" }
                 },
                 "unit_id": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Unidad"
+                  "description": "Solo si el certificado es de UNA unidad y no de la propiedad entera. En ese caso va junto con la propiedad a la que esa unidad pertenece.",
+                  "ref": { "resource": "properties.units" }
                 },
                 "type": {
                   "type": "string",
@@ -410,33 +431,47 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 4,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.certificates.update",
         "action": "properties.certificates.update",
-        "generatedBy": "builder",
-        "title": "Actualizar Certificado",
-        "description": "Actualiza los campos editables de Certificado.",
+        "title": "Corregir un certificado",
+        "description": "Modifica un certificado ya registrado — típicamente para corregir la fecha de vencimiento o el resultado. Una renovación NO va acá: el certificado nuevo se registra aparte, así queda el historial de qué se hizo y cuándo.",
         "effect": "write",
         "confirmation": "always",
         "inputSchema": {
           "type": "object",
           "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" },
+            "id": {
+              "type": "string",
+              "description": "El certificado a corregir.",
+              "ref": { "resource": "properties.certificates" }
+            },
             "data": {
               "type": "object",
-              "description": "Campos de Certificado a modificar.",
+              "description": "Los campos del certificado que se quieren cambiar.",
               "properties": {
                 "building_id": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Propiedad"
+                  "description": "La propiedad a la que pertenece el certificado.",
+                  "ref": { "resource": "properties.buildings" }
                 },
                 "unit_id": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Unidad"
+                  "description": "Solo si el certificado es de UNA unidad y no de la propiedad entera. En ese caso va junto con la propiedad a la que esa unidad pertenece.",
+                  "ref": { "resource": "properties.units" }
                 },
                 "type": {
                   "type": "string",
@@ -517,14 +552,22 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 4,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.buildings.list",
         "action": "properties.buildings.list",
-        "generatedBy": "builder",
-        "title": "Listar Propiedad",
-        "description": "Obtiene Propiedad disponibles para el cliente actual.",
+        "title": "Listar propiedades",
+        "description": "La cartera completa: cada propiedad con su dirección, cuántas unidades tiene, cuántas están ocupadas, el alquiler de referencia sumado y si sus certificados están al día.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
@@ -599,20 +642,32 @@
           "identifierKey": "id",
           "defaultLimit": 20,
           "maxLimit": 50
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.buildings.getById",
         "action": "properties.buildings.getById",
-        "generatedBy": "builder",
-        "title": "Consultar Propiedad",
-        "description": "Obtiene un registro de Propiedad por su ID.",
+        "title": "Ver una propiedad",
+        "description": "Los datos cargados de una propiedad: tipo, dirección, partida inmobiliaria, modo de tenencia, administración y notas. No trae unidades ni ocupación — para eso está «Resumen de una propiedad».",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
           "type": "object",
           "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" }
+            "id": {
+              "type": "string",
+              "description": "La propiedad que se quiere ver.",
+              "ref": { "resource": "properties.buildings" }
+            }
           },
           "required": ["id"],
           "additionalProperties": false
@@ -673,14 +728,22 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.buildings.create",
         "action": "properties.buildings.create",
-        "generatedBy": "builder",
-        "title": "Crear Propiedad",
-        "description": "Crea Propiedad con los mismos campos disponibles en el formulario del cliente.",
+        "title": "Dar de alta una propiedad",
+        "description": "Registra una propiedad en la cartera: un edificio, una casa, un local, una cochera. Las unidades que se alquilan NO se crean acá — se agregan después, una por una, con «Dar de alta una unidad».",
         "effect": "write",
         "confirmation": "always",
         "inputSchema": {
@@ -847,23 +910,35 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 4,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.buildings.update",
         "action": "properties.buildings.update",
-        "generatedBy": "builder",
-        "title": "Actualizar Propiedad",
-        "description": "Actualiza los campos editables de Propiedad.",
+        "title": "Editar una propiedad",
+        "description": "Cambia los datos de una propiedad ya cargada: dirección, administración, partida inmobiliaria, notas o fotos.",
         "effect": "write",
         "confirmation": "always",
         "inputSchema": {
           "type": "object",
           "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" },
+            "id": {
+              "type": "string",
+              "description": "La propiedad a editar.",
+              "ref": { "resource": "properties.buildings" }
+            },
             "data": {
               "type": "object",
-              "description": "Campos de Propiedad a modificar.",
+              "description": "Los campos de la propiedad que se quieren cambiar.",
               "properties": {
                 "type": {
                   "type": "string",
@@ -1021,14 +1096,22 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 4,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.units.list",
         "action": "properties.units.list",
-        "generatedBy": "builder",
-        "title": "Listar Unidad",
-        "description": "Obtiene Unidad disponibles para el cliente actual.",
+        "title": "Listar unidades",
+        "description": "Todas las unidades alquilables de la cartera, sin importar de qué propiedad son. Para las de una propiedad puntual, «Unidades de una propiedad».",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
@@ -1083,20 +1166,32 @@
           "identifierKey": "id",
           "defaultLimit": 20,
           "maxLimit": 50
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.units.getById",
         "action": "properties.units.getById",
-        "generatedBy": "builder",
-        "title": "Consultar Unidad",
-        "description": "Obtiene un registro de Unidad por su ID.",
+        "title": "Ver una unidad",
+        "description": "Los datos de una unidad: ambientes, baños, superficie, alícuota de expensas, estado de ocupación y alquiler de referencia.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
           "type": "object",
           "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" }
+            "id": {
+              "type": "string",
+              "description": "La unidad que se quiere ver.",
+              "ref": { "resource": "properties.units" }
+            }
           },
           "required": ["id"],
           "additionalProperties": false
@@ -1137,14 +1232,22 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.units.create",
         "action": "properties.units.create",
-        "generatedBy": "builder",
-        "title": "Crear Unidad",
-        "description": "Crea Unidad con los mismos campos disponibles en el formulario del cliente.",
+        "title": "Dar de alta una unidad",
+        "description": "Agrega una unidad alquilable a una propiedad. El alquiler que se cobra NO se define acá: sale del contrato. El «alquiler de referencia» es solo el valor con el que se publica mientras está vacante.",
         "effect": "write",
         "confirmation": "always",
         "inputSchema": {
@@ -1152,12 +1255,13 @@
           "properties": {
             "data": {
               "type": "object",
-              "description": "Datos de Unidad a crear.",
+              "description": "Datos de la unidad a crear.",
               "properties": {
                 "building_id": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Propiedad"
+                  "description": "La propiedad a la que pertenece la unidad.",
+                  "ref": { "resource": "properties.buildings" }
                 },
                 "name": { "type": "string", "description": "Nombre o número" },
                 "rooms": { "type": "integer", "description": "Ambientes" },
@@ -1253,28 +1357,41 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 4,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.units.update",
         "action": "properties.units.update",
-        "generatedBy": "builder",
-        "title": "Actualizar Unidad",
-        "description": "Actualiza los campos editables de Unidad.",
+        "title": "Editar una unidad",
+        "description": "Cambia los datos de una unidad. Cuidado con el estado: la ocupación la escribe el contrato al firmarse, renovarse o rescindirse. Ponerlo a mano acá deja la unidad diciendo una cosa y el alquiler otra.",
         "effect": "write",
         "confirmation": "always",
         "inputSchema": {
           "type": "object",
           "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" },
+            "id": {
+              "type": "string",
+              "description": "La unidad a editar.",
+              "ref": { "resource": "properties.units" }
+            },
             "data": {
               "type": "object",
-              "description": "Campos de Unidad a modificar.",
+              "description": "Los campos de la unidad que se quieren cambiar.",
               "properties": {
                 "building_id": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Propiedad"
+                  "description": "Mover la unidad a otra propiedad. Normalmente no se toca.",
+                  "ref": { "resource": "properties.buildings" }
                 },
                 "name": { "type": "string", "description": "Nombre o número" },
                 "rooms": { "type": "integer", "description": "Ambientes" },
@@ -1369,14 +1486,22 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 4,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
         }
       },
       {
         "id": "properties.buildingExpenses.list",
         "action": "properties.buildingExpenses.list",
-        "generatedBy": "builder",
-        "title": "Listar Expensas del mes",
-        "description": "Obtiene Expensas del mes disponibles para el cliente actual.",
+        "title": "Listar liquidaciones de expensas",
+        "description": "Todas las liquidaciones de expensas cargadas, de cualquier propiedad y cualquier mes. Para acotar, «Expensas de una propiedad» o «Expensas liquidadas de un mes».",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
@@ -1422,20 +1547,32 @@
           "identifierKey": "id",
           "defaultLimit": 10,
           "maxLimit": 50
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "full",
+          "validated": false
         }
       },
       {
         "id": "properties.buildingExpenses.getById",
         "action": "properties.buildingExpenses.getById",
-        "generatedBy": "builder",
-        "title": "Consultar Expensas del mes",
-        "description": "Obtiene un registro de Expensas del mes por su ID.",
+        "title": "Ver una liquidación de expensas",
+        "description": "Una liquidación por su id: de qué propiedad y qué mes es, cuánto liquidó el consorcio, cuándo llegó y si ya se pagó.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
           "type": "object",
           "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" }
+            "id": {
+              "type": "string",
+              "description": "La liquidación que se quiere ver.",
+              "ref": { "resource": "properties.buildingExpenses" }
+            }
           },
           "required": ["id"],
           "additionalProperties": false
@@ -1467,14 +1604,22 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "full",
+          "validated": false
         }
       },
       {
         "id": "properties.buildingExpenses.create",
         "action": "properties.buildingExpenses.create",
-        "generatedBy": "builder",
-        "title": "Crear Expensas del mes",
-        "description": "Crea Expensas del mes con los mismos campos disponibles en el formulario del cliente.",
+        "title": "Cargar la liquidación de expensas",
+        "description": "Registra lo que el consorcio liquidó a una propiedad por un mes. Ese total es el que después se reparte entre las unidades según su alícuota, así que cargar dos veces el mismo mes duplica el reparto: antes de cargar, conviene mirar si ya está con «Expensas de una propiedad».",
         "effect": "write",
         "confirmation": "always",
         "inputSchema": {
@@ -1482,12 +1627,13 @@
           "properties": {
             "data": {
               "type": "object",
-              "description": "Datos de Expensas del mes a crear.",
+              "description": "Datos de la liquidación a cargar.",
               "properties": {
                 "building_id": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Propiedad"
+                  "description": "La propiedad a la que el consorcio le liquidó estas expensas.",
+                  "ref": { "resource": "properties.buildings" }
                 },
                 "period": { "type": "string", "description": "Período" },
                 "amount": {
@@ -1546,28 +1692,41 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 4,
+          "authority": "module",
+          "coverage": "full",
+          "validated": false
         }
       },
       {
         "id": "properties.buildingExpenses.update",
         "action": "properties.buildingExpenses.update",
-        "generatedBy": "builder",
-        "title": "Actualizar Expensas del mes",
-        "description": "Actualiza los campos editables de Expensas del mes.",
+        "title": "Corregir una liquidación de expensas",
+        "description": "Cambia el importe, las fechas o el estado de una liquidación ya cargada. Ojo: si ese mes ya se repartió a los inquilinos, corregir acá NO corrige los cargos que ya se emitieron.",
         "effect": "write",
         "confirmation": "always",
         "inputSchema": {
           "type": "object",
           "properties": {
-            "id": { "type": "string", "format": "uuid", "description": "ID" },
+            "id": {
+              "type": "string",
+              "description": "La liquidación a corregir.",
+              "ref": { "resource": "properties.buildingExpenses" }
+            },
             "data": {
               "type": "object",
-              "description": "Campos de Expensas del mes a modificar.",
+              "description": "Los campos de la liquidación que se quieren cambiar.",
               "properties": {
                 "building_id": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "Propiedad"
+                  "description": "La propiedad a la que corresponde la liquidación.",
+                  "ref": { "resource": "properties.buildings" }
                 },
                 "period": { "type": "string", "description": "Período" },
                 "amount": {
@@ -1625,22 +1784,42 @@
             }
           ],
           "identifierKey": "id"
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 4,
+          "authority": "module",
+          "coverage": "full",
+          "validated": false
         }
       },
       {
         "id": "properties.buildings.getSummary",
         "action": "properties.buildings.getSummary",
-        "title": "Ficha de propiedad",
-        "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+        "title": "Resumen de una propiedad",
+        "description": "Una propiedad con lo que no está en su fila: la dirección armada, cuántas unidades tiene, cuántas están ocupadas, el alquiler de referencia sumado y si sus certificados están al día.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
           "type": "object",
-          "properties": {},
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "La propiedad de la que se quiere el resumen.",
+              "ref": { "resource": "properties.buildings" }
+            },
+            "alertDays": {
+              "type": "integer",
+              "description": "Con cuántos días de anticipación contar un certificado como «por vencer». Si se omite, 30."
+            }
+          },
+          "required": ["id"],
           "additionalProperties": false
         },
         "output": {
-          "kind": "collection",
+          "kind": "record",
           "fields": [
             {
               "key": "name",
@@ -1694,22 +1873,35 @@
               "format": "money"
             }
           ],
-          "identifierKey": "id",
-          "defaultLimit": 20,
-          "maxLimit": 50
+          "identifierKey": "id"
         },
-        "generatedBy": "builder"
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
       },
       {
         "id": "properties.units.listByBuilding",
         "action": "properties.units.listByBuilding",
-        "title": "Ficha de propiedad",
-        "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+        "title": "Unidades de una propiedad",
+        "description": "Las unidades alquilables de una propiedad, ordenadas por nombre, con su estado de ocupación.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
           "type": "object",
-          "properties": {},
+          "properties": {
+            "buildingId": {
+              "type": "string",
+              "description": "La propiedad cuyas unidades se quieren listar.",
+              "ref": { "resource": "properties.buildings" }
+            }
+          },
+          "required": ["buildingId"],
           "additionalProperties": false
         },
         "output": {
@@ -1751,18 +1943,37 @@
           "defaultLimit": 20,
           "maxLimit": 50
         },
-        "generatedBy": "builder"
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
       },
       {
         "id": "properties.certificates.listByBuilding",
         "action": "properties.certificates.listByBuilding",
-        "title": "Ficha de propiedad",
-        "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+        "title": "Certificados de una propiedad",
+        "description": "Los certificados que alcanzan a una propiedad —los suyos y los de sus unidades—, con el estado ya resuelto contra la fecha de hoy: vigente, por vencer o vencido. Lo que vence primero viene primero.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
           "type": "object",
-          "properties": {},
+          "properties": {
+            "buildingId": {
+              "type": "string",
+              "description": "La propiedad cuyos certificados se quieren ver.",
+              "ref": { "resource": "properties.buildings" }
+            },
+            "alertDays": {
+              "type": "integer",
+              "description": "Con cuántos días de anticipación marcar un certificado como «por vencer». Si se omite, cada tipo usa su propio horizonte."
+            }
+          },
+          "required": ["buildingId"],
           "additionalProperties": false
         },
         "output": {
@@ -1804,18 +2015,33 @@
           "defaultLimit": 10,
           "maxLimit": 50
         },
-        "generatedBy": "builder"
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
       },
       {
         "id": "properties.buildingExpenses.forBuilding",
         "action": "properties.buildingExpenses.forBuilding",
-        "title": "Ficha de propiedad",
-        "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+        "title": "Expensas de una propiedad",
+        "description": "Las liquidaciones de expensas de una propiedad, del mes más reciente al más viejo, con el total que liquidó el consorcio y si ya se pagó.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
           "type": "object",
-          "properties": {},
+          "properties": {
+            "buildingId": {
+              "type": "string",
+              "description": "La propiedad cuyas liquidaciones se quieren ver.",
+              "ref": { "resource": "properties.buildings" }
+            }
+          },
+          "required": ["buildingId"],
           "additionalProperties": false
         },
         "output": {
@@ -1848,22 +2074,37 @@
           "defaultLimit": 10,
           "maxLimit": 50
         },
-        "generatedBy": "builder"
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "full",
+          "validated": false
+        }
       },
       {
         "id": "properties.unitOwners.getOwner",
         "action": "properties.unitOwners.getOwner",
-        "title": "Propietario",
-        "description": "Propietario: capacidad declarada por el Builder.",
+        "title": "Ver un propietario",
+        "description": "Un propietario con sus datos de contacto y de cobro juntos: documento, condición fiscal, banco, CBU y alias. Los datos de cobro se guardan aparte de las columnas del contacto y esta capacidad ya los devuelve al mismo nivel.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
           "type": "object",
-          "properties": {},
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "El propietario que se quiere ver, tal como lo devuelve «Listar propietarios».",
+              "ref": { "resource": "properties.unitOwners" }
+            }
+          },
+          "required": ["id"],
           "additionalProperties": false
         },
         "output": {
-          "kind": "collection",
+          "kind": "record",
           "fields": [
             {
               "key": "name",
@@ -1872,40 +2113,85 @@
               "format": "text"
             },
             {
-              "key": "document",
-              "name": "document",
+              "key": "document_number",
+              "name": "documentNumber",
               "label": "Documento",
               "format": "text"
             },
             {
-              "key": "units",
-              "name": "units",
-              "label": "Unidades",
+              "key": "email",
+              "name": "email",
+              "label": "Email",
               "format": "text"
             },
             {
-              "key": "cbu",
-              "name": "cbu",
-              "label": "CBU / alias",
+              "key": "phone",
+              "name": "phone",
+              "label": "Teléfono",
+              "format": "text"
+            },
+            {
+              "key": "address",
+              "name": "address",
+              "label": "Domicilio",
+              "format": "text"
+            },
+            {
+              "key": "tax_condition",
+              "name": "taxCondition",
+              "label": "Condición frente al IVA",
+              "format": "text",
+              "values": [
+                { "value": "monotributo", "label": "Monotributo" },
+                {
+                  "value": "responsable_inscripto",
+                  "label": "Responsable inscripto"
+                },
+                { "value": "exento", "label": "Exento" },
+                { "value": "consumidor_final", "label": "Consumidor final" }
+              ]
+            },
+            {
+              "key": "bank",
+              "name": "bank",
+              "label": "Banco",
+              "format": "text"
+            },
+            { "key": "cbu", "name": "cbu", "label": "CBU", "format": "text" },
+            {
+              "key": "alias",
+              "name": "alias",
+              "label": "Alias",
               "format": "text"
             }
           ],
-          "identifierKey": "id",
-          "defaultLimit": 20,
-          "maxLimit": 50
+          "identifierKey": "id"
         },
-        "generatedBy": "builder"
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
       },
       {
         "id": "properties.unitOwners.saveOwner",
         "action": "properties.unitOwners.saveOwner",
-        "title": "Propietario",
-        "description": "Propietario: capacidad declarada por el Builder.",
+        "title": "Guardar un propietario",
+        "description": "Da de alta un propietario o edita uno que ya existe: con «id» edita ese, sin «id» crea uno nuevo. Necesita nombre y documento (CUIT, CUIL o DNI) — sin documento no se le puede liquidar. Es el único camino correcto para escribir un propietario: decide qué va en las columnas del contacto y qué en sus datos de cobro, y conserva lo que otro rol le haya cargado a esa misma persona. Al editar no cambia el rol, porque alguien puede ser propietario de una unidad e inquilino de otra.",
         "effect": "write",
         "confirmation": "always",
         "inputSchema": {
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string",
+              "description": "El propietario a editar. Omitilo para crear uno nuevo; mandarlo con un id inexistente no crea nada.",
+              "ref": { "resource": "properties.unitOwners" }
+            },
             "data": {
               "type": "object",
               "description": "Datos de Propietario a crear.",
@@ -1952,39 +2238,29 @@
           "kind": "record",
           "fields": [
             {
-              "key": "name",
-              "name": "name",
-              "label": "Propietario",
-              "format": "text"
-            },
-            {
-              "key": "document",
-              "name": "document",
-              "label": "Documento",
-              "format": "text"
-            },
-            {
-              "key": "units",
-              "name": "units",
-              "label": "Unidades",
-              "format": "text"
-            },
-            {
-              "key": "cbu",
-              "name": "cbu",
-              "label": "CBU / alias",
-              "format": "text"
+              "key": "created",
+              "name": "created",
+              "label": "Se creó como propietario nuevo",
+              "format": "boolean"
             }
           ],
           "identifierKey": "id"
         },
-        "generatedBy": "builder"
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 4,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
       },
       {
         "id": "properties.unitOwners.listOwners",
         "action": "properties.unitOwners.listOwners",
-        "title": "Propietarios",
-        "description": "Propietarios: capacidad declarada por el Builder.",
+        "title": "Listar propietarios",
+        "description": "Los propietarios de la cartera: cuántas unidades tiene cada uno y con qué participación, más los datos con los que se le transfiere (alias o CBU). Incluye a los registrados como propietarios aunque todavía no tengan ninguna unidad a su nombre.",
         "effect": "read",
         "confirmation": "never",
         "inputSchema": {
@@ -1992,6 +2268,7 @@
           "properties": {},
           "additionalProperties": false
         },
+        "inputNone": true,
         "output": {
           "kind": "collection",
           "fields": [
@@ -2024,9 +2301,89 @@
           "defaultLimit": 20,
           "maxLimit": 50
         },
-        "generatedBy": "builder"
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
+      },
+      {
+        "id": "properties.buildingExpenses.forPeriod",
+        "action": "properties.buildingExpenses.forPeriod",
+        "title": "Expensas liquidadas de un mes",
+        "description": "Las liquidaciones de expensas de un mes, de todas las propiedades. Es el total que el consorcio liquidó y que después se reparte entre las unidades según su alícuota.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "period": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "description": "El mes a consultar, como «2026-08». Las expensas son mensuales."
+            }
+          },
+          "required": ["period"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "period",
+              "name": "period",
+              "label": "Período",
+              "format": "text"
+            },
+            {
+              "key": "amount",
+              "name": "amount",
+              "label": "Total",
+              "format": "money"
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "recibida", "label": "Recibida" },
+                { "value": "pagada", "label": "Pagada" }
+              ]
+            },
+            {
+              "key": "building_id",
+              "name": "buildingId",
+              "label": "Propiedad",
+              "format": "text",
+              "reference": {
+                "action": "properties.buildings.getById",
+                "displayField": "name"
+              }
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 20,
+          "maxLimit": 50
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "full",
+          "validated": false
+        }
       }
-    ]
+    ],
+    "actionContracts": "./dist/agentic/contracts.js",
+    "copilotCatalogFingerprint": "044fcbcb8dc8cfb139d22f5c7e037398",
+    "copilotCatalogContentFingerprint": "a6927cc46aa6b7e71dc3718beeb71c98"
   },
   "initView": null
 }
