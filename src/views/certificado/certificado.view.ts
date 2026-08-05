@@ -69,7 +69,15 @@ export function CertificadoView() {
                       clearable: true,
                     },
                     ...(refOptions['building_id'] ?? []).map((r: any) =>
-                      h(UI.SelectItem, { key: String(r.id), value: String(r.id) }, refLabel(r))
+                      h(
+                        UI.SelectItem,
+                        {
+                          key: String(r.id),
+                          value: String(r.id),
+                          subtitle: String(r['address'] ?? ''),
+                        },
+                        String(r['name'] ?? refLabel(r))
+                      )
                     )
                   ),
                   errors['building_id']
@@ -103,7 +111,15 @@ export function CertificadoView() {
                       clearable: true,
                     },
                     ...(refOptions['unit_id'] ?? []).map((r: any) =>
-                      h(UI.SelectItem, { key: String(r.id), value: String(r.id) }, refLabel(r))
+                      h(
+                        UI.SelectItem,
+                        {
+                          key: String(r.id),
+                          value: String(r.id),
+                          subtitle: String(r['detail'] ?? ''),
+                        },
+                        String(r['label'] ?? refLabel(r))
+                      )
                     )
                   ),
                   errors['unit_id']

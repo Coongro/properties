@@ -20,6 +20,8 @@
           "fieldType": "ref",
           "label": "Propiedad",
           "refEntity": "properties.buildings",
+          "refDisplay": "name",
+          "refSubtitle": "address",
           "width": "half",
           "validations": [
             "required"
@@ -32,6 +34,8 @@
           "fieldType": "ref",
           "label": "Unidad",
           "refEntity": "properties.units",
+          "refDisplay": "label",
+          "refSubtitle": "detail",
           "width": "half",
           "validations": [],
           "help": "Solo si el certificado es de una unidad puntual. Vacío = alcanza a toda la propiedad."
@@ -173,11 +177,6 @@
     }
   ],
   "headless": {
-    "handlers": [
-      {
-        "hook": "refLabel",
-        "mode": "presentation"
-      }
-    ]
+    "handlers": []
   }
 }

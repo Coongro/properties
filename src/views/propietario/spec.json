@@ -127,6 +127,70 @@
       ]
     },
     {
+      "id": "s4",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Qué unidad le pertenece",
+      "icon": "DoorOpen",
+      "children": [
+        {
+          "id": "f_unit",
+          "kind": "field",
+          "name": "unit_id",
+          "fieldType": "ref",
+          "label": "Unidad",
+          "refEntity": "properties.units",
+          "refDisplay": "label",
+          "refSubtitle": "detail",
+          "width": "half",
+          "validations": [],
+          "help": "Opcional: se puede cargar la persona ahora y decir de qué unidad es dueña después."
+        },
+        {
+          "id": "f_share",
+          "kind": "field",
+          "name": "share_pct",
+          "fieldType": "number",
+          "label": "Participación (%)",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: 50 · vacío = 100 %",
+          "help": "Si es dueño único, dejalo vacío: se toma 100 %. Entre todos los dueños de una unidad no puede pasar de 100 %."
+        },
+        {
+          "id": "f_role",
+          "kind": "field",
+          "name": "role",
+          "fieldType": "enum",
+          "label": "Carácter",
+          "validations": [],
+          "options": [
+            {
+              "value": "titular",
+              "label": "Titular",
+              "icon": "UserCheck"
+            },
+            {
+              "value": "cotitular",
+              "label": "Cotitular",
+              "icon": "Users"
+            },
+            {
+              "value": "usufructuario",
+              "label": "Usufructuario",
+              "icon": "HandCoins"
+            },
+            {
+              "value": "nudo_propietario",
+              "label": "Nudo propietario",
+              "icon": "KeyRound"
+            }
+          ],
+          "help": "El usufructuario percibe el alquiler; el nudo propietario conserva el dominio sin cobrarlo."
+        }
+      ]
+    },
+    {
       "id": "s3",
       "kind": "container",
       "ctype": "card",

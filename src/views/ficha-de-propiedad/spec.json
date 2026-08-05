@@ -51,6 +51,27 @@
                 "sub": "5 departamentos y 1 local",
                 "icon": "Grid3x3",
                 "tone": "neutral"
+              },
+              "showWhen": {
+                "column": "type",
+                "values": "edificio"
+              }
+            },
+            {
+              "id": "k1_unica",
+              "kind": "component",
+              "comp": "SummaryCard",
+              "showWhen": {
+                "column": "type",
+                "values": "edificio",
+                "negate": true
+              },
+              "props": {
+                "label": "Estado",
+                "value": "Vacante",
+                "sub": "sin contrato vigente",
+                "icon": "DoorOpen",
+                "tone": "warning"
               }
             }
           ]
@@ -68,6 +89,27 @@
                 "sub": "1°B vacante desde mayo",
                 "icon": "UserCheck",
                 "tone": "success"
+              },
+              "showWhen": {
+                "column": "type",
+                "values": "edificio"
+              }
+            },
+            {
+              "id": "k2_unica",
+              "kind": "component",
+              "comp": "SummaryCard",
+              "showWhen": {
+                "column": "type",
+                "values": "edificio",
+                "negate": true
+              },
+              "props": {
+                "label": "Titularidad",
+                "value": "Falta 100 %",
+                "sub": "sin titulares cargados",
+                "icon": "Users",
+                "tone": "warning"
               }
             }
           ]
@@ -143,9 +185,9 @@
             "subtitle": "detail",
             "pageSize": "20",
             "rowAction": {
-              "id": "openForm",
-              "label": "Editar unidad",
-              "target": "properties.unidad.open"
+              "id": "navigate",
+              "label": "Ver ficha",
+              "target": "properties.ficha-de-unidad.open"
             },
             "columns": [
               {
@@ -250,9 +292,123 @@
               ]
             ],
             "filters": [],
-            "actions": [],
+            "actions": [
+              {
+                "label": "Editar",
+                "icon": "Pencil",
+                "action": {
+                  "id": "openForm",
+                  "label": "Editar",
+                  "target": "properties.unidad.open"
+                }
+              }
+            ],
             "emptyTitle": "Esta propiedad no tiene unidades",
             "emptySub": "Agregá la primera para poder firmar un contrato."
+          }
+        }
+      ],
+      "showWhen": {
+        "column": "type",
+        "values": "edificio"
+      }
+    },
+    {
+      "id": "sec_titulares_prop",
+      "kind": "container",
+      "ctype": "section",
+      "label": "Titulares",
+      "icon": "Users",
+      "showWhen": {
+        "column": "type",
+        "values": "edificio",
+        "negate": true
+      },
+      "children": [
+        {
+          "id": "btn_titular_prop",
+          "kind": "component",
+          "comp": "Button",
+          "align": "right",
+          "props": {
+            "label": "Agregar titular",
+            "variant": "secondary",
+            "action": {
+              "id": "openForm",
+              "label": "Agregar titular",
+              "target": "properties.propietario.open"
+            }
+          }
+        },
+        {
+          "id": "tbl_titulares_prop",
+          "kind": "component",
+          "comp": "DataTable",
+          "props": {
+            "pageSize": "20",
+            "filters": [],
+            "columns": [
+              {
+                "key": "name",
+                "label": "Titular"
+              },
+              {
+                "key": "document",
+                "label": "Documento",
+                "emptyLabel": "Sin documento"
+              },
+              {
+                "key": "share_label",
+                "label": "Participación"
+              },
+              {
+                "key": "role",
+                "label": "Carácter",
+                "display": "pill",
+                "values": [
+                  {
+                    "value": "titular",
+                    "label": "Titular",
+                    "tone": "neutral",
+                    "icon": "UserCheck"
+                  },
+                  {
+                    "value": "cotitular",
+                    "label": "Cotitular",
+                    "tone": "neutral",
+                    "icon": "Users"
+                  },
+                  {
+                    "value": "usufructuario",
+                    "label": "Usufructuario",
+                    "tone": "success",
+                    "icon": "HandCoins"
+                  },
+                  {
+                    "value": "nudo_propietario",
+                    "label": "Nudo propietario",
+                    "tone": "neutral",
+                    "icon": "KeyRound"
+                  }
+                ]
+              }
+            ],
+            "actions": [
+              {
+                "label": "Quitar",
+                "variant": "destructive",
+                "icon": "UserMinus",
+                "confirm": "¿Sacar a esta persona de la titularidad? La persona no se borra: queda sin esta propiedad a su nombre, y se la puede volver a cargar.",
+                "successToast": "Titular quitado",
+                "action": {
+                  "id": "serverAction",
+                  "label": "Quitar",
+                  "target": "properties.unitOwners.removeOwner"
+                }
+              }
+            ],
+            "emptyTitle": "Esta propiedad no tiene titulares cargados",
+            "emptySub": "Sin dueño cargado no hay a quién liquidarle lo que se cobra."
           }
         }
       ]
@@ -618,6 +774,22 @@
         "key": "tbl_ot",
         "mode": "uiOnly",
         "reason": "Las órdenes de trabajo llegan con el plugin maintenance (F5); hasta entonces la tabla muestra su estado vacío."
+      },
+      {
+        "hook": "loadDataFor",
+        "key": "tbl_titulares_prop",
+        "mode": "query",
+        "action": "properties.unitOwners.listByBuilding",
+        "resource": "properties.unitOwners",
+        "outputBlockId": "tbl_titulares_prop"
+      },
+      {
+        "hook": "onAction",
+        "key": "properties.unitOwners.removeOwner",
+        "mode": "command",
+        "action": "properties.unitOwners.removeOwner",
+        "effect": "destructive",
+        "confirmation": "always"
       }
     ]
   }
