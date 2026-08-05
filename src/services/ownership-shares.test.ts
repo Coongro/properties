@@ -61,7 +61,7 @@ describe('checkOwnershipShares — el tope de 100 %', () => {
     expect(r.missing).toBe(0);
   });
 
-  it('rechaza un porcentaje fuera de rango antes de mirar la unit', () => {
+  it('rechaza un porcentaje fuera de rango antes de mirar la unidad', () => {
     expect(checkOwnershipShares({ ...unit(), share: 0, role: 'titular' }).error).toContain(
       'entre 0 y 100'
     );
@@ -109,8 +109,8 @@ describe('checkOwnershipShares — el usufruct no le saca assigned a nadie', () 
   });
 });
 
-describe('summarizeOwnership — cómo está repartida una unit', () => {
-  it('sin owners lo dice, en vez de mostrar 0 %', () => {
+describe('summarizeOwnership — cómo está repartida una unidad', () => {
+  it('sin titulares lo dice, en vez de mostrar 0 %', () => {
     const s = summarizeOwnership([]);
     expect(s.complete).toBe(false);
     expect(s.assigned).toBe(0);

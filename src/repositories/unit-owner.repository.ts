@@ -257,7 +257,7 @@ export class UnitOwnerRepository {
           // «4 unidades · 100%»: la participación se promedia porque puede diferir
           // por unidad (una heredada al 50%, otra propia al 100%).
           units: sql<string>`case when ${owned} = 0 then 'Sin unidades' else
-            ${owned}::text || ' unit' || (case when ${owned} = 1 then '' else 'es' end)
+            ${owned}::text || ' unidad' || (case when ${owned} = 1 then '' else 'es' end)
             || coalesce(' · ' || (
               select round(avg(o2.share_pct))::text from ${unitOwnerTable} o2
               where o2.contact_id = ${c} and o2.deleted_at is null and o2.share_pct is not null
