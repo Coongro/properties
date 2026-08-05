@@ -3,9 +3,16 @@ import type { NewContactRow } from '@coongro/contacts/server';
 import type { ModuleDatabaseAPI } from '@coongro/plugin-sdk';
 import { and, asc, eq, isNull, ne, sql, type SQL } from 'drizzle-orm';
 
+import { buildingTable } from '../schema/building.js';
 import { unitOwnerTable } from '../schema/unit-owner.js';
 import type { UnitOwnerRow, NewUnitOwnerRow } from '../schema/unit-owner.js';
 import { unitTable } from '../schema/unit.js';
+import {
+  documentKey,
+  findSamePerson,
+  samePersonMessage,
+  type PersonIdentity,
+} from '../services/duplicate-person.js';
 import {
   DEFAULT_OWNER_ROLE,
   OWNER_ROLES,
@@ -15,6 +22,9 @@ import {
   summarizeOwnership,
 } from '../services/ownership-shares.js';
 import type { OwnerRole, OwnershipSummary } from '../services/ownership-shares.js';
+import { unitLabel } from '../services/unit-identity.js';
+
+import { buildingAddressSql } from './building.repository.js';
 
 /**
  * Un propietario tal como lo muestra su listado. No hay entidad `owner`: es un
@@ -86,6 +96,25 @@ export interface UnitOwnerListRow {
   photo_url: string | null;
 }
 
+/** Una unidad a nombre de una persona, como la muestra su ficha. */
+export interface OwnerUnitRow {
+  /** El id del VÍNCULO. */
+  id: string;
+  unit_id: string;
+  contact_id: string;
+  /** Nombre calificado: «Belgrano 1240 · 1°A» — una unidad suelta no identifica nada. */
+  label: string;
+  unit_name: string;
+  building_name: string | null;
+  building_address: string | null;
+  share_pct: string | null;
+  /** «50 %», o «Sin definir» cuando la parte todavía no se cargó. */
+  share_label: string;
+  role: string;
+  /** Estado de ocupación de la unidad, con el vocabulario de siempre. */
+  status: string | null;
+}
+
 /** Lo que se va a escribir en el vínculo, ya validado contra el resto de los dueños. */
 interface OwnershipPlan {
   unitId: string;
@@ -143,6 +172,53 @@ export class UnitOwnerRepository {
         where u.building_id = ${buildingId} and u.deleted_at is null
       )`
     );
+  }
+
+  /**
+   * Las unidades que están a nombre de una persona, con su participación y carácter.
+   *
+   * Es la lectura que faltaba para que un propietario tenga ficha: el listado dice «2
+   * unidades» y ahí terminaba — no decía cuáles, y no había ninguna pantalla donde
+   * verlas. Va calificada («Belgrano 1240 · 1°A») porque una lista de unidades de otras
+   * propiedades es justo donde el nombre suelto no identifica nada.
+   */
+  async listUnitsOf({ contactId }: { contactId: string }): Promise<OwnerUnitRow[]> {
+    const rows = await this.db.ormQuery((tx) =>
+      tx
+        .select({
+          id: unitOwnerTable.id,
+          unit_id: unitOwnerTable.unit_id,
+          contact_id: unitOwnerTable.contact_id,
+          share_pct: unitOwnerTable.share_pct,
+          role: unitOwnerTable.role,
+          unit_name: unitTable.name,
+          building_name: buildingTable.name,
+          building_address: buildingAddressSql,
+          status: unitTable.status,
+        })
+        .from(unitOwnerTable)
+        .innerJoin(unitTable, eq(unitTable.id, unitOwnerTable.unit_id))
+        .leftJoin(buildingTable, eq(buildingTable.id, unitTable.building_id))
+        .where(
+          and(
+            eq(unitOwnerTable.contact_id, contactId),
+            isNull(unitOwnerTable.deleted_at),
+            isNull(unitTable.deleted_at)
+          )
+        )
+        .orderBy(asc(buildingTable.name), asc(unitTable.name))
+    );
+
+    return rows.map((f) => ({
+      ...f,
+      label: unitLabel({
+        unitName: f.unit_name,
+        buildingName: f.building_name,
+        buildingAddress: f.building_address,
+      }),
+      share_label: f.share_pct === null ? 'Sin definir' : `${Number(f.share_pct)} %`,
+      role: f.role ?? DEFAULT_OWNER_ROLE,
+    }));
   }
 
   /** El select de un dueño, que las dos lecturas comparten para leerse igual. */
@@ -254,14 +330,23 @@ export class UnitOwnerRepository {
           document: sql<string | null>`nullif(trim(concat_ws(' ',
             upper(${contactTable}."document_type"), ${contactTable}."document_number")), '')`,
           unit_count: sql<number>`${owned}::int`,
-          // «4 unidades · 100%»: la participación se promedia porque puede diferir
-          // por unidad (una heredada al 50%, otra propia al 100%).
+          /**
+           * «4 unidades». Sin porcentaje: el que se mostraba era el PROMEDIO de las
+           * participaciones, y promediar partes de cosas distintas no significa nada —
+           * alguien con el 50 % de un departamento y el 100 % de otro figuraba con
+           * «75 %», que no es su parte de nada. La participación es por unidad y se ve
+           * en la ficha de la persona, donde cada unidad tiene la suya al lado.
+           */
           units: sql<string>`case when ${owned} = 0 then 'Sin unidades' else
             ${owned}::text || ' unidad' || (case when ${owned} = 1 then '' else 'es' end)
-            || coalesce(' · ' || (
-              select round(avg(o2.share_pct))::text from ${unitOwnerTable} o2
-              where o2.contact_id = ${c} and o2.deleted_at is null and o2.share_pct is not null
-            ) || '%', '') end`,
+          end`,
+          /**
+           * Si tiene más de una unidad. El formulario solo puede hablar de UNA, así que
+           * con varias muestra un aviso en vez de un campo vacío que hace creer que no
+           * tiene ninguna. Viaja como texto porque las condiciones del Builder comparan
+           * contra valores, no contra booleanos.
+           */
+          many_units: sql<string>`case when ${owned} > 1 then 'si' else 'no' end`,
           // Los datos de cobro viven en `metadata` del contacto: son vocabulario de
           // alquileres y `contacts` lo comparte con otros kits.
           //
@@ -396,7 +481,13 @@ export class UnitOwnerRepository {
     if (!name) throw new Error('El propietario necesita un nombre.');
 
     // Se valida ANTES de escribir el contacto: si el porcentaje no cierra, la persona no
-    // queda creada a medias esperando un vínculo que nunca llegó.
+    // queda creada a medias esperando un vínculo que nunca llegó. Lo mismo con el
+    // documento repetido — que además evita partir en dos a la misma persona.
+    await this.rejectIfPersonExists({
+      id: id ?? undefined,
+      document_type: text(data.document_type),
+      document_number: text(data.document_number),
+    });
     const plan = await this.planLink({ contactId: id ?? null, data });
 
     // `metadata` es de todo el contacto, no de este formulario: ahí conviven los datos
@@ -597,6 +688,39 @@ export class UnitOwnerRepository {
           )
         )
     );
+  }
+
+  /**
+   * Frena el alta que cargaría dos veces a la misma persona.
+   *
+   * El documento es lo que identifica a alguien —hay dos «Ricardo Beltrán» en cualquier
+   * ciudad, un solo 14.892.331— y por eso el formulario ya lo exige. Sin este control la
+   * persona se parte en dos: los datos de cobro en una ficha, las unidades en la otra, y la
+   * liquidación le gira a media persona. Pasó en el tenant de prueba con dos «Ricardo
+   * Beltrán» del mismo DNI.
+   *
+   * Se comparan TODOS los contactos del tenant, no solo los propietarios: la misma persona
+   * puede estar cargada como inquilina, y duplicarla sería igual de malo. Y se comparan acá
+   * y no en el formulario porque la misma operación entra por la pantalla, por el canal
+   * agentic y por cualquier import.
+   */
+  private async rejectIfPersonExists(person: PersonIdentity): Promise<void> {
+    if (!documentKey(person)) return;
+
+    const existing = await this.db.ormQuery((tx) =>
+      tx
+        .select({
+          id: contactTable.id,
+          name: contactTable.name,
+          document_type: contactTable.document_type,
+          document_number: contactTable.document_number,
+        })
+        .from(contactTable)
+        .where(isNull(contactTable.deleted_at))
+    );
+
+    const same = findSamePerson(person, existing);
+    if (same) throw new Error(samePersonMessage(same));
   }
 
   /** El contacto crudo, para saber qué había en `metadata` antes de tocarla. */

@@ -210,7 +210,7 @@ export function PropietariosView() {
         pagination: { page, pageSize: 20, total: visibleRows.length },
         onPageChange: setPage,
         onRowClick: (row: any) => {
-          views.open('properties.propietario.open', { record: row }, { mode: 'dialog' });
+          views.open('properties.ficha-de-propietario.open', { record: row });
         },
         actions: ROW_ACTIONS,
         view: 'list' as const,

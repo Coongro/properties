@@ -78,6 +78,12 @@
         "title": "Ficha de unidad",
         "component": "./dist/views/ficha-de-unidad/index.js",
         "export": "FichaDeUnidadView"
+      },
+      {
+        "id": "properties.ficha-de-propietario.open",
+        "title": "Ficha de propietario",
+        "component": "./dist/views/ficha-de-propietario/index.js",
+        "export": "FichaDePropietarioView"
       }
     ],
     "repositories": [
@@ -137,6 +143,7 @@
           "ownershipOf",
           "listByUnit",
           "listByBuilding",
+          "listUnitsOf",
           "create",
           "update",
           "delete",
@@ -2688,11 +2695,85 @@
           "coverage": "partial",
           "validated": false
         }
+      },
+      {
+        "id": "properties.unitOwners.listUnitsOf",
+        "action": "properties.unitOwners.listUnitsOf",
+        "title": "Unidades de un propietario",
+        "description": "Qué unidades están a nombre de una persona, con qué participación y con qué carácter en cada una. Cada unidad viene con su propiedad adelante («Belgrano 1240 · 1°A»), porque el nombre suelto no distingue el «1°A» de un edificio del de otro.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "contactId": {
+              "type": "string",
+              "description": "La persona de la que se quieren ver las unidades.",
+              "ref": { "resource": "properties.unitOwners" }
+            }
+          },
+          "required": ["contactId"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "label",
+              "name": "label",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
+              "key": "share_label",
+              "name": "shareLabel",
+              "label": "Participación",
+              "format": "text"
+            },
+            {
+              "key": "role",
+              "name": "role",
+              "label": "Carácter",
+              "format": "text",
+              "values": [
+                { "value": "titular", "label": "Titular" },
+                { "value": "cotitular", "label": "Cotitular" },
+                { "value": "usufructuario", "label": "Usufructuario" },
+                { "value": "nudo_propietario", "label": "Nudo propietario" }
+              ]
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "ocupada", "label": "Ocupada" },
+                { "value": "vacante", "label": "Vacante" },
+                { "value": "en_recambio", "label": "En recambio" },
+                { "value": "con_preaviso", "label": "Con preaviso" },
+                { "value": "no_disponible", "label": "No disponible" }
+              ]
+            }
+          ],
+          "identifierKey": "unit_id",
+          "defaultLimit": 20,
+          "maxLimit": 50
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
       }
     ],
     "actionContracts": "./dist/agentic/contracts.js",
-    "copilotCatalogFingerprint": "e1fa1e247ab6a01da8c31296eed44fac",
-    "copilotCatalogContentFingerprint": "8c835e644b665d780b1f284e7e596a33"
+    "copilotCatalogFingerprint": "b3b64f981b274bb57b8f6fa2f9b7cd23",
+    "copilotCatalogContentFingerprint": "1d2dd9e61e43e69a03cfc23c0fba7d30"
   },
   "initView": null
 }
