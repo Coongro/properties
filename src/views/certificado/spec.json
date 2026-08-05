@@ -140,10 +140,10 @@
           "id": "f_file",
           "kind": "field",
           "name": "file_url",
-          "fieldType": "text",
-          "label": "Certificado (URL)",
+          "fieldType": "image",
+          "label": "Certificado",
           "validations": [],
-          "placeholder": "https://…"
+          "help": "Sacale una foto al papel o arrastrá el archivo. Antes había que pegar una dirección, así que hacía falta tenerlo publicado en otro lado — y por eso nadie cargaba ninguno."
         }
       ]
     },
