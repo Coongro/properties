@@ -1,0 +1,307 @@
+{
+  "specVersion": 1,
+  "kind": "blank",
+  "title": "Ficha de propietario",
+  "data": {
+    "repositoryPrefix": "properties.unitOwners"
+  },
+  "blocks": [
+    {
+      "id": "hdr",
+      "kind": "container",
+      "ctype": "header",
+      "alias": "Encabezado",
+      "back": true,
+      "avatar": "AR",
+      "name": "Ana María Ruiz",
+      "sub": "CUIT 27-11402887-3",
+      "badge": {
+        "text": "2 unidades",
+        "tone": "outline"
+      },
+      "actions": [
+        {
+          "label": "Editar propietario",
+          "variant": "secondary",
+          "action": {
+            "id": "openForm",
+            "label": "Editar propietario",
+            "target": "properties.propietario.open"
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "row_kpi",
+      "kind": "container",
+      "ctype": "columns",
+      "alias": "Resumen",
+      "cols": [
+        {
+          "fr": 0.34,
+          "children": [
+            {
+              "id": "k_unidades",
+              "kind": "component",
+              "comp": "SummaryCard",
+              "props": {
+                "label": "Unidades a su nombre",
+                "value": "2",
+                "sub": "en 1 propiedad",
+                "icon": "DoorOpen",
+                "tone": "neutral"
+              }
+            }
+          ]
+        },
+        {
+          "fr": 0.33,
+          "children": [
+            {
+              "id": "k_cobro",
+              "kind": "component",
+              "comp": "SummaryCard",
+              "props": {
+                "label": "Dónde cobra",
+                "value": "ana.ruiz.mp",
+                "sub": "Banco Galicia",
+                "icon": "Wallet",
+                "tone": "success"
+              }
+            }
+          ]
+        },
+        {
+          "fr": 0.33,
+          "children": [
+            {
+              "id": "k_fiscal",
+              "kind": "component",
+              "comp": "SummaryCard",
+              "props": {
+                "label": "Condición frente al IVA",
+                "value": "Responsable inscripto",
+                "sub": "para la liquidación",
+                "icon": "FileText",
+                "tone": "neutral"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec_unidades",
+      "kind": "container",
+      "ctype": "section",
+      "label": "Unidades a su nombre",
+      "icon": "DoorOpen",
+      "children": [
+        {
+          "id": "tbl_unidades",
+          "kind": "component",
+          "comp": "DataTable",
+          "props": {
+            "pageSize": "20",
+            "filters": [],
+            "rowAction": {
+              "id": "navigate",
+              "label": "Ver la unidad",
+              "target": "properties.ficha-de-unidad.open"
+            },
+            "columns": [
+              {
+                "key": "label",
+                "label": "Unidad"
+              },
+              {
+                "key": "share_label",
+                "label": "Participación"
+              },
+              {
+                "key": "role",
+                "label": "Carácter",
+                "display": "pill",
+                "values": [
+                  {
+                    "value": "titular",
+                    "label": "Titular",
+                    "tone": "neutral",
+                    "icon": "UserCheck"
+                  },
+                  {
+                    "value": "cotitular",
+                    "label": "Cotitular",
+                    "tone": "neutral",
+                    "icon": "Users"
+                  },
+                  {
+                    "value": "usufructuario",
+                    "label": "Usufructuario",
+                    "tone": "success",
+                    "icon": "HandCoins"
+                  },
+                  {
+                    "value": "nudo_propietario",
+                    "label": "Nudo propietario",
+                    "tone": "neutral",
+                    "icon": "KeyRound"
+                  }
+                ]
+              },
+              {
+                "key": "status",
+                "label": "Estado",
+                "display": "pill",
+                "values": [
+                  {
+                    "value": "ocupada",
+                    "label": "Ocupada",
+                    "tone": "success",
+                    "icon": "UserCheck"
+                  },
+                  {
+                    "value": "vacante",
+                    "label": "Vacante",
+                    "tone": "warning",
+                    "icon": "DoorOpen"
+                  },
+                  {
+                    "value": "en_recambio",
+                    "label": "En recambio",
+                    "tone": "neutral",
+                    "icon": "Paintbrush"
+                  },
+                  {
+                    "value": "con_preaviso",
+                    "label": "Con preaviso",
+                    "tone": "warning",
+                    "icon": "BellRing"
+                  },
+                  {
+                    "value": "no_disponible",
+                    "label": "No disponible",
+                    "tone": "outline",
+                    "icon": "Ban"
+                  }
+                ]
+              }
+            ],
+            "actions": [],
+            "emptyTitle": "Todavía no tiene unidades a su nombre",
+            "emptySub": "La titularidad se carga parado en la unidad, que es donde se ve si el 100 % está completo."
+          }
+        }
+      ]
+    },
+    {
+      "id": "row_datos",
+      "kind": "container",
+      "ctype": "columns",
+      "alias": "Cobro y contacto",
+      "cols": [
+        {
+          "fr": 0.5,
+          "children": [
+            {
+              "id": "sec_cobro",
+              "kind": "container",
+              "ctype": "section",
+              "label": "Dónde se le paga",
+              "icon": "Wallet",
+              "children": [
+                {
+                  "id": "kv_cobro",
+                  "kind": "component",
+                  "comp": "KeyValue",
+                  "props": {
+                    "rows": [
+                      {
+                        "k": "Banco",
+                        "v": "Banco Galicia",
+                        "icon": "Landmark"
+                      },
+                      {
+                        "k": "CBU",
+                        "v": "0070123430004001234567",
+                        "icon": "Hash",
+                        "mono": true
+                      },
+                      {
+                        "k": "Alias",
+                        "v": "ana.ruiz.mp",
+                        "icon": "AtSign"
+                      },
+                      {
+                        "k": "Tipo y número de cuenta",
+                        "v": "Caja de ahorro 1234/5",
+                        "icon": "CreditCard"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "fr": 0.5,
+          "children": [
+            {
+              "id": "sec_contacto",
+              "kind": "container",
+              "ctype": "section",
+              "label": "Cómo ubicarlo",
+              "icon": "Contact",
+              "children": [
+                {
+                  "id": "kv_contacto",
+                  "kind": "component",
+                  "comp": "KeyValue",
+                  "props": {
+                    "rows": [
+                      {
+                        "k": "Email",
+                        "v": "ana.ruiz@gmail.com",
+                        "icon": "Mail"
+                      },
+                      {
+                        "k": "Teléfono",
+                        "v": "341 555-9090",
+                        "icon": "Phone"
+                      },
+                      {
+                        "k": "Domicilio",
+                        "v": "Córdoba 1234, Rosario",
+                        "icon": "MapPin"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "headless": {
+    "handlers": [
+      {
+        "hook": "loadLiveValues",
+        "mode": "query",
+        "action": "properties.unitOwners.getOwner",
+        "resource": "properties.unitOwners"
+      },
+      {
+        "hook": "loadDataFor",
+        "key": "tbl_unidades",
+        "mode": "query",
+        "action": "properties.unitOwners.listUnitsOf",
+        "resource": "properties.unitOwners",
+        "outputBlockId": "tbl_unidades"
+      }
+    ]
+  }
+}

@@ -6,6 +6,7 @@
  */
 import { getHostReact, getHostUI, usePlugin } from '@coongro/plugin-sdk';
 
+import { customHandlers } from './handlers.js';
 import { useCertificadoView } from './use-certificado.js';
 
 const React = getHostReact();
@@ -363,14 +364,14 @@ export function CertificadoView() {
                 h(
                   UI.Label,
                   { htmlFor: 'file_url', style: { display: 'block', marginBottom: '6px' } },
-                  'Certificado (URL)'
+                  'Certificado'
                 ),
-                h(UI.Input, {
+                h(UI.ImageInput, {
                   id: 'file_url',
-                  type: 'text',
-                  value: String(values['file_url'] ?? ''),
-                  placeholder: 'https://…',
-                  onChange: (e: any) => setField('file_url', e.target.value),
+                  multiple: false,
+                  value: values['file_url'] ?? null,
+                  onChange: (v: any) => setField('file_url', v),
+                  onUpload: customHandlers.uploadImage,
                 }),
                 errors['file_url']
                   ? h(

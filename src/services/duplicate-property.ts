@@ -86,6 +86,46 @@ export function findDuplicate(
  * un choque con algo real— y dice qué hacer con las dos salidas legítimas: si de verdad es
  * otra unidad del mismo edificio, distinguirla en el nombre.
  */
+/**
+ * El edificio ya cargado en esa misma dirección, si lo hay.
+ *
+ * Es el otro camino por el que el mismo inmueble entra dos veces, y el que la comparación
+ * entre propiedades no ve: un departamento se puede cargar como propiedad suelta **o** como
+ * unidad de un edificio, y son dos pantallas que no se conocen. Con «Belgrano 1240» cargado
+ * como edificio y su 3°B adentro, nada impedía cargar además un departamento llamado
+ * «Belgrano 1240 3°B» — el mismo inmueble en dos lugares, cada uno con su contrato y su
+ * titular, y ninguna pantalla mostrando la contradicción.
+ *
+ * La regla es del negocio, no del dato: **si en esa dirección ya hay un edificio, lo que se
+ * alquila ahí es una de sus unidades.** No importa si el nombre coincide con alguna que ya
+ * exista: la que falte se agrega adentro, que es donde el sistema sabe contarla.
+ */
+export function buildingAtSameAddress<T extends PropertyIdentity & { type?: string | null }>(
+  property: PropertyIdentity,
+  existing: readonly T[]
+): T | undefined {
+  const address = addressKey(property);
+  if (!address) return undefined;
+  return existing.find(
+    (other) =>
+      other.id !== property.id &&
+      normalize(other.type) === 'edificio' &&
+      addressKey(other) === address
+  );
+}
+
+/**
+ * Qué se le dice a quien está cargando un departamento donde ya hay un edificio.
+ *
+ * No alcanza con negarse: hay un lugar correcto para eso y hay que decir cuál, porque la
+ * persona no tiene por qué saber que Coongro modela los departamentos de un edificio como
+ * unidades. Por eso el mensaje nombra el edificio y el botón exacto que hay que apretar.
+ */
+export function insideBuildingMessage(building: PropertyIdentity): string {
+  const name = String(building.name ?? '').trim() || 'el que ya está cargado';
+  return `En esa dirección ya está cargado el edificio «${name}»: lo que se alquila ahí es una de sus unidades. Agregala desde su ficha con «Nueva unidad», y así el contrato, el dueño y las expensas quedan contra el mismo inmueble.`;
+}
+
 export function duplicateMessage(existing: PropertyIdentity): string {
   const name = String(existing.name ?? '').trim();
   const address = [existing.street, existing.street_number, existing.city]

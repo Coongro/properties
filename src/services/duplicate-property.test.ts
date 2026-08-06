@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { duplicateMessage, findDuplicate, isSameProperty } from './duplicate-property.js';
+import {
+  buildingAtSameAddress,
+  duplicateMessage,
+  findDuplicate,
+  insideBuildingMessage,
+  isSameProperty,
+} from './duplicate-property.js';
 
 const laprida = {
   id: 'a',
@@ -84,5 +90,72 @@ describe('duplicateMessage', () => {
   it('sin dirección cargada, no inventa un lugar', () => {
     const message = duplicateMessage({ name: 'Casa de la abuela' });
     expect(message).toContain('«Casa de la abuela».');
+  });
+});
+
+describe('buildingAtSameAddress — el departamento va DENTRO de su edificio', () => {
+  const edificio = {
+    id: 'e1',
+    name: 'Belgrano 1240',
+    type: 'edificio',
+    street: 'Belgrano',
+    street_number: '1240',
+    city: 'Rosario',
+  };
+
+  it('el caso que originó esto: cargar un depto donde ya está el edificio', () => {
+    const depto = {
+      id: 'nuevo',
+      name: 'Belgrano 1240 3°B',
+      type: 'departamento',
+      street: 'Belgrano',
+      street_number: '1240',
+      city: 'Rosario',
+    };
+    expect(buildingAtSameAddress(depto, [edificio])?.id).toBe('e1');
+  });
+
+  it('no hace falta que el nombre coincida con una unidad: la dirección alcanza', () => {
+    const otro = { ...edificio, id: 'nuevo', name: 'Depto del fondo', type: 'departamento' };
+    expect(buildingAtSameAddress(otro, [edificio])).toBeDefined();
+  });
+
+  it('otra dirección no se frena', () => {
+    const lejos = {
+      id: 'nuevo',
+      name: 'Mitre 840',
+      type: 'casa',
+      street: 'Mitre',
+      street_number: '840',
+      city: 'Rosario',
+    };
+    expect(buildingAtSameAddress(lejos, [edificio])).toBeUndefined();
+  });
+
+  it('misma calle y altura en OTRA ciudad no es el mismo edificio', () => {
+    const otraCiudad = { ...edificio, id: 'nuevo', type: 'departamento', city: 'Santa Fe' };
+    expect(buildingAtSameAddress(otraCiudad, [edificio])).toBeUndefined();
+  });
+
+  it('sin dirección cargada no se afirma nada: frenar a ciegas sería peor', () => {
+    const sinDireccion = { id: 'n', name: 'Depto', type: 'departamento' };
+    expect(buildingAtSameAddress(sinDireccion, [edificio])).toBeUndefined();
+  });
+
+  it('un edificio no se choca consigo mismo al editarlo', () => {
+    expect(buildingAtSameAddress(edificio, [edificio])).toBeUndefined();
+  });
+
+  it('dos edificios en la misma dirección no los mira: eso ya lo ve el duplicado', () => {
+    const otroEdificio = { ...edificio, id: 'e2', name: 'Belgrano 1240 bis' };
+    // La regla solo aplica a lo que ES una sola unidad; el repositorio la llama
+    // únicamente en ese caso, y acá se documenta que la función no discrimina sola.
+    expect(buildingAtSameAddress(otroEdificio, [edificio])?.id).toBe('e1');
+  });
+
+  it('el mensaje dice DÓNDE va, no solo que no se puede', () => {
+    const texto = insideBuildingMessage(edificio);
+    expect(texto).toContain('Belgrano 1240');
+    expect(texto).toContain('Nueva unidad');
   });
 });

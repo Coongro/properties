@@ -7,8 +7,10 @@ import { certificateTable } from '../schema/certificate.js';
 import { unitOwnerTable } from '../schema/unit-owner.js';
 import { unitTable } from '../schema/unit.js';
 import {
+  buildingAtSameAddress,
   duplicateMessage,
   findDuplicate,
+  insideBuildingMessage,
   type PropertyIdentity,
 } from '../services/duplicate-property.js';
 import { summarizeOwnership } from '../services/ownership-shares.js';
@@ -133,12 +135,13 @@ async function syncSingleUnit(
  */
 async function rejectIfAlreadyLoaded(
   tx: Parameters<Parameters<ModuleDatabaseAPI['ormQuery']>[0]>[0],
-  property: PropertyIdentity
+  property: PropertyIdentity & { type?: string | null }
 ): Promise<void> {
   const existing = await tx
     .select({
       id: buildingTable.id,
       name: buildingTable.name,
+      type: buildingTable.type,
       street: buildingTable.street,
       street_number: buildingTable.street_number,
       city: buildingTable.city,
@@ -148,6 +151,15 @@ async function rejectIfAlreadyLoaded(
 
   const duplicate = findDuplicate(property, existing);
   if (duplicate) throw new Error(duplicateMessage(duplicate));
+
+  // El otro camino a lo mismo: un departamento cargado como propiedad suelta
+  // cuando su edificio YA está en el sistema. No es duplicado de otra propiedad
+  // —por eso el chequeo de arriba no lo ve— pero es el mismo inmueble entrando
+  // por la puerta equivocada.
+  if (isSingleUnit(property.type)) {
+    const building = buildingAtSameAddress(property, existing);
+    if (building) throw new Error(insideBuildingMessage(building));
+  }
 }
 
 export class BuildingRepository {

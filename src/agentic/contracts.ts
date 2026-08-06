@@ -2881,3 +2881,77 @@ export const listByBuildingUnitOwners = defineAction({
     maxLimit: 50,
   },
 });
+
+/**
+ * Las unidades que están a nombre de una persona. Es la mitad que faltaba: el
+ * catálogo sabía decir quiénes son los dueños de una unidad, pero no de qué es
+ * dueño alguien.
+ */
+export const listUnitsOfUnitOwners = defineAction({
+  id: 'properties.unitOwners.listUnitsOf',
+  title: 'Unidades de un propietario',
+  description:
+    'Qué unidades están a nombre de una persona, con qué participación y con qué carácter en cada una. Cada unidad viene con su propiedad adelante («Belgrano 1240 · 1°A»), porque el nombre suelto no distingue el «1°A» de un edificio del de otro.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      contactId: {
+        type: 'string',
+        description: 'La persona de la que se quieren ver las unidades.',
+        ref: { resource: 'properties.unitOwners' },
+      },
+    },
+    required: ['contactId'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'label',
+        name: 'label',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        key: 'share_label',
+        name: 'shareLabel',
+        label: 'Participación',
+        format: 'text',
+      },
+      {
+        key: 'role',
+        name: 'role',
+        label: 'Carácter',
+        format: 'text',
+        values: [
+          { value: 'titular', label: 'Titular' },
+          { value: 'cotitular', label: 'Cotitular' },
+          { value: 'usufructuario', label: 'Usufructuario' },
+          { value: 'nudo_propietario', label: 'Nudo propietario' },
+        ],
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          { value: 'ocupada', label: 'Ocupada' },
+          { value: 'vacante', label: 'Vacante' },
+          { value: 'en_recambio', label: 'En recambio' },
+          { value: 'con_preaviso', label: 'Con preaviso' },
+          { value: 'no_disponible', label: 'No disponible' },
+        ],
+      },
+    ],
+    // La UNIDAD, que es de lo que habla cada fila: con esa referencia el agente
+    // encadena hacia su ficha o hacia un contrato.
+    identifierKey: 'unit_id',
+    defaultLimit: 20,
+    maxLimit: 50,
+  },
+});

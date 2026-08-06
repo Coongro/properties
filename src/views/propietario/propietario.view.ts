@@ -4,7 +4,7 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { getHostReact, getHostUI, usePlugin } from '@coongro/plugin-sdk';
+import { getHostReact, getHostUI, usePlugin, views } from '@coongro/plugin-sdk';
 
 import { usePropietarioView } from './use-propietario.js';
 
@@ -304,166 +304,244 @@ export function PropietarioView() {
           )
         )
       ),
-      h(
-        'div',
-        { 'data-cg-block-id': 's4', style: { display: 'contents' } },
-        h(
-          UI.FormSection,
-          { icon: 'DoorOpen', title: 'Qué unidad le pertenece' },
-          h(
+      !['si'].includes(String(((views.params as any)?.record ?? null)?.['many_units'] ?? ''))
+        ? h(
             'div',
-            {
-              style: {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                alignItems: 'stretch',
-              },
-            },
+            { 'data-cg-block-id': 's4', style: { display: 'contents' } },
             h(
-              'div',
-              { style: { display: 'flex', gap: '14px', alignItems: 'flex-start' } },
+              UI.FormSection,
+              { icon: 'DoorOpen', title: 'Qué unidad le pertenece' },
               h(
                 'div',
-                { 'data-cg-block-id': 'f_unit', style: { display: 'contents' } },
+                {
+                  style: {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    alignItems: 'stretch',
+                  },
+                },
                 h(
                   'div',
-                  { style: { flex: '1 1 260px', minWidth: 0 } },
+                  { style: { display: 'flex', gap: '14px', alignItems: 'flex-start' } },
                   h(
-                    UI.Label,
-                    { htmlFor: 'unit_id', style: { display: 'block', marginBottom: '6px' } },
-                    'Unidad'
+                    'div',
+                    { 'data-cg-block-id': 'f_unit', style: { display: 'contents' } },
+                    h(
+                      'div',
+                      { style: { flex: '1 1 260px', minWidth: 0 } },
+                      h(
+                        UI.Label,
+                        { htmlFor: 'unit_id', style: { display: 'block', marginBottom: '6px' } },
+                        'Unidad'
+                      ),
+                      h(
+                        UI.Select,
+                        {
+                          value: String(values['unit_id'] ?? ''),
+                          onValueChange: (v: string) => setField('unit_id', v),
+                          placeholder: 'Elegir…',
+                          clearable: true,
+                        },
+                        ...(refOptions['unit_id'] ?? []).map((r: any) =>
+                          h(
+                            UI.SelectItem,
+                            {
+                              key: String(r.id),
+                              value: String(r.id),
+                              subtitle: String(r['detail'] ?? ''),
+                            },
+                            String(r['label'] ?? refLabel(r))
+                          )
+                        )
+                      ),
+                      errors['unit_id']
+                        ? h(
+                            'div',
+                            {
+                              style: {
+                                fontSize: '12px',
+                                color: 'var(--cg-danger)',
+                                marginTop: '4px',
+                              },
+                            },
+                            errors['unit_id']
+                          )
+                        : null
+                    )
                   ),
                   h(
-                    UI.Select,
-                    {
-                      value: String(values['unit_id'] ?? ''),
-                      onValueChange: (v: string) => setField('unit_id', v),
-                      placeholder: 'Elegir…',
-                      clearable: true,
-                    },
-                    ...(refOptions['unit_id'] ?? []).map((r: any) =>
+                    'div',
+                    { 'data-cg-block-id': 'f_share', style: { display: 'contents' } },
+                    h(
+                      'div',
+                      { style: { flex: '1 1 260px', minWidth: 0 } },
+                      h(
+                        UI.Label,
+                        { htmlFor: 'share_pct', style: { display: 'block', marginBottom: '6px' } },
+                        'Participación (%)'
+                      ),
+                      h(UI.Input, {
+                        id: 'share_pct',
+                        type: 'number',
+                        value: values['share_pct'] ?? '',
+                        placeholder: 'Ej: 50 · vacío = 100 %',
+                        onChange: (e: any) =>
+                          setField(
+                            'share_pct',
+                            e.target.value === '' ? null : Number(e.target.value)
+                          ),
+                      }),
+                      errors['share_pct']
+                        ? h(
+                            'div',
+                            {
+                              style: {
+                                fontSize: '12px',
+                                color: 'var(--cg-danger)',
+                                marginTop: '4px',
+                              },
+                            },
+                            errors['share_pct']
+                          )
+                        : null
+                    )
+                  )
+                ),
+                h(
+                  'div',
+                  { 'data-cg-block-id': 'f_role', style: { display: 'contents' } },
+                  h(
+                    'div',
+                    { style: { flex: '1 1 100%', minWidth: 0 } },
+                    h(
+                      UI.Label,
+                      { htmlFor: 'role', style: { display: 'block', marginBottom: '6px' } },
+                      'Carácter'
+                    ),
+                    h(
+                      UI.Select,
+                      {
+                        value: String(values['role'] ?? ''),
+                        onValueChange: (v: string) => setField('role', v),
+                        placeholder: 'Elegir…',
+                        clearable: true,
+                      },
                       h(
                         UI.SelectItem,
                         {
-                          key: String(r.id),
-                          value: String(r.id),
-                          subtitle: String(r['detail'] ?? ''),
+                          key: 'titular',
+                          value: 'titular',
+                          icon: h(UI.DynamicIcon, { icon: 'UserCheck', size: 16 }),
                         },
-                        String(r['label'] ?? refLabel(r))
-                      )
-                    )
-                  ),
-                  errors['unit_id']
-                    ? h(
-                        'div',
+                        'Titular'
+                      ),
+                      h(
+                        UI.SelectItem,
                         {
-                          style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
+                          key: 'cotitular',
+                          value: 'cotitular',
+                          icon: h(UI.DynamicIcon, { icon: 'Users', size: 16 }),
                         },
-                        errors['unit_id']
-                      )
-                    : null
-                )
-              ),
-              h(
-                'div',
-                { 'data-cg-block-id': 'f_share', style: { display: 'contents' } },
-                h(
-                  'div',
-                  { style: { flex: '1 1 260px', minWidth: 0 } },
-                  h(
-                    UI.Label,
-                    { htmlFor: 'share_pct', style: { display: 'block', marginBottom: '6px' } },
-                    'Participación (%)'
-                  ),
-                  h(UI.Input, {
-                    id: 'share_pct',
-                    type: 'number',
-                    value: values['share_pct'] ?? '',
-                    placeholder: 'Ej: 50 · vacío = 100 %',
-                    onChange: (e: any) =>
-                      setField('share_pct', e.target.value === '' ? null : Number(e.target.value)),
-                  }),
-                  errors['share_pct']
-                    ? h(
-                        'div',
+                        'Cotitular'
+                      ),
+                      h(
+                        UI.SelectItem,
                         {
-                          style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
+                          key: 'usufructuario',
+                          value: 'usufructuario',
+                          icon: h(UI.DynamicIcon, { icon: 'HandCoins', size: 16 }),
                         },
-                        errors['share_pct']
+                        'Usufructuario'
+                      ),
+                      h(
+                        UI.SelectItem,
+                        {
+                          key: 'nudo_propietario',
+                          value: 'nudo_propietario',
+                          icon: h(UI.DynamicIcon, { icon: 'KeyRound', size: 16 }),
+                        },
+                        'Nudo propietario'
                       )
-                    : null
-                )
-              )
-            ),
-            h(
-              'div',
-              { 'data-cg-block-id': 'f_role', style: { display: 'contents' } },
-              h(
-                'div',
-                { style: { flex: '1 1 100%', minWidth: 0 } },
-                h(
-                  UI.Label,
-                  { htmlFor: 'role', style: { display: 'block', marginBottom: '6px' } },
-                  'Carácter'
-                ),
-                h(
-                  UI.Select,
-                  {
-                    value: String(values['role'] ?? ''),
-                    onValueChange: (v: string) => setField('role', v),
-                    placeholder: 'Elegir…',
-                    clearable: true,
-                  },
-                  h(
-                    UI.SelectItem,
-                    {
-                      key: 'titular',
-                      value: 'titular',
-                      icon: h(UI.DynamicIcon, { icon: 'UserCheck', size: 16 }),
-                    },
-                    'Titular'
-                  ),
-                  h(
-                    UI.SelectItem,
-                    {
-                      key: 'cotitular',
-                      value: 'cotitular',
-                      icon: h(UI.DynamicIcon, { icon: 'Users', size: 16 }),
-                    },
-                    'Cotitular'
-                  ),
-                  h(
-                    UI.SelectItem,
-                    {
-                      key: 'usufructuario',
-                      value: 'usufructuario',
-                      icon: h(UI.DynamicIcon, { icon: 'HandCoins', size: 16 }),
-                    },
-                    'Usufructuario'
-                  ),
-                  h(
-                    UI.SelectItem,
-                    {
-                      key: 'nudo_propietario',
-                      value: 'nudo_propietario',
-                      icon: h(UI.DynamicIcon, { icon: 'KeyRound', size: 16 }),
-                    },
-                    'Nudo propietario'
+                    ),
+                    errors['role']
+                      ? h(
+                          'div',
+                          {
+                            style: {
+                              fontSize: '12px',
+                              color: 'var(--cg-danger)',
+                              marginTop: '4px',
+                            },
+                          },
+                          errors['role']
+                        )
+                      : null
                   )
-                ),
-                errors['role']
-                  ? h(
-                      'div',
-                      { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
-                      errors['role']
-                    )
-                  : null
+                )
               )
             )
           )
-        )
-      ),
+        : null,
+      ['si'].includes(String(((views.params as any)?.record ?? null)?.['many_units'] ?? ''))
+        ? h(
+            'div',
+            { 'data-cg-block-id': 's4_varias', style: { display: 'contents' } },
+            h(
+              UI.FormSection,
+              { icon: 'DoorOpen', title: 'Qué unidades le pertenecen' },
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    alignItems: 'stretch',
+                  },
+                },
+                h(
+                  'div',
+                  { 'data-cg-block-id': 'cal_varias', style: { display: 'contents' } },
+                  h(
+                    'div',
+                    {
+                      style: {
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '10px',
+                        padding: '12px 14px',
+                        borderRadius: '10px',
+                        background: 'var(--cg-bg-main)',
+                        border: '1px solid var(--cg-border)',
+                        color: 'var(--cg-text-secondary)',
+                      },
+                    },
+                    h(
+                      'span',
+                      { style: { flexShrink: 0, marginTop: '1px', display: 'inline-flex' } },
+                      h(UI.DynamicIcon, { icon: 'Info', size: 16 })
+                    ),
+                    h(
+                      'div',
+                      { style: { minWidth: 0 } },
+                      h(
+                        'div',
+                        { style: { fontWeight: 600, fontSize: '13.5px', marginBottom: '2px' } },
+                        'Tiene varias unidades a su nombre'
+                      ),
+                      h(
+                        'div',
+                        { style: { fontSize: '13px', lineHeight: 1.5 } },
+                        'Se ven todas, con su participación, en su ficha. Para cambiar la parte de una unidad, entrá a esa unidad: es donde se ve si el 100 % está completo.'
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        : null,
       h(
         'div',
         { 'data-cg-block-id': 's3', style: { display: 'contents' } },
@@ -494,13 +572,152 @@ export function PropietarioView() {
                     { htmlFor: 'bank', style: { display: 'block', marginBottom: '6px' } },
                     'Banco'
                   ),
-                  h(UI.Input, {
-                    id: 'bank',
-                    type: 'text',
-                    value: String(values['bank'] ?? ''),
-                    placeholder: 'Ej: Banco Galicia',
-                    onChange: (e: any) => setField('bank', e.target.value),
-                  }),
+                  h(
+                    UI.Select,
+                    {
+                      value: String(values['bank'] ?? ''),
+                      onValueChange: (v: string) => setField('bank', v),
+                      placeholder: 'Elegir…',
+                      clearable: true,
+                    },
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Nación', value: 'Banco Nación' },
+                      'Banco Nación'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Provincia', value: 'Banco Provincia' },
+                      'Banco Provincia'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Ciudad', value: 'Banco Ciudad' },
+                      'Banco Ciudad'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Galicia', value: 'Banco Galicia' },
+                      'Banco Galicia'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Santander', value: 'Banco Santander' },
+                      'Banco Santander'
+                    ),
+                    h(UI.SelectItem, { key: 'BBVA', value: 'BBVA' }, 'BBVA'),
+                    h(UI.SelectItem, { key: 'Banco Macro', value: 'Banco Macro' }, 'Banco Macro'),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Credicoop', value: 'Banco Credicoop' },
+                      'Banco Credicoop'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Patagonia', value: 'Banco Patagonia' },
+                      'Banco Patagonia'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Supervielle', value: 'Banco Supervielle' },
+                      'Banco Supervielle'
+                    ),
+                    h(UI.SelectItem, { key: 'ICBC', value: 'ICBC' }, 'ICBC'),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Comafi', value: 'Banco Comafi' },
+                      'Banco Comafi'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Hipotecario', value: 'Banco Hipotecario' },
+                      'Banco Hipotecario'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Industrial (BIND)', value: 'Banco Industrial (BIND)' },
+                      'Banco Industrial (BIND)'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco de Córdoba', value: 'Banco de Córdoba' },
+                      'Banco de Córdoba'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Nuevo Banco de Santa Fe', value: 'Nuevo Banco de Santa Fe' },
+                      'Nuevo Banco de Santa Fe'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Municipal de Rosario', value: 'Banco Municipal de Rosario' },
+                      'Banco Municipal de Rosario'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco de Corrientes', value: 'Banco de Corrientes' },
+                      'Banco de Corrientes'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Entre Ríos', value: 'Banco Entre Ríos' },
+                      'Banco Entre Ríos'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco de La Pampa', value: 'Banco de La Pampa' },
+                      'Banco de La Pampa'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco del Chubut', value: 'Banco del Chubut' },
+                      'Banco del Chubut'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco de San Juan', value: 'Banco de San Juan' },
+                      'Banco de San Juan'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco Santa Cruz', value: 'Banco Santa Cruz' },
+                      'Banco Santa Cruz'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco de Tierra del Fuego', value: 'Banco de Tierra del Fuego' },
+                      'Banco de Tierra del Fuego'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Nuevo Banco del Chaco', value: 'Nuevo Banco del Chaco' },
+                      'Nuevo Banco del Chaco'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco de Formosa', value: 'Banco de Formosa' },
+                      'Banco de Formosa'
+                    ),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Banco del Sol', value: 'Banco del Sol' },
+                      'Banco del Sol'
+                    ),
+                    h(UI.SelectItem, { key: 'Brubank', value: 'Brubank' }, 'Brubank'),
+                    h(UI.SelectItem, { key: 'Naranja X', value: 'Naranja X' }, 'Naranja X'),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Mercado Pago', value: 'Mercado Pago' },
+                      'Mercado Pago'
+                    ),
+                    h(UI.SelectItem, { key: 'Ualá', value: 'Ualá' }, 'Ualá'),
+                    h(
+                      UI.SelectItem,
+                      { key: 'Personal Pay', value: 'Personal Pay' },
+                      'Personal Pay'
+                    ),
+                    h(UI.SelectItem, { key: 'Otro', value: 'Otro' }, 'Otro')
+                  ),
                   errors['bank']
                     ? h(
                         'div',

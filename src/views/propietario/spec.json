@@ -188,6 +188,35 @@
           ],
           "help": "El usufructuario percibe el alquiler; el nudo propietario conserva el dominio sin cobrarlo."
         }
+      ],
+      "showWhen": {
+        "column": "many_units",
+        "values": "si",
+        "negate": true
+      }
+    },
+    {
+      "id": "s4_varias",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Qué unidades le pertenecen",
+      "icon": "DoorOpen",
+      "showWhen": {
+        "column": "many_units",
+        "values": "si"
+      },
+      "children": [
+        {
+          "id": "cal_varias",
+          "kind": "component",
+          "comp": "Callout",
+          "props": {
+            "tone": "neutral",
+            "icon": "Info",
+            "title": "Tiene varias unidades a su nombre",
+            "text": "Se ven todas, con su participación, en su ficha. Para cambiar la parte de una unidad, entrá a esa unidad: es donde se ve si el 100 % está completo."
+          }
+        }
       ]
     },
     {
@@ -201,11 +230,144 @@
           "id": "f_bank",
           "kind": "field",
           "name": "bank",
-          "fieldType": "text",
+          "fieldType": "enum",
           "label": "Banco",
           "width": "half",
           "validations": [],
-          "placeholder": "Ej: Banco Galicia"
+          "options": [
+            {
+              "value": "Banco Nación",
+              "label": "Banco Nación"
+            },
+            {
+              "value": "Banco Provincia",
+              "label": "Banco Provincia"
+            },
+            {
+              "value": "Banco Ciudad",
+              "label": "Banco Ciudad"
+            },
+            {
+              "value": "Banco Galicia",
+              "label": "Banco Galicia"
+            },
+            {
+              "value": "Banco Santander",
+              "label": "Banco Santander"
+            },
+            {
+              "value": "BBVA",
+              "label": "BBVA"
+            },
+            {
+              "value": "Banco Macro",
+              "label": "Banco Macro"
+            },
+            {
+              "value": "Banco Credicoop",
+              "label": "Banco Credicoop"
+            },
+            {
+              "value": "Banco Patagonia",
+              "label": "Banco Patagonia"
+            },
+            {
+              "value": "Banco Supervielle",
+              "label": "Banco Supervielle"
+            },
+            {
+              "value": "ICBC",
+              "label": "ICBC"
+            },
+            {
+              "value": "Banco Comafi",
+              "label": "Banco Comafi"
+            },
+            {
+              "value": "Banco Hipotecario",
+              "label": "Banco Hipotecario"
+            },
+            {
+              "value": "Banco Industrial (BIND)",
+              "label": "Banco Industrial (BIND)"
+            },
+            {
+              "value": "Banco de Córdoba",
+              "label": "Banco de Córdoba"
+            },
+            {
+              "value": "Nuevo Banco de Santa Fe",
+              "label": "Nuevo Banco de Santa Fe"
+            },
+            {
+              "value": "Banco Municipal de Rosario",
+              "label": "Banco Municipal de Rosario"
+            },
+            {
+              "value": "Banco de Corrientes",
+              "label": "Banco de Corrientes"
+            },
+            {
+              "value": "Banco Entre Ríos",
+              "label": "Banco Entre Ríos"
+            },
+            {
+              "value": "Banco de La Pampa",
+              "label": "Banco de La Pampa"
+            },
+            {
+              "value": "Banco del Chubut",
+              "label": "Banco del Chubut"
+            },
+            {
+              "value": "Banco de San Juan",
+              "label": "Banco de San Juan"
+            },
+            {
+              "value": "Banco Santa Cruz",
+              "label": "Banco Santa Cruz"
+            },
+            {
+              "value": "Banco de Tierra del Fuego",
+              "label": "Banco de Tierra del Fuego"
+            },
+            {
+              "value": "Nuevo Banco del Chaco",
+              "label": "Nuevo Banco del Chaco"
+            },
+            {
+              "value": "Banco de Formosa",
+              "label": "Banco de Formosa"
+            },
+            {
+              "value": "Banco del Sol",
+              "label": "Banco del Sol"
+            },
+            {
+              "value": "Brubank",
+              "label": "Brubank"
+            },
+            {
+              "value": "Naranja X",
+              "label": "Naranja X"
+            },
+            {
+              "value": "Mercado Pago",
+              "label": "Mercado Pago"
+            },
+            {
+              "value": "Ualá",
+              "label": "Ualá"
+            },
+            {
+              "value": "Personal Pay",
+              "label": "Personal Pay"
+            },
+            {
+              "value": "Otro",
+              "label": "Otro"
+            }
+          ]
         },
         {
           "id": "f_account",
