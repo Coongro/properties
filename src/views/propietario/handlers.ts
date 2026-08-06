@@ -16,6 +16,11 @@
 import type { CustomHandlers } from '@coongro/plugin-sdk';
 
 export const customHandlers: CustomHandlers = {
+  // Cómo se lee cada unidad en el desplegable —«Belgrano 1240 · 1°A» con su detalle
+  // debajo— NO se decide acá: es diseño del campo y se elige en el Builder
+  // («Texto de cada opción» y «Subtítulo de cada opción»). Escribirlo como código sería
+  // programar la presentación de un campo en vez de diseñarla.
+
   /** Abre el formulario con el propietario ya cargado, incluidos sus datos de cobro. */
   onInit: ({ execute, editingId }) =>
     editingId

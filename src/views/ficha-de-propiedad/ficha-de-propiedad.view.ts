@@ -4,7 +4,7 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { getHostReact, getHostUI, useIsMobile, views } from '@coongro/plugin-sdk';
+import { getHostReact, getHostUI, useIsMobile, usePlugin, views } from '@coongro/plugin-sdk';
 
 import { useFichaDePropiedadView } from './use-ficha-de-propiedad.js';
 
@@ -16,6 +16,7 @@ const UI = getHostUI() as any;
 
 export function FichaDePropiedadView() {
   const isMobile = useIsMobile();
+  const { toast } = usePlugin();
   // Tono del badge: el que devuelven los datos, y si no el del diseño.
   // ⚠️ MISMO mapa que el TONE_VARIANT de las tablas: el mismo estado tiene
   // que pintarse igual en la lista y en la ficha (neutral era 'secondary'
@@ -28,7 +29,19 @@ export function FichaDePropiedadView() {
       danger: 'danger-soft',
       outline: 'outline',
     })[tone] ?? fallback;
-  const { t1, t2, t3, t4, metric } = useFichaDePropiedadView();
+  const {
+    pendingConfirm,
+    askConfirm,
+    cancelConfirm,
+    runConfirmed,
+    t1,
+    t2,
+    t3,
+    t4,
+    t5,
+    runServerAction,
+    metric,
+  } = useFichaDePropiedadView();
 
   // ── tabla 1 — properties.buildings: render propio sobre su estado t1 ──
   const renderTable1 = (() => {
@@ -163,6 +176,15 @@ export function FichaDePropiedadView() {
           )
         : shown;
     };
+    const ROW_ACTIONS = [
+      {
+        label: 'Editar',
+        icon: 'Pencil',
+        onClick: (row: any) => {
+          views.open('properties.unidad.open', { record: row }, { mode: 'sheet' });
+        },
+      },
+    ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
     const renderTable = () =>
       h(
@@ -206,8 +228,9 @@ export function FichaDePropiedadView() {
           pagination: { page, pageSize: 20, total: visibleRows.length },
           onPageChange: setPage,
           onRowClick: (row: any) => {
-            views.open('properties.unidad.open', { record: row }, { mode: 'sheet' });
+            views.open('properties.ficha-de-unidad.open', { record: row });
           },
+          actions: ROW_ACTIONS,
           view: 'cards' as const,
           cardMinWidth: 260,
           itemImage: (row: any) => {
@@ -281,6 +304,37 @@ export function FichaDePropiedadView() {
                     renderCell(row, c)
                   )
                 )
+              ),
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    gap: '4px',
+                    justifyContent: 'flex-end',
+                    borderTop: '1px solid var(--cg-border-light)',
+                    paddingTop: '8px',
+                    marginTop: '2px',
+                  },
+                },
+                ...ROW_ACTIONS.filter((a2: any) => !a2.hidden?.(row)).map((a2: any) =>
+                  h(
+                    UI.Button,
+                    {
+                      key: a2.label,
+                      size: 'sm' as const,
+                      variant:
+                        a2.variant === 'destructive'
+                          ? ('destructive' as const)
+                          : ('ghost' as const),
+                      onClick: (e: any) => {
+                        e.stopPropagation();
+                        a2.onClick(row);
+                      },
+                    },
+                    a2.label
+                  )
+                )
               )
             ),
           onClearFilters: () => {
@@ -301,6 +355,253 @@ export function FichaDePropiedadView() {
     const {
       loading,
       visibleRows,
+      COLUMNS,
+      sort,
+      onSortChange,
+      cellValue,
+      search,
+      setSearch,
+      clearFilters,
+      page,
+      setPage,
+      pagedRows,
+    } = t2;
+    const cellText = (row: any, c: any) => {
+      const v = cellValue(row, c);
+      return v === null || v === undefined
+        ? ''
+        : typeof v === 'object'
+          ? JSON.stringify(v)
+          : String(v);
+    };
+    const TONE_VARIANT: Record<string, string> = {
+      neutral: 'neutral-soft',
+      success: 'success-soft',
+      warning: 'warning-soft',
+      danger: 'danger-soft',
+      outline: 'outline',
+    };
+    const enumVal = (c: any, raw: string) => (c.values ?? []).find((e: any) => e.value === raw);
+    const renderCell = (row: any, c: any) => {
+      const raw = cellText(row, c);
+      if (raw === '' && c.emptyLabel) {
+        return h(
+          'span',
+          {
+            style: {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--cg-text-muted)',
+            },
+          },
+          c.emptyIcon ? h(UI.DynamicIcon, { icon: c.emptyIcon, size: 15 }) : null,
+          c.emptyLabel
+        );
+      }
+      const ev = enumVal(c, raw);
+      const label = ev?.label ?? raw;
+      const shown = raw !== '' ? (c.prefix ?? '') + label + (c.suffix ?? '') : label;
+      if (c.display === 'avatar') {
+        const initial = (String(raw).trim().charAt(0) || '?').toUpperCase();
+        return h(
+          'span',
+          { style: { display: 'inline-flex', alignItems: 'center', gap: '8px', minWidth: 0 } },
+          h(
+            'span',
+            {
+              style: {
+                width: '26px',
+                height: '26px',
+                borderRadius: '50%',
+                flexShrink: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'var(--cg-gold-soft)',
+                border: '1px solid var(--cg-gold-lt)',
+                color: 'var(--cg-gold-deep)',
+                fontWeight: 700,
+                fontSize: '11px',
+              },
+            },
+            initial
+          ),
+          h('span', null, shown)
+        );
+      }
+      const iconName = ev?.icon;
+      const icon = iconName ? h(UI.DynamicIcon, { icon: iconName, size: 16 }) : null;
+      if (c.display === 'pill') {
+        return label
+          ? h(
+              UI.Badge,
+              {
+                variant: TONE_VARIANT[ev?.tone ?? c.tone ?? 'neutral'] ?? 'neutral-soft',
+                size: 'compact',
+                icon,
+              },
+              label
+            )
+          : '';
+      }
+      if (c.display === 'progress') {
+        const n = Math.max(0, Math.min(100, Number(cellValue(row, c)) || 0));
+        return h(
+          'div',
+          { style: { display: 'flex', alignItems: 'center', gap: '8px', minWidth: '90px' } },
+          h(
+            'div',
+            {
+              style: {
+                flex: '1 1 0',
+                height: '6px',
+                borderRadius: '999px',
+                background: 'var(--cg-bg-secondary)',
+                overflow: 'hidden',
+              },
+            },
+            h('div', {
+              style: {
+                width: n + '%',
+                height: '100%',
+                borderRadius: '999px',
+                background: 'var(--cg-gold)',
+              },
+            })
+          ),
+          h(
+            'span',
+            { style: { fontSize: '12px', color: 'var(--cg-text-muted)' } },
+            Math.round(n) + '%'
+          )
+        );
+      }
+      if (c.display === 'mono')
+        return h(
+          'span',
+          { style: { fontFamily: 'ui-monospace, monospace', fontSize: '12px' } },
+          shown
+        );
+      return icon
+        ? h(
+            'span',
+            { style: { display: 'inline-flex', alignItems: 'center', gap: '6px' } },
+            icon,
+            shown
+          )
+        : shown;
+    };
+    const ROW_ACTIONS = [
+      {
+        label: 'Quitar',
+        variant: 'destructive' as const,
+        icon: 'UserMinus',
+        onClick: (row: any) => {
+          askConfirm(
+            'Quitar',
+            '¿Sacar a esta persona de la titularidad? La persona no se borra: queda sin esta propiedad a su nombre, y se la puede volver a cargar.',
+            'Quitar',
+            () => {
+              ((row: any) => {
+                ((row: any) => {
+                  void runServerAction('properties.unitOwners.removeOwner', { id: row.id }, row);
+                })(row);
+                toast.success('Titular quitado', '');
+              })(row);
+            }
+          );
+        },
+      },
+    ];
+    // eslint-disable-next-line sonarjs/prefer-immediate-return
+    const renderTable = () =>
+      h(
+        'div',
+        {
+          style: {
+            background: 'var(--cg-bg)',
+            border: '1px solid var(--cg-border)',
+            borderRadius: '14px',
+            padding: '20px',
+          },
+        },
+        h(UI.DataTable, {
+          data: pagedRows,
+          rowKey: (row: any) => String(row.id ?? JSON.stringify(row)),
+          loading,
+          columns: COLUMNS.map((c) => ({
+            key: c.key,
+            header: c.label,
+            sortable: true,
+            render: (row: any) => renderCell(row, c),
+          })),
+          searchPlaceholder: 'Buscar…',
+          searchValue: search,
+          onSearchChange: setSearch,
+          sortKey: sort?.k ?? null,
+          sortDirection: sort ? (sort.d > 0 ? 'asc' : 'desc') : null,
+          onSortChange,
+          pagination: { page, pageSize: 20, total: visibleRows.length },
+          onPageChange: setPage,
+          actions: ROW_ACTIONS,
+          mobileRender: (row: any) =>
+            h(
+              'div',
+              { style: { display: 'flex', flexDirection: 'column' as const, gap: '6px' } },
+              h(
+                'div',
+                { style: { fontSize: '14px', fontWeight: 600, color: 'var(--cg-text)' } },
+                renderCell(row, COLUMNS[0])
+              ),
+              ...COLUMNS.slice(1).map((c) =>
+                h(
+                  'div',
+                  {
+                    key: c.key,
+                    style: {
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '12px',
+                      fontSize: '13px',
+                    },
+                  },
+                  h('span', { style: { color: 'var(--cg-text-muted)', flexShrink: 0 } }, c.label),
+                  h(
+                    'span',
+                    {
+                      style: {
+                        textAlign: 'right' as const,
+                        minWidth: 0,
+                        flex: '1 1 auto',
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                      },
+                    },
+                    renderCell(row, c)
+                  )
+                )
+              )
+            ),
+          onClearFilters: () => {
+            clearFilters();
+          },
+          emptyState: {
+            title: 'Esta propiedad no tiene titulares cargados',
+            description: 'Sin dueño cargado no hay a quién liquidarle lo que se cobra.',
+            filteredTitle: 'Sin resultados',
+            filteredDescription: 'Probá con otros términos o ajustá los filtros.',
+          },
+        })
+      );
+    return renderTable;
+  })();
+  // ── tabla 3 — properties.buildings: render propio sobre su estado t3 ──
+  const renderTable3 = (() => {
+    const {
+      loading,
+      visibleRows,
       sort,
       onSortChange,
       cellValue,
@@ -312,7 +613,7 @@ export function FichaDePropiedadView() {
       pagedRows,
       SUB_COL,
       ITEM_COLS,
-    } = t2;
+    } = t3;
     const cellText = (row: any, c: any) => {
       const v = cellValue(row, c);
       return v === null || v === undefined
@@ -556,8 +857,8 @@ export function FichaDePropiedadView() {
       );
     return renderTable;
   })();
-  // ── tabla 3 — properties.buildings: render propio sobre su estado t3 ──
-  const renderTable3 = (() => {
+  // ── tabla 4 — properties.buildings: render propio sobre su estado t4 ──
+  const renderTable4 = (() => {
     const {
       loading,
       visibleRows,
@@ -572,7 +873,7 @@ export function FichaDePropiedadView() {
       pagedRows,
       SUB_COL,
       ITEM_COLS,
-    } = t3;
+    } = t4;
     const cellText = (row: any, c: any) => {
       const v = cellValue(row, c);
       return v === null || v === undefined
@@ -823,8 +1124,8 @@ export function FichaDePropiedadView() {
       );
     return renderTable;
   })();
-  // ── tabla 4 — properties.buildings: render propio sobre su estado t4 ──
-  const renderTable4 = (() => {
+  // ── tabla 5 — properties.buildings: render propio sobre su estado t5 ──
+  const renderTable5 = (() => {
     const {
       loading,
       visibleRows,
@@ -839,7 +1140,7 @@ export function FichaDePropiedadView() {
       pagedRows,
       SUB_COL,
       ITEM_COLS,
-    } = t4;
+    } = t5;
     const cellText = (row: any, c: any) => {
       const v = cellValue(row, c);
       return v === null || v === undefined
@@ -993,9 +1294,6 @@ export function FichaDePropiedadView() {
           onSortChange,
           pagination: { page, pageSize: 10, total: visibleRows.length },
           onPageChange: setPage,
-          onRowClick: (row: any) => {
-            views.open('properties.propiedad.open', { record: row }, { mode: 'dialog' });
-          },
           view: 'list' as const,
           renderItem: (row: any) =>
             h(
@@ -1220,78 +1518,166 @@ export function FichaDePropiedadView() {
                 gap: '16px',
               },
             },
-            h(
-              'div',
-              { 'data-cg-block-id': 'k1', style: { display: 'contents' } },
-              h(
-                'div',
-                {
-                  style: {
-                    display: 'flex',
-                    flexDirection: 'column',
-                    boxSizing: 'border-box',
-                    width: '100%',
-                    padding: '16px',
-                    borderRadius: '12px',
-                    background: 'var(--cg-bg)',
-                    border: '1px solid var(--cg-border)',
-                    boxShadow: 'var(--cg-shadow-card, 0 1px 2px rgba(0,0,0,.05))',
-                  },
-                },
-                h(
+            ['edificio'].includes(String(((views.params as any)?.record ?? null)?.['type'] ?? ''))
+              ? h(
                   'div',
-                  { style: { display: 'flex', alignItems: 'center', gap: '10px' } },
+                  { 'data-cg-block-id': 'k1', style: { display: 'contents' } },
                   h(
-                    'span',
+                    'div',
                     {
                       style: {
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '34px',
-                        height: '34px',
-                        borderRadius: '8px',
-                        color: 'var(--cg-text-muted)',
-                        background: 'var(--cg-bg-secondary)',
-                        flexShrink: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        boxSizing: 'border-box',
+                        width: '100%',
+                        padding: '16px',
+                        borderRadius: '12px',
+                        background: 'var(--cg-bg)',
+                        border: '1px solid var(--cg-border)',
+                        boxShadow: 'var(--cg-shadow-card, 0 1px 2px rgba(0,0,0,.05))',
                       },
                     },
-                    h(UI.DynamicIcon, { icon: 'Grid3x3', size: 17 })
-                  ),
-                  h(
-                    'span',
-                    {
-                      style: {
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        letterSpacing: '.02em',
-                        textTransform: 'uppercase',
-                        color: 'var(--cg-text-muted)',
+                    h(
+                      'div',
+                      { style: { display: 'flex', alignItems: 'center', gap: '10px' } },
+                      h(
+                        'span',
+                        {
+                          style: {
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '8px',
+                            color: 'var(--cg-text-muted)',
+                            background: 'var(--cg-bg-secondary)',
+                            flexShrink: 0,
+                          },
+                        },
+                        h(UI.DynamicIcon, { icon: 'Grid3x3', size: 17 })
+                      ),
+                      h(
+                        'span',
+                        {
+                          style: {
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            letterSpacing: '.02em',
+                            textTransform: 'uppercase',
+                            color: 'var(--cg-text-muted)',
+                          },
+                        },
+                        'Unidades'
+                      )
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          fontSize: '24px',
+                          fontWeight: 700,
+                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                          color: 'var(--cg-text)',
+                          marginTop: '8px',
+                        },
                       },
-                    },
-                    'Unidades'
+                      metric('k1', 'value', '6')
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          fontSize: '12px',
+                          color: 'var(--cg-text-muted)',
+                          marginTop: '2px',
+                        },
+                      },
+                      metric('k1', 'sub', '5 departamentos y 1 local')
+                    )
                   )
-                ),
-                h(
-                  'div',
-                  {
-                    style: {
-                      fontSize: '24px',
-                      fontWeight: 700,
-                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                      color: 'var(--cg-text)',
-                      marginTop: '8px',
-                    },
-                  },
-                  metric('k1', 'value', '6')
-                ),
-                h(
-                  'div',
-                  { style: { fontSize: '12px', color: 'var(--cg-text-muted)', marginTop: '2px' } },
-                  metric('k1', 'sub', '5 departamentos y 1 local')
                 )
-              )
-            )
+              : null,
+            !['edificio'].includes(String(((views.params as any)?.record ?? null)?.['type'] ?? ''))
+              ? h(
+                  'div',
+                  { 'data-cg-block-id': 'k1_unica', style: { display: 'contents' } },
+                  h(
+                    'div',
+                    {
+                      style: {
+                        display: 'flex',
+                        flexDirection: 'column',
+                        boxSizing: 'border-box',
+                        width: '100%',
+                        padding: '16px',
+                        borderRadius: '12px',
+                        background: 'var(--cg-bg)',
+                        border: '1px solid var(--cg-border)',
+                        boxShadow: 'var(--cg-shadow-card, 0 1px 2px rgba(0,0,0,.05))',
+                      },
+                    },
+                    h(
+                      'div',
+                      { style: { display: 'flex', alignItems: 'center', gap: '10px' } },
+                      h(
+                        'span',
+                        {
+                          style: {
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '8px',
+                            color: 'var(--cg-gold-deep)',
+                            background: 'var(--cg-gold-soft)',
+                            flexShrink: 0,
+                          },
+                        },
+                        h(UI.DynamicIcon, { icon: 'DoorOpen', size: 17 })
+                      ),
+                      h(
+                        'span',
+                        {
+                          style: {
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            letterSpacing: '.02em',
+                            textTransform: 'uppercase',
+                            color: 'var(--cg-text-muted)',
+                          },
+                        },
+                        'Estado'
+                      )
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          fontSize: '24px',
+                          fontWeight: 700,
+                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                          color: 'var(--cg-text)',
+                          marginTop: '8px',
+                        },
+                      },
+                      metric('k1_unica', 'value', 'Vacante')
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          fontSize: '12px',
+                          color: 'var(--cg-text-muted)',
+                          marginTop: '2px',
+                        },
+                      },
+                      metric('k1_unica', 'sub', 'sin contrato vigente')
+                    )
+                  )
+                )
+              : null
           ),
           h(
             'div',
@@ -1304,78 +1690,166 @@ export function FichaDePropiedadView() {
                 gap: '16px',
               },
             },
-            h(
-              'div',
-              { 'data-cg-block-id': 'k2', style: { display: 'contents' } },
-              h(
-                'div',
-                {
-                  style: {
-                    display: 'flex',
-                    flexDirection: 'column',
-                    boxSizing: 'border-box',
-                    width: '100%',
-                    padding: '16px',
-                    borderRadius: '12px',
-                    background: 'var(--cg-bg)',
-                    border: '1px solid var(--cg-border)',
-                    boxShadow: 'var(--cg-shadow-card, 0 1px 2px rgba(0,0,0,.05))',
-                  },
-                },
-                h(
+            ['edificio'].includes(String(((views.params as any)?.record ?? null)?.['type'] ?? ''))
+              ? h(
                   'div',
-                  { style: { display: 'flex', alignItems: 'center', gap: '10px' } },
+                  { 'data-cg-block-id': 'k2', style: { display: 'contents' } },
                   h(
-                    'span',
+                    'div',
                     {
                       style: {
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '34px',
-                        height: '34px',
-                        borderRadius: '8px',
-                        color: 'var(--cg-green)',
-                        background: 'var(--cg-green-bg)',
-                        flexShrink: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        boxSizing: 'border-box',
+                        width: '100%',
+                        padding: '16px',
+                        borderRadius: '12px',
+                        background: 'var(--cg-bg)',
+                        border: '1px solid var(--cg-border)',
+                        boxShadow: 'var(--cg-shadow-card, 0 1px 2px rgba(0,0,0,.05))',
                       },
                     },
-                    h(UI.DynamicIcon, { icon: 'UserCheck', size: 17 })
-                  ),
-                  h(
-                    'span',
-                    {
-                      style: {
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        letterSpacing: '.02em',
-                        textTransform: 'uppercase',
-                        color: 'var(--cg-text-muted)',
+                    h(
+                      'div',
+                      { style: { display: 'flex', alignItems: 'center', gap: '10px' } },
+                      h(
+                        'span',
+                        {
+                          style: {
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '8px',
+                            color: 'var(--cg-green)',
+                            background: 'var(--cg-green-bg)',
+                            flexShrink: 0,
+                          },
+                        },
+                        h(UI.DynamicIcon, { icon: 'UserCheck', size: 17 })
+                      ),
+                      h(
+                        'span',
+                        {
+                          style: {
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            letterSpacing: '.02em',
+                            textTransform: 'uppercase',
+                            color: 'var(--cg-text-muted)',
+                          },
+                        },
+                        'Ocupadas'
+                      )
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          fontSize: '24px',
+                          fontWeight: 700,
+                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                          color: 'var(--cg-text)',
+                          marginTop: '8px',
+                        },
                       },
-                    },
-                    'Ocupadas'
+                      metric('k2', 'value', '5 de 6')
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          fontSize: '12px',
+                          color: 'var(--cg-text-muted)',
+                          marginTop: '2px',
+                        },
+                      },
+                      metric('k2', 'sub', '1°B vacante desde mayo')
+                    )
                   )
-                ),
-                h(
-                  'div',
-                  {
-                    style: {
-                      fontSize: '24px',
-                      fontWeight: 700,
-                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                      color: 'var(--cg-text)',
-                      marginTop: '8px',
-                    },
-                  },
-                  metric('k2', 'value', '5 de 6')
-                ),
-                h(
-                  'div',
-                  { style: { fontSize: '12px', color: 'var(--cg-text-muted)', marginTop: '2px' } },
-                  metric('k2', 'sub', '1°B vacante desde mayo')
                 )
-              )
-            )
+              : null,
+            !['edificio'].includes(String(((views.params as any)?.record ?? null)?.['type'] ?? ''))
+              ? h(
+                  'div',
+                  { 'data-cg-block-id': 'k2_unica', style: { display: 'contents' } },
+                  h(
+                    'div',
+                    {
+                      style: {
+                        display: 'flex',
+                        flexDirection: 'column',
+                        boxSizing: 'border-box',
+                        width: '100%',
+                        padding: '16px',
+                        borderRadius: '12px',
+                        background: 'var(--cg-bg)',
+                        border: '1px solid var(--cg-border)',
+                        boxShadow: 'var(--cg-shadow-card, 0 1px 2px rgba(0,0,0,.05))',
+                      },
+                    },
+                    h(
+                      'div',
+                      { style: { display: 'flex', alignItems: 'center', gap: '10px' } },
+                      h(
+                        'span',
+                        {
+                          style: {
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '8px',
+                            color: 'var(--cg-gold-deep)',
+                            background: 'var(--cg-gold-soft)',
+                            flexShrink: 0,
+                          },
+                        },
+                        h(UI.DynamicIcon, { icon: 'Users', size: 17 })
+                      ),
+                      h(
+                        'span',
+                        {
+                          style: {
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            letterSpacing: '.02em',
+                            textTransform: 'uppercase',
+                            color: 'var(--cg-text-muted)',
+                          },
+                        },
+                        'Titularidad'
+                      )
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          fontSize: '24px',
+                          fontWeight: 700,
+                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                          color: 'var(--cg-text)',
+                          marginTop: '8px',
+                        },
+                      },
+                      metric('k2_unica', 'value', 'Falta 100 %')
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          fontSize: '12px',
+                          color: 'var(--cg-text-muted)',
+                          marginTop: '2px',
+                        },
+                      },
+                      metric('k2_unica', 'sub', 'sin titulares cargados')
+                    )
+                  )
+                )
+              : null
           ),
           h(
             'div',
@@ -1547,85 +2021,175 @@ export function FichaDePropiedadView() {
           )
         )
       ),
-      h(
-        'div',
-        { 'data-cg-block-id': 'sec_unidades', style: { display: 'contents' } },
-        h(
-          'section',
-          null,
-          h(
+      ['edificio'].includes(String(((views.params as any)?.record ?? null)?.['type'] ?? ''))
+        ? h(
             'div',
-            { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' } },
-            h('span', {
-              style: {
-                width: '16px',
-                height: '2px',
-                background: 'var(--cg-accent)',
-                borderRadius: '2px',
-              },
-            }),
-            h(UI.DynamicIcon, {
-              icon: 'DoorOpen',
-              size: 15,
-              style: { color: 'var(--cg-text-muted)' },
-            }),
+            { 'data-cg-block-id': 'sec_unidades', style: { display: 'contents' } },
             h(
-              'span',
-              {
-                style: {
-                  fontSize: '11px',
-                  fontWeight: 500,
-                  letterSpacing: '.08em',
-                  textTransform: 'uppercase' as const,
-                  color: 'var(--cg-text-muted)',
-                },
-              },
-              'Unidades'
-            )
-          ),
-          h(
-            'div',
-            {
-              style: {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                alignItems: 'stretch',
-              },
-            },
-            h(
-              'div',
-              { 'data-cg-block-id': 'btn_unidad', style: { display: 'contents' } },
+              'section',
+              null,
               h(
                 'div',
-                { style: { display: 'flex', justifyContent: 'flex-end' } },
+                {
+                  style: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '12px',
+                  },
+                },
+                h('span', {
+                  style: {
+                    width: '16px',
+                    height: '2px',
+                    background: 'var(--cg-accent)',
+                    borderRadius: '2px',
+                  },
+                }),
+                h(UI.DynamicIcon, {
+                  icon: 'DoorOpen',
+                  size: 15,
+                  style: { color: 'var(--cg-text-muted)' },
+                }),
                 h(
-                  UI.Button,
+                  'span',
                   {
-                    variant: 'secondary',
-                    onClick: () => {
-                      views.open(
-                        'properties.unidad.open',
-                        {
-                          parentRecord: (views.params as any)?.record ?? null,
-                          parentEntity: 'properties.buildings',
-                        },
-                        { mode: 'sheet' }
-                      );
+                    style: {
+                      fontSize: '11px',
+                      fontWeight: 500,
+                      letterSpacing: '.08em',
+                      textTransform: 'uppercase' as const,
+                      color: 'var(--cg-text-muted)',
                     },
                   },
-                  'Nueva unidad'
+                  'Unidades'
+                )
+              ),
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    alignItems: 'stretch',
+                  },
+                },
+                h(
+                  'div',
+                  { 'data-cg-block-id': 'btn_unidad', style: { display: 'contents' } },
+                  h(
+                    'div',
+                    { style: { display: 'flex', justifyContent: 'flex-end' } },
+                    h(
+                      UI.Button,
+                      {
+                        variant: 'secondary',
+                        onClick: () => {
+                          views.open(
+                            'properties.unidad.open',
+                            {
+                              parentRecord: (views.params as any)?.record ?? null,
+                              parentEntity: 'properties.buildings',
+                            },
+                            { mode: 'sheet' }
+                          );
+                        },
+                      },
+                      'Nueva unidad'
+                    )
+                  )
+                ),
+                h(
+                  'div',
+                  { 'data-cg-block-id': 'tbl_unidades', style: { display: 'contents' } },
+                  renderTable1()
                 )
               )
-            ),
-            h(
-              'div',
-              { 'data-cg-block-id': 'tbl_unidades', style: { display: 'contents' } },
-              renderTable1()
             )
           )
-        )
-      ),
+        : null,
+      !['edificio'].includes(String(((views.params as any)?.record ?? null)?.['type'] ?? ''))
+        ? h(
+            'div',
+            { 'data-cg-block-id': 'sec_titulares_prop', style: { display: 'contents' } },
+            h(
+              'section',
+              null,
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '12px',
+                  },
+                },
+                h('span', {
+                  style: {
+                    width: '16px',
+                    height: '2px',
+                    background: 'var(--cg-accent)',
+                    borderRadius: '2px',
+                  },
+                }),
+                h(UI.DynamicIcon, {
+                  icon: 'Users',
+                  size: 15,
+                  style: { color: 'var(--cg-text-muted)' },
+                }),
+                h(
+                  'span',
+                  {
+                    style: {
+                      fontSize: '11px',
+                      fontWeight: 500,
+                      letterSpacing: '.08em',
+                      textTransform: 'uppercase' as const,
+                      color: 'var(--cg-text-muted)',
+                    },
+                  },
+                  'Titulares'
+                )
+              ),
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px',
+                    alignItems: 'stretch',
+                  },
+                },
+                h(
+                  'div',
+                  { 'data-cg-block-id': 'btn_titular_prop', style: { display: 'contents' } },
+                  h(
+                    'div',
+                    { style: { display: 'flex', justifyContent: 'flex-end' } },
+                    h(
+                      UI.Button,
+                      {
+                        variant: 'secondary',
+                        onClick: () => {
+                          views.open('properties.propietario.open', undefined, { mode: 'dialog' });
+                        },
+                      },
+                      'Agregar titular'
+                    )
+                  )
+                ),
+                h(
+                  'div',
+                  { 'data-cg-block-id': 'tbl_titulares_prop', style: { display: 'contents' } },
+                  renderTable2()
+                )
+              )
+            )
+          )
+        : null,
       h(
         'div',
         { 'data-cg-block-id': 'row_bottom', style: { display: 'contents' } },
@@ -1733,7 +2297,7 @@ export function FichaDePropiedadView() {
                   h(
                     'div',
                     { 'data-cg-block-id': 'tbl_expensas', style: { display: 'contents' } },
-                    renderTable2()
+                    renderTable3()
                   )
                 )
               )
@@ -1831,7 +2395,7 @@ export function FichaDePropiedadView() {
                   h(
                     'div',
                     { 'data-cg-block-id': 'tbl_certs', style: { display: 'contents' } },
-                    renderTable3()
+                    renderTable4()
                   )
                 )
               )
@@ -1904,7 +2468,7 @@ export function FichaDePropiedadView() {
                   h(
                     'div',
                     { 'data-cg-block-id': 'tbl_ot', style: { display: 'contents' } },
-                    renderTable4()
+                    renderTable5()
                   )
                 )
               )
@@ -1912,6 +2476,18 @@ export function FichaDePropiedadView() {
           )
         )
       )
-    )
+    ),
+    h(UI.ConfirmDialog, {
+      open: !!pendingConfirm,
+      onOpenChange: (o: boolean) => {
+        if (!o) cancelConfirm();
+      },
+      title: pendingConfirm?.title ?? '',
+      description: pendingConfirm?.message ?? '',
+      confirmLabel: pendingConfirm?.confirmLabel ?? 'Confirmar',
+      onConfirm: () => {
+        runConfirmed();
+      },
+    })
   );
 }

@@ -33,6 +33,9 @@ export function usePropietarioView() {
     email: null,
     phone: null,
     address: null,
+    unit_id: null,
+    share_pct: null,
+    role: null,
     bank: null,
     account: null,
     cbu: null,
@@ -79,6 +82,33 @@ export function usePropietarioView() {
   const [editingId, setEditingId] = useState<string | null>(
     initialRecord?.id !== null && initialRecord?.id !== undefined ? String(initialRecord.id) : null
   );
+  // entidad del padre → campo ref que lo referencia (solo matches únicos)
+  const PARENT_REF_FIELD: Record<string, string> = { 'properties.units': 'unit_id' };
+  useEffect(() => {
+    const parentEntity = ((views.params as any)?.parentEntity ?? null) as string | null;
+    const linkField = parentEntity ? PARENT_REF_FIELD[parentEntity] : undefined;
+    if (!linkField || !parentRecord || parentRecord.id === null || parentRecord.id === undefined)
+      return;
+    setValues((prev: any) =>
+      prev[linkField] ? prev : { ...prev, [linkField]: String(parentRecord.id) }
+    );
+    // deps intencionalmente fijas: el efecto corre una sola vez
+  }, []);
+  const [refOptions, setRefOptions] = useState<Record<string, any[]>>({});
+  const refLabel =
+    customHandlers.refLabel ?? ((r: any) => String(r?.name ?? r?.title ?? r?.label ?? r?.id ?? ''));
+  useEffect(() => {
+    void Promise.all([
+      actions
+        .execute<any[]>('properties.units.list')
+        .then((r) => {
+          if (mounted.current)
+            setRefOptions((o: any) => ({ ...o, unit_id: Array.isArray(r) ? r : [] }));
+        })
+        .catch(() => {}),
+    ]);
+    // deps intencionalmente fijas: el efecto corre una sola vez
+  }, []);
 
   const validate = useCallback((): Record<string, string> => {
     const errs: Record<string, string> = {};
@@ -142,6 +172,9 @@ export function usePropietarioView() {
         email: null,
         phone: null,
         address: null,
+        unit_id: null,
+        share_pct: null,
+        role: null,
         bank: null,
         account: null,
         cbu: null,
@@ -154,5 +187,5 @@ export function usePropietarioView() {
     // deps intencionalmente fijas: el efecto corre una sola vez
   }, [values, validate, editingId]);
 
-  return { values, errors, setField, editingId, submit };
+  return { values, errors, setField, editingId, refOptions, refLabel, submit };
 }

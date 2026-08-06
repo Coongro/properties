@@ -15,15 +15,8 @@ export const customHandlers: CustomHandlers = {
   // solo `building_id` (único campo ref hacia esa entidad). Un `onInit` que lea
   // `record` para esto está muerto — `record` significa «estás editando» y el
   // alta nunca lo trae.
-
-  /**
-   * Cómo se lee una propiedad o una unidad en el desplegable. Sin esto el select
-   * muestra el UUID, que no le dice nada a nadie.
-   */
-  refLabel: (row) => {
-    const nombre = String(row.name ?? '').trim();
-    const donde = String(row.address ?? '').trim();
-    if (nombre && donde) return `${nombre} — ${donde}`;
-    return nombre || donde || String(row.id ?? '');
-  },
+  // Cómo se leen la propiedad y la unidad en sus desplegables tampoco se decide acá:
+  // es diseño del campo y se elige en el Builder («Texto de cada opción» y «Subtítulo de
+  // cada opción»). Antes vivía en este archivo como un `refLabel`, porque el editor no
+  // dejaba configurarlo — eso era un bug del Builder, no una decisión (COONG-294).
 };

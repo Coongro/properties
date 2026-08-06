@@ -18,7 +18,7 @@ export function PropietarioView() {
   const {
     views: { closeDialog },
   } = usePlugin();
-  const { values, errors, setField, submit } = usePropietarioView();
+  const { values, errors, setField, refOptions, refLabel, submit } = usePropietarioView();
 
   return h(
     'div',
@@ -297,6 +297,166 @@ export function PropietarioView() {
                       'div',
                       { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
                       errors['address']
+                    )
+                  : null
+              )
+            )
+          )
+        )
+      ),
+      h(
+        'div',
+        { 'data-cg-block-id': 's4', style: { display: 'contents' } },
+        h(
+          UI.FormSection,
+          { icon: 'DoorOpen', title: 'Qué unidad le pertenece' },
+          h(
+            'div',
+            {
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                alignItems: 'stretch',
+              },
+            },
+            h(
+              'div',
+              { style: { display: 'flex', gap: '14px', alignItems: 'flex-start' } },
+              h(
+                'div',
+                { 'data-cg-block-id': 'f_unit', style: { display: 'contents' } },
+                h(
+                  'div',
+                  { style: { flex: '1 1 260px', minWidth: 0 } },
+                  h(
+                    UI.Label,
+                    { htmlFor: 'unit_id', style: { display: 'block', marginBottom: '6px' } },
+                    'Unidad'
+                  ),
+                  h(
+                    UI.Select,
+                    {
+                      value: String(values['unit_id'] ?? ''),
+                      onValueChange: (v: string) => setField('unit_id', v),
+                      placeholder: 'Elegir…',
+                      clearable: true,
+                    },
+                    ...(refOptions['unit_id'] ?? []).map((r: any) =>
+                      h(
+                        UI.SelectItem,
+                        {
+                          key: String(r.id),
+                          value: String(r.id),
+                          subtitle: String(r['detail'] ?? ''),
+                        },
+                        String(r['label'] ?? refLabel(r))
+                      )
+                    )
+                  ),
+                  errors['unit_id']
+                    ? h(
+                        'div',
+                        {
+                          style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
+                        },
+                        errors['unit_id']
+                      )
+                    : null
+                )
+              ),
+              h(
+                'div',
+                { 'data-cg-block-id': 'f_share', style: { display: 'contents' } },
+                h(
+                  'div',
+                  { style: { flex: '1 1 260px', minWidth: 0 } },
+                  h(
+                    UI.Label,
+                    { htmlFor: 'share_pct', style: { display: 'block', marginBottom: '6px' } },
+                    'Participación (%)'
+                  ),
+                  h(UI.Input, {
+                    id: 'share_pct',
+                    type: 'number',
+                    value: values['share_pct'] ?? '',
+                    placeholder: 'Ej: 50 · vacío = 100 %',
+                    onChange: (e: any) =>
+                      setField('share_pct', e.target.value === '' ? null : Number(e.target.value)),
+                  }),
+                  errors['share_pct']
+                    ? h(
+                        'div',
+                        {
+                          style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
+                        },
+                        errors['share_pct']
+                      )
+                    : null
+                )
+              )
+            ),
+            h(
+              'div',
+              { 'data-cg-block-id': 'f_role', style: { display: 'contents' } },
+              h(
+                'div',
+                { style: { flex: '1 1 100%', minWidth: 0 } },
+                h(
+                  UI.Label,
+                  { htmlFor: 'role', style: { display: 'block', marginBottom: '6px' } },
+                  'Carácter'
+                ),
+                h(
+                  UI.Select,
+                  {
+                    value: String(values['role'] ?? ''),
+                    onValueChange: (v: string) => setField('role', v),
+                    placeholder: 'Elegir…',
+                    clearable: true,
+                  },
+                  h(
+                    UI.SelectItem,
+                    {
+                      key: 'titular',
+                      value: 'titular',
+                      icon: h(UI.DynamicIcon, { icon: 'UserCheck', size: 16 }),
+                    },
+                    'Titular'
+                  ),
+                  h(
+                    UI.SelectItem,
+                    {
+                      key: 'cotitular',
+                      value: 'cotitular',
+                      icon: h(UI.DynamicIcon, { icon: 'Users', size: 16 }),
+                    },
+                    'Cotitular'
+                  ),
+                  h(
+                    UI.SelectItem,
+                    {
+                      key: 'usufructuario',
+                      value: 'usufructuario',
+                      icon: h(UI.DynamicIcon, { icon: 'HandCoins', size: 16 }),
+                    },
+                    'Usufructuario'
+                  ),
+                  h(
+                    UI.SelectItem,
+                    {
+                      key: 'nudo_propietario',
+                      value: 'nudo_propietario',
+                      icon: h(UI.DynamicIcon, { icon: 'KeyRound', size: 16 }),
+                    },
+                    'Nudo propietario'
+                  )
+                ),
+                errors['role']
+                  ? h(
+                      'div',
+                      { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
+                      errors['role']
                     )
                   : null
               )

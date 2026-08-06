@@ -72,6 +72,12 @@
         "title": "Expensas del mes",
         "component": "./dist/views/expensas-del-mes/index.js",
         "export": "ExpensasDelMesView"
+      },
+      {
+        "id": "properties.ficha-de-unidad.open",
+        "title": "Ficha de unidad",
+        "component": "./dist/views/ficha-de-unidad/index.js",
+        "export": "FichaDeUnidadView"
       }
     ],
     "repositories": [
@@ -127,6 +133,10 @@
           "getById",
           "getOwner",
           "saveOwner",
+          "removeOwner",
+          "ownershipOf",
+          "listByUnit",
+          "listByBuilding",
           "create",
           "update",
           "delete",
@@ -1132,9 +1142,15 @@
           "kind": "collection",
           "fields": [
             {
+              "key": "label",
+              "name": "label",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
               "key": "name",
               "name": "name",
-              "label": "Unidad",
+              "label": "Nombre",
               "format": "text"
             },
             {
@@ -1200,9 +1216,15 @@
           "kind": "record",
           "fields": [
             {
+              "key": "label",
+              "name": "label",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
               "key": "name",
               "name": "name",
-              "label": "Unidad",
+              "label": "Nombre",
               "format": "text"
             },
             {
@@ -1325,9 +1347,15 @@
           "kind": "record",
           "fields": [
             {
+              "key": "label",
+              "name": "label",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
               "key": "name",
               "name": "name",
-              "label": "Unidad",
+              "label": "Nombre",
               "format": "text"
             },
             {
@@ -1454,9 +1482,15 @@
           "kind": "record",
           "fields": [
             {
+              "key": "label",
+              "name": "label",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
               "key": "name",
               "name": "name",
-              "label": "Unidad",
+              "label": "Nombre",
               "format": "text"
             },
             {
@@ -1908,9 +1942,15 @@
           "kind": "collection",
           "fields": [
             {
+              "key": "label",
+              "name": "label",
+              "label": "Unidad",
+              "format": "text"
+            },
+            {
               "key": "name",
               "name": "name",
-              "label": "Unidad",
+              "label": "Nombre",
               "format": "text"
             },
             {
@@ -2181,7 +2221,7 @@
         "id": "properties.unitOwners.saveOwner",
         "action": "properties.unitOwners.saveOwner",
         "title": "Guardar un propietario",
-        "description": "Da de alta un propietario o edita uno que ya existe: con «id» edita ese, sin «id» crea uno nuevo. Necesita nombre y documento (CUIT, CUIL o DNI) — sin documento no se le puede liquidar. Es el único camino correcto para escribir un propietario: decide qué va en las columnas del contacto y qué en sus datos de cobro, y conserva lo que otro rol le haya cargado a esa misma persona. Al editar no cambia el rol, porque alguien puede ser propietario de una unidad e inquilino de otra.",
+        "description": "Da de alta un propietario o edita uno existente: con «id» edita ese, sin «id» crea uno. Necesita nombre y documento (CUIT, CUIL o DNI) — sin documento no se le puede liquidar. Es el único camino correcto para escribirlo: decide qué va en columnas y qué en los datos de cobro, y conserva lo que otro rol le cargó a esa persona. También es el único modo de decir DE QUÉ UNIDAD es dueño: con «unit_id» crea o corrige ese vínculo, sin tocar sus otras unidades.",
         "effect": "write",
         "confirmation": "always",
         "inputSchema": {
@@ -2225,7 +2265,27 @@
                   "description": "Tipo y número de cuenta"
                 },
                 "cbu": { "type": "string", "description": "CBU" },
-                "alias": { "type": "string", "description": "Alias" }
+                "alias": { "type": "string", "description": "Alias" },
+                "unit_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "De qué unidad es dueño. Opcional: sin esto se guarda solo la persona. Con esto se crea el vínculo, o se corrige el que ya tenía con ESA unidad — las otras no se tocan.",
+                  "ref": { "resource": "properties.units" }
+                },
+                "share_pct": {
+                  "type": "number",
+                  "description": "Con qué porcentaje figura en esa unidad. Si es el único dueño se puede omitir: se toma 100. Entre todos los dueños de una unidad no puede pasar de 100, y la operación se rechaza si se pasa — ese porcentaje es con el que después se le liquida y con el que declara la renta."
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "titular",
+                    "cotitular",
+                    "usufructuario",
+                    "nudo_propietario"
+                  ],
+                  "description": "Con qué carácter figura en la unidad. Si se omite, «titular» al crear el vínculo y el que ya tenía al corregirlo. Titular, cotitular y nudo propietario reparten el DOMINIO (juntos llegan a 100); el usufructuario percibe los frutos y suma por su cuenta, así que un usufructo sobre una unidad ya escriturada al 100 % es válido."
+                }
               },
               "required": ["name", "document_type", "document_number"],
               "additionalProperties": false
@@ -2242,6 +2302,12 @@
               "name": "created",
               "label": "Se creó como propietario nuevo",
               "format": "boolean"
+            },
+            {
+              "key": "ownership",
+              "name": "ownership",
+              "label": "Cómo quedó la unidad",
+              "format": "text"
             }
           ],
           "identifierKey": "id"
@@ -2379,11 +2445,254 @@
           "coverage": "full",
           "validated": false
         }
+      },
+      {
+        "id": "properties.unitOwners.removeOwner",
+        "action": "properties.unitOwners.removeOwner",
+        "title": "Sacar a un titular de una unidad",
+        "description": "Quita a una persona de la titularidad de una unidad. NO borra a la persona: sigue existiendo con sus datos y sus otras unidades, y se la puede volver a cargar con «Guardar un propietario». Deja la unidad por debajo de 100 % a propósito —quien se equivocó de persona tiene que poder sacarla— y devuelve cómo quedó el reparto.",
+        "effect": "destructive",
+        "confirmation": "always",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "unitId": {
+              "type": "string",
+              "description": "La unidad de la que se saca al titular.",
+              "ref": { "resource": "properties.units" }
+            },
+            "contactId": {
+              "type": "string",
+              "description": "La persona que deja de figurar. Es el id del propietario, no el del vínculo — el mismo que devuelve «Titulares de una unidad» en su columna de contacto.",
+              "ref": { "resource": "properties.unitOwners" }
+            }
+          },
+          "required": ["unitId", "contactId"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "ownership",
+              "name": "ownership",
+              "label": "Cómo quedó la unidad",
+              "format": "text"
+            }
+          ]
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 4,
+          "id": "ejecutado",
+          "floor": 4,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": true
+        }
+      },
+      {
+        "id": "properties.unitOwners.ownershipOf",
+        "action": "properties.unitOwners.ownershipOf",
+        "title": "Cómo está repartida una unidad",
+        "description": "Si el dominio de una unidad llega a 100 % y, si no, cuánto falta asignar. El usufructo se informa aparte porque no le saca dominio a nadie: lo desmembra. Sirve para detectar unidades a medio cargar antes de que repartan mal la liquidación.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "unitId": {
+              "type": "string",
+              "description": "La unidad que se quiere revisar.",
+              "ref": { "resource": "properties.units" }
+            }
+          },
+          "required": ["unitId"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "record",
+          "fields": [
+            {
+              "key": "summary",
+              "name": "summary",
+              "label": "Estado del reparto",
+              "format": "text"
+            },
+            {
+              "key": "assigned",
+              "name": "assigned",
+              "label": "Dominio asignado (%)",
+              "format": "number"
+            },
+            {
+              "key": "missing",
+              "name": "missing",
+              "label": "Falta asignar (%)",
+              "format": "number"
+            },
+            {
+              "key": "usufruct",
+              "name": "usufruct",
+              "label": "Usufructo declarado (%)",
+              "format": "number"
+            },
+            {
+              "key": "owners",
+              "name": "owners",
+              "label": "Personas cargadas",
+              "format": "number"
+            }
+          ]
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
+      },
+      {
+        "id": "properties.unitOwners.listByUnit",
+        "action": "properties.unitOwners.listByUnit",
+        "title": "Titulares de una unidad",
+        "description": "Quiénes figuran como dueños de UNA unidad, con qué participación y con qué carácter. Es la lectura que responde «¿de quién es esto?»; para saber si el reparto está completo, «Cómo está repartida una unidad».",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "unitId": {
+              "type": "string",
+              "description": "La unidad cuyos titulares se quieren ver.",
+              "ref": { "resource": "properties.units" }
+            }
+          },
+          "required": ["unitId"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Titular",
+              "format": "text"
+            },
+            {
+              "key": "document",
+              "name": "document",
+              "label": "Documento",
+              "format": "text"
+            },
+            {
+              "key": "share_label",
+              "name": "shareLabel",
+              "label": "Participación",
+              "format": "text"
+            },
+            {
+              "key": "role",
+              "name": "role",
+              "label": "Carácter",
+              "format": "text",
+              "values": [
+                { "value": "titular", "label": "Titular" },
+                { "value": "cotitular", "label": "Cotitular" },
+                { "value": "usufructuario", "label": "Usufructuario" },
+                { "value": "nudo_propietario", "label": "Nudo propietario" }
+              ]
+            }
+          ],
+          "identifierKey": "contact_id",
+          "defaultLimit": 20,
+          "maxLimit": 50
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
+      },
+      {
+        "id": "properties.unitOwners.listByBuilding",
+        "action": "properties.unitOwners.listByBuilding",
+        "title": "Titulares de una propiedad",
+        "description": "Quiénes figuran como dueños de una propiedad, con qué participación y con qué carácter. En una casa o un local —que son una sola unidad— es la forma directa de preguntar de quién es. En un edificio devuelve los dueños de todas sus unidades.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "buildingId": {
+              "type": "string",
+              "description": "La propiedad cuyos titulares se quieren ver.",
+              "ref": { "resource": "properties.buildings" }
+            }
+          },
+          "required": ["buildingId"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "name",
+              "name": "name",
+              "label": "Titular",
+              "format": "text"
+            },
+            {
+              "key": "document",
+              "name": "document",
+              "label": "Documento",
+              "format": "text"
+            },
+            {
+              "key": "share_label",
+              "name": "shareLabel",
+              "label": "Participación",
+              "format": "text"
+            },
+            {
+              "key": "role",
+              "name": "role",
+              "label": "Carácter",
+              "format": "text",
+              "values": [
+                { "value": "titular", "label": "Titular" },
+                { "value": "cotitular", "label": "Cotitular" },
+                { "value": "usufructuario", "label": "Usufructuario" },
+                { "value": "nudo_propietario", "label": "Nudo propietario" }
+              ]
+            }
+          ],
+          "identifierKey": "contact_id",
+          "defaultLimit": 20,
+          "maxLimit": 50
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
       }
     ],
     "actionContracts": "./dist/agentic/contracts.js",
-    "copilotCatalogFingerprint": "044fcbcb8dc8cfb139d22f5c7e037398",
-    "copilotCatalogContentFingerprint": "a6927cc46aa6b7e71dc3718beeb71c98"
+    "copilotCatalogFingerprint": "e1fa1e247ab6a01da8c31296eed44fac",
+    "copilotCatalogContentFingerprint": "8c835e644b665d780b1f284e7e596a33"
   },
   "initView": null
 }

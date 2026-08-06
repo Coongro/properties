@@ -1189,9 +1189,21 @@ export const listUnits = defineAction({
     kind: 'collection',
     fields: [
       {
+        // El nombre calificado con su propiedad («Belgrano 1240 · 1°A»). Publicar solo
+        // «1°A» hacía que dos unidades de edificios distintos se leyeran idénticas: el
+        // nombre de una unidad no identifica nada fuera de su propiedad.
+        key: 'label',
+        name: 'label',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        // El nombre tal cual se guardó. Va junto con `label` y no en su lugar: es el campo
+        // que el agente escribe, y si no está en la salida no hay con qué comprobar que lo
+        // escrito es lo que quedó — la certificación live lo rechaza, con razón.
         key: 'name',
         name: 'name',
-        label: 'Unidad',
+        label: 'Nombre',
         format: 'text',
       },
       {
@@ -1265,9 +1277,21 @@ export const getByIdUnits = defineAction({
     kind: 'record',
     fields: [
       {
+        // El nombre calificado con su propiedad («Belgrano 1240 · 1°A»). Publicar solo
+        // «1°A» hacía que dos unidades de edificios distintos se leyeran idénticas: el
+        // nombre de una unidad no identifica nada fuera de su propiedad.
+        key: 'label',
+        name: 'label',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        // El nombre tal cual se guardó. Va junto con `label` y no en su lugar: es el campo
+        // que el agente escribe, y si no está en la salida no hay con qué comprobar que lo
+        // escrito es lo que quedó — la certificación live lo rechaza, con razón.
         key: 'name',
         name: 'name',
-        label: 'Unidad',
+        label: 'Nombre',
         format: 'text',
       },
       {
@@ -1405,9 +1429,21 @@ export const createUnits = defineAction({
     kind: 'record',
     fields: [
       {
+        // El nombre calificado con su propiedad («Belgrano 1240 · 1°A»). Publicar solo
+        // «1°A» hacía que dos unidades de edificios distintos se leyeran idénticas: el
+        // nombre de una unidad no identifica nada fuera de su propiedad.
+        key: 'label',
+        name: 'label',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        // El nombre tal cual se guardó. Va junto con `label` y no en su lugar: es el campo
+        // que el agente escribe, y si no está en la salida no hay con qué comprobar que lo
+        // escrito es lo que quedó — la certificación live lo rechaza, con razón.
         key: 'name',
         name: 'name',
-        label: 'Unidad',
+        label: 'Nombre',
         format: 'text',
       },
       {
@@ -1549,9 +1585,21 @@ export const updateUnits = defineAction({
     kind: 'record',
     fields: [
       {
+        // El nombre calificado con su propiedad («Belgrano 1240 · 1°A»). Publicar solo
+        // «1°A» hacía que dos unidades de edificios distintos se leyeran idénticas: el
+        // nombre de una unidad no identifica nada fuera de su propiedad.
+        key: 'label',
+        name: 'label',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        // El nombre tal cual se guardó. Va junto con `label` y no en su lugar: es el campo
+        // que el agente escribe, y si no está en la salida no hay con qué comprobar que lo
+        // escrito es lo que quedó — la certificación live lo rechaza, con razón.
         key: 'name',
         name: 'name',
-        label: 'Unidad',
+        label: 'Nombre',
         format: 'text',
       },
       {
@@ -2046,9 +2094,21 @@ export const listByBuildingUnits = defineAction({
     kind: 'collection',
     fields: [
       {
+        // El nombre calificado con su propiedad («Belgrano 1240 · 1°A»). Publicar solo
+        // «1°A» hacía que dos unidades de edificios distintos se leyeran idénticas: el
+        // nombre de una unidad no identifica nada fuera de su propiedad.
+        key: 'label',
+        name: 'label',
+        label: 'Unidad',
+        format: 'text',
+      },
+      {
+        // El nombre tal cual se guardó. Va junto con `label` y no en su lugar: es el campo
+        // que el agente escribe, y si no está en la salida no hay con qué comprobar que lo
+        // escrito es lo que quedó — la certificación live lo rechaza, con razón.
         key: 'name',
         name: 'name',
-        label: 'Unidad',
+        label: 'Nombre',
         format: 'text',
       },
       {
@@ -2354,7 +2414,7 @@ export const saveOwnerUnitOwners = defineAction({
   id: 'properties.unitOwners.saveOwner',
   title: 'Guardar un propietario',
   description:
-    'Da de alta un propietario o edita uno que ya existe: con «id» edita ese, sin «id» crea uno nuevo. Necesita nombre y documento (CUIT, CUIL o DNI) — sin documento no se le puede liquidar. Es el único camino correcto para escribir un propietario: decide qué va en las columnas del contacto y qué en sus datos de cobro, y conserva lo que otro rol le haya cargado a esa misma persona. Al editar no cambia el rol, porque alguien puede ser propietario de una unidad e inquilino de otra.',
+    'Da de alta un propietario o edita uno existente: con «id» edita ese, sin «id» crea uno. Necesita nombre y documento (CUIT, CUIL o DNI) — sin documento no se le puede liquidar. Es el único camino correcto para escribirlo: decide qué va en columnas y qué en los datos de cobro, y conserva lo que otro rol le cargó a esa persona. También es el único modo de decir DE QUÉ UNIDAD es dueño: con «unit_id» crea o corrige ese vínculo, sin tocar sus otras unidades.',
   effect: 'write',
   confirmation: 'always',
   tenantScope: 'required',
@@ -2418,6 +2478,24 @@ export const saveOwnerUnitOwners = defineAction({
             type: 'string',
             description: 'Alias',
           },
+          unit_id: {
+            type: 'string',
+            format: 'uuid',
+            description:
+              'De qué unidad es dueño. Opcional: sin esto se guarda solo la persona. Con esto se crea el vínculo, o se corrige el que ya tenía con ESA unidad — las otras no se tocan.',
+            ref: { resource: 'properties.units' },
+          },
+          share_pct: {
+            type: 'number',
+            description:
+              'Con qué porcentaje figura en esa unidad. Si es el único dueño se puede omitir: se toma 100. Entre todos los dueños de una unidad no puede pasar de 100, y la operación se rechaza si se pasa — ese porcentaje es con el que después se le liquida y con el que declara la renta.',
+          },
+          role: {
+            type: 'string',
+            enum: ['titular', 'cotitular', 'usufructuario', 'nudo_propietario'],
+            description:
+              'Con qué carácter figura en la unidad. Si se omite, «titular» al crear el vínculo y el que ya tenía al corregirlo. Titular, cotitular y nudo propietario reparten el DOMINIO (juntos llegan a 100); el usufructuario percibe los frutos y suma por su cuenta, así que un usufructo sobre una unidad ya escriturada al 100 % es válido.',
+          },
         },
         // El handler solo exige nombre, pero el canal agentic valida contra el
         // mismo formulario que la pantalla, que además pide documento. Declarar
@@ -2431,8 +2509,9 @@ export const saveOwnerUnitOwners = defineAction({
     required: ['data'],
     additionalProperties: false,
   },
-  // saveOwner devuelve a quién guardó y si nació en esta llamada — no la fila
-  // completa del propietario. Para leerlo entero, «Ver un propietario».
+  // saveOwner devuelve a quién guardó, si nació en esta llamada y cómo quedó
+  // repartida la unidad — no la fila completa del propietario. Para leerlo
+  // entero, «Ver un propietario».
   output: {
     kind: 'record',
     fields: [
@@ -2441,6 +2520,15 @@ export const saveOwnerUnitOwners = defineAction({
         name: 'created',
         label: 'Se creó como propietario nuevo',
         format: 'boolean',
+      },
+      {
+        // Que la unidad haya quedado al 60 % no es un error —los dueños se cargan
+        // de a uno— pero tiene que DECIRSE, o se reparte mal en silencio hasta que
+        // alguien lo note en la liquidación.
+        key: 'ownership',
+        name: 'ownership',
+        label: 'Cómo quedó la unidad',
+        format: 'text',
       },
     ],
     identifierKey: 'id',
@@ -2559,6 +2647,236 @@ export const forPeriodBuildingExpenses = defineAction({
       },
     ],
     identifierKey: 'id',
+    defaultLimit: 20,
+    maxLimit: 50,
+  },
+});
+
+/**
+ * Las tres operaciones que hacen falta para mirar y corregir la titularidad parado en la
+ * unidad, que es donde el 100 % significa algo: en la ficha de una persona nunca se ve si
+ * a una unidad le falta asignar una parte (COONG-294).
+ */
+export const listByUnitUnitOwners = defineAction({
+  id: 'properties.unitOwners.listByUnit',
+  title: 'Titulares de una unidad',
+  description:
+    'Quiénes figuran como dueños de UNA unidad, con qué participación y con qué carácter. Es la lectura que responde «¿de quién es esto?»; para saber si el reparto está completo, «Cómo está repartida una unidad».',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      unitId: {
+        type: 'string',
+        description: 'La unidad cuyos titulares se quieren ver.',
+        ref: { resource: 'properties.units' },
+      },
+    },
+    required: ['unitId'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Titular',
+        format: 'text',
+      },
+      {
+        key: 'document',
+        name: 'document',
+        label: 'Documento',
+        format: 'text',
+      },
+      {
+        key: 'share_label',
+        name: 'shareLabel',
+        label: 'Participación',
+        format: 'text',
+      },
+      {
+        key: 'role',
+        name: 'role',
+        label: 'Carácter',
+        format: 'text',
+        values: [
+          { value: 'titular', label: 'Titular' },
+          { value: 'cotitular', label: 'Cotitular' },
+          { value: 'usufructuario', label: 'Usufructuario' },
+          { value: 'nudo_propietario', label: 'Nudo propietario' },
+        ],
+      },
+    ],
+    // La PERSONA, no el vínculo. Cada fila tiene los dos ids, y el que identifica
+    // al recurso «propietario» es el del contacto — es el que devuelve
+    // «listOwners» y el que pide «removeOwner». Emitir el id del vínculo hacía
+    // que encadenar list → remove fallara con «esa persona no figura como dueña».
+    identifierKey: 'contact_id',
+    defaultLimit: 20,
+    maxLimit: 50,
+  },
+});
+
+export const ownershipOfUnitOwners = defineAction({
+  id: 'properties.unitOwners.ownershipOf',
+  title: 'Cómo está repartida una unidad',
+  description:
+    'Si el dominio de una unidad llega a 100 % y, si no, cuánto falta asignar. El usufructo se informa aparte porque no le saca dominio a nadie: lo desmembra. Sirve para detectar unidades a medio cargar antes de que repartan mal la liquidación.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      unitId: {
+        type: 'string',
+        description: 'La unidad que se quiere revisar.',
+        ref: { resource: 'properties.units' },
+      },
+    },
+    required: ['unitId'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'summary',
+        name: 'summary',
+        label: 'Estado del reparto',
+        format: 'text',
+      },
+      {
+        key: 'assigned',
+        name: 'assigned',
+        label: 'Dominio asignado (%)',
+        format: 'number',
+      },
+      {
+        key: 'missing',
+        name: 'missing',
+        label: 'Falta asignar (%)',
+        format: 'number',
+      },
+      {
+        key: 'usufruct',
+        name: 'usufruct',
+        label: 'Usufructo declarado (%)',
+        format: 'number',
+      },
+      {
+        key: 'owners',
+        name: 'owners',
+        label: 'Personas cargadas',
+        format: 'number',
+      },
+    ],
+  },
+});
+
+export const removeOwnerUnitOwners = defineAction({
+  id: 'properties.unitOwners.removeOwner',
+  title: 'Sacar a un titular de una unidad',
+  description:
+    'Quita a una persona de la titularidad de una unidad. NO borra a la persona: sigue existiendo con sus datos y sus otras unidades, y se la puede volver a cargar con «Guardar un propietario». Deja la unidad por debajo de 100 % a propósito —quien se equivocó de persona tiene que poder sacarla— y devuelve cómo quedó el reparto.',
+  effect: 'destructive',
+  confirmation: 'always',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      unitId: {
+        type: 'string',
+        description: 'La unidad de la que se saca al titular.',
+        ref: { resource: 'properties.units' },
+      },
+      contactId: {
+        type: 'string',
+        description:
+          'La persona que deja de figurar. Es el id del propietario, no el del vínculo — el mismo que devuelve «Titulares de una unidad» en su columna de contacto.',
+        ref: { resource: 'properties.unitOwners' },
+      },
+    },
+    required: ['unitId', 'contactId'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'record',
+    fields: [
+      {
+        key: 'ownership',
+        name: 'ownership',
+        label: 'Cómo quedó la unidad',
+        format: 'text',
+      },
+    ],
+  },
+});
+
+/**
+ * Los dueños de una propiedad entera. Existe para las que SON una sola unidad
+ * —una casa, un local—, donde la titularidad se mira parado en la propiedad.
+ */
+export const listByBuildingUnitOwners = defineAction({
+  id: 'properties.unitOwners.listByBuilding',
+  title: 'Titulares de una propiedad',
+  description:
+    'Quiénes figuran como dueños de una propiedad, con qué participación y con qué carácter. En una casa o un local —que son una sola unidad— es la forma directa de preguntar de quién es. En un edificio devuelve los dueños de todas sus unidades.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  input: {
+    type: 'object',
+    properties: {
+      buildingId: {
+        type: 'string',
+        description: 'La propiedad cuyos titulares se quieren ver.',
+        ref: { resource: 'properties.buildings' },
+      },
+    },
+    required: ['buildingId'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'name',
+        name: 'name',
+        label: 'Titular',
+        format: 'text',
+      },
+      {
+        key: 'document',
+        name: 'document',
+        label: 'Documento',
+        format: 'text',
+      },
+      {
+        key: 'share_label',
+        name: 'shareLabel',
+        label: 'Participación',
+        format: 'text',
+      },
+      {
+        key: 'role',
+        name: 'role',
+        label: 'Carácter',
+        format: 'text',
+        values: [
+          { value: 'titular', label: 'Titular' },
+          { value: 'cotitular', label: 'Cotitular' },
+          { value: 'usufructuario', label: 'Usufructuario' },
+          { value: 'nudo_propietario', label: 'Nudo propietario' },
+        ],
+      },
+    ],
+    // La PERSONA, no el vínculo — mismo criterio que «Titulares de una unidad».
+    identifierKey: 'contact_id',
     defaultLimit: 20,
     maxLimit: 50,
   },
