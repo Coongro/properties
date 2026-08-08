@@ -1,6 +1,6 @@
 {
   "id": "properties",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "apiVersion": "2.0",
   "displayName": "Propiedades",
   "assets": {
@@ -169,7 +169,13 @@
       }
     ],
     "settings": {
-      "groups": [{ "id": "properties", "label": "properties", "order": 50 }],
+      "groups": [
+        {
+          "id": "properties",
+          "label": "properties",
+          "order": 50
+        }
+      ],
       "pages": [
         {
           "id": "properties.certificados",
@@ -238,12 +244,30 @@
               "label": "Certificado",
               "format": "text",
               "values": [
-                { "value": "matafuegos", "label": "Matafuegos" },
-                { "value": "gas", "label": "Instalación de gas" },
-                { "value": "ascensor", "label": "Ascensor" },
-                { "value": "electricidad", "label": "Instalación eléctrica" },
-                { "value": "seguro", "label": "Seguro del inmueble" },
-                { "value": "otro", "label": "Otro" }
+                {
+                  "value": "matafuegos",
+                  "label": "Matafuegos"
+                },
+                {
+                  "value": "gas",
+                  "label": "Instalación de gas"
+                },
+                {
+                  "value": "ascensor",
+                  "label": "Ascensor"
+                },
+                {
+                  "value": "electricidad",
+                  "label": "Instalación eléctrica"
+                },
+                {
+                  "value": "seguro",
+                  "label": "Seguro del inmueble"
+                },
+                {
+                  "value": "otro",
+                  "label": "Otro"
+                }
               ]
             },
             {
@@ -252,9 +276,18 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "vigente", "label": "Vigente" },
-                { "value": "por_vencer", "label": "Por vencer" },
-                { "value": "vencido", "label": "Vencido" }
+                {
+                  "value": "vigente",
+                  "label": "Vigente"
+                },
+                {
+                  "value": "por_vencer",
+                  "label": "Por vencer"
+                },
+                {
+                  "value": "vencido",
+                  "label": "Vencido"
+                }
               ]
             },
             {
@@ -291,10 +324,14 @@
             "id": {
               "type": "string",
               "description": "El certificado que se quiere ver.",
-              "ref": { "resource": "properties.certificates" }
+              "ref": {
+                "resource": "properties.certificates"
+              }
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -306,12 +343,30 @@
               "label": "Certificado",
               "format": "text",
               "values": [
-                { "value": "matafuegos", "label": "Matafuegos" },
-                { "value": "gas", "label": "Instalación de gas" },
-                { "value": "ascensor", "label": "Ascensor" },
-                { "value": "electricidad", "label": "Instalación eléctrica" },
-                { "value": "seguro", "label": "Seguro del inmueble" },
-                { "value": "otro", "label": "Otro" }
+                {
+                  "value": "matafuegos",
+                  "label": "Matafuegos"
+                },
+                {
+                  "value": "gas",
+                  "label": "Instalación de gas"
+                },
+                {
+                  "value": "ascensor",
+                  "label": "Ascensor"
+                },
+                {
+                  "value": "electricidad",
+                  "label": "Instalación eléctrica"
+                },
+                {
+                  "value": "seguro",
+                  "label": "Seguro del inmueble"
+                },
+                {
+                  "value": "otro",
+                  "label": "Otro"
+                }
               ]
             },
             {
@@ -320,9 +375,18 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "vigente", "label": "Vigente" },
-                { "value": "por_vencer", "label": "Por vencer" },
-                { "value": "vencido", "label": "Vencido" }
+                {
+                  "value": "vigente",
+                  "label": "Vigente"
+                },
+                {
+                  "value": "por_vencer",
+                  "label": "Por vencer"
+                },
+                {
+                  "value": "vencido",
+                  "label": "Vencido"
+                }
               ]
             },
             {
@@ -362,13 +426,17 @@
                   "type": "string",
                   "format": "uuid",
                   "description": "La propiedad a la que pertenece el certificado.",
-                  "ref": { "resource": "properties.buildings" }
+                  "ref": {
+                    "resource": "properties.buildings"
+                  }
                 },
                 "unit_id": {
                   "type": "string",
                   "format": "uuid",
                   "description": "Solo si el certificado es de UNA unidad y no de la propiedad entera. En ese caso va junto con la propiedad a la que esa unidad pertenece.",
-                  "ref": { "resource": "properties.units" }
+                  "ref": {
+                    "resource": "properties.units"
+                  }
                 },
                 "type": {
                   "type": "string",
@@ -394,7 +462,11 @@
                 },
                 "result": {
                   "type": "string",
-                  "enum": ["apto", "apto_con_observaciones", "rechazado"],
+                  "enum": [
+                    "apto",
+                    "apto_con_observaciones",
+                    "rechazado"
+                  ],
                   "description": "Resultado. Opciones: apto (Apto), apto_con_observaciones (Apto con observaciones), rechazado (Rechazado)."
                 },
                 "file_url": {
@@ -405,13 +477,22 @@
                   "type": "integer",
                   "description": "Avisarme con (días de anticipación)"
                 },
-                "notes": { "type": "string", "description": "Observaciones" }
+                "notes": {
+                  "type": "string",
+                  "description": "Observaciones"
+                }
               },
-              "required": ["building_id", "type", "expires_at"],
+              "required": [
+                "building_id",
+                "type",
+                "expires_at"
+              ],
               "additionalProperties": false
             }
           },
-          "required": ["data"],
+          "required": [
+            "data"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -423,12 +504,30 @@
               "label": "Certificado",
               "format": "text",
               "values": [
-                { "value": "matafuegos", "label": "Matafuegos" },
-                { "value": "gas", "label": "Instalación de gas" },
-                { "value": "ascensor", "label": "Ascensor" },
-                { "value": "electricidad", "label": "Instalación eléctrica" },
-                { "value": "seguro", "label": "Seguro del inmueble" },
-                { "value": "otro", "label": "Otro" }
+                {
+                  "value": "matafuegos",
+                  "label": "Matafuegos"
+                },
+                {
+                  "value": "gas",
+                  "label": "Instalación de gas"
+                },
+                {
+                  "value": "ascensor",
+                  "label": "Ascensor"
+                },
+                {
+                  "value": "electricidad",
+                  "label": "Instalación eléctrica"
+                },
+                {
+                  "value": "seguro",
+                  "label": "Seguro del inmueble"
+                },
+                {
+                  "value": "otro",
+                  "label": "Otro"
+                }
               ]
             },
             {
@@ -437,9 +536,18 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "vigente", "label": "Vigente" },
-                { "value": "por_vencer", "label": "Por vencer" },
-                { "value": "vencido", "label": "Vencido" }
+                {
+                  "value": "vigente",
+                  "label": "Vigente"
+                },
+                {
+                  "value": "por_vencer",
+                  "label": "Por vencer"
+                },
+                {
+                  "value": "vencido",
+                  "label": "Vencido"
+                }
               ]
             },
             {
@@ -474,7 +582,9 @@
             "id": {
               "type": "string",
               "description": "El certificado a corregir.",
-              "ref": { "resource": "properties.certificates" }
+              "ref": {
+                "resource": "properties.certificates"
+              }
             },
             "data": {
               "type": "object",
@@ -484,13 +594,17 @@
                   "type": "string",
                   "format": "uuid",
                   "description": "La propiedad a la que pertenece el certificado.",
-                  "ref": { "resource": "properties.buildings" }
+                  "ref": {
+                    "resource": "properties.buildings"
+                  }
                 },
                 "unit_id": {
                   "type": "string",
                   "format": "uuid",
                   "description": "Solo si el certificado es de UNA unidad y no de la propiedad entera. En ese caso va junto con la propiedad a la que esa unidad pertenece.",
-                  "ref": { "resource": "properties.units" }
+                  "ref": {
+                    "resource": "properties.units"
+                  }
                 },
                 "type": {
                   "type": "string",
@@ -516,7 +630,11 @@
                 },
                 "result": {
                   "type": "string",
-                  "enum": ["apto", "apto_con_observaciones", "rechazado"],
+                  "enum": [
+                    "apto",
+                    "apto_con_observaciones",
+                    "rechazado"
+                  ],
                   "description": "Resultado. Opciones: apto (Apto), apto_con_observaciones (Apto con observaciones), rechazado (Rechazado)."
                 },
                 "file_url": {
@@ -527,12 +645,18 @@
                   "type": "integer",
                   "description": "Avisarme con (días de anticipación)"
                 },
-                "notes": { "type": "string", "description": "Observaciones" }
+                "notes": {
+                  "type": "string",
+                  "description": "Observaciones"
+                }
               },
               "additionalProperties": false
             }
           },
-          "required": ["id", "data"],
+          "required": [
+            "id",
+            "data"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -544,12 +668,30 @@
               "label": "Certificado",
               "format": "text",
               "values": [
-                { "value": "matafuegos", "label": "Matafuegos" },
-                { "value": "gas", "label": "Instalación de gas" },
-                { "value": "ascensor", "label": "Ascensor" },
-                { "value": "electricidad", "label": "Instalación eléctrica" },
-                { "value": "seguro", "label": "Seguro del inmueble" },
-                { "value": "otro", "label": "Otro" }
+                {
+                  "value": "matafuegos",
+                  "label": "Matafuegos"
+                },
+                {
+                  "value": "gas",
+                  "label": "Instalación de gas"
+                },
+                {
+                  "value": "ascensor",
+                  "label": "Ascensor"
+                },
+                {
+                  "value": "electricidad",
+                  "label": "Instalación eléctrica"
+                },
+                {
+                  "value": "seguro",
+                  "label": "Seguro del inmueble"
+                },
+                {
+                  "value": "otro",
+                  "label": "Otro"
+                }
               ]
             },
             {
@@ -558,9 +700,18 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "vigente", "label": "Vigente" },
-                { "value": "por_vencer", "label": "Por vencer" },
-                { "value": "vencido", "label": "Vencido" }
+                {
+                  "value": "vigente",
+                  "label": "Vigente"
+                },
+                {
+                  "value": "por_vencer",
+                  "label": "Por vencer"
+                },
+                {
+                  "value": "vencido",
+                  "label": "Vencido"
+                }
               ]
             },
             {
@@ -624,9 +775,18 @@
               "label": "Certificados",
               "format": "text",
               "values": [
-                { "value": "ok", "label": "Al día" },
-                { "value": "soon", "label": "Certificado por vencer" },
-                { "value": "expired", "label": "Certificado vencido" }
+                {
+                  "value": "ok",
+                  "label": "Al día"
+                },
+                {
+                  "value": "soon",
+                  "label": "Certificado por vencer"
+                },
+                {
+                  "value": "expired",
+                  "label": "Certificado vencido"
+                }
               ]
             },
             {
@@ -635,14 +795,38 @@
               "label": "Tipo",
               "format": "text",
               "values": [
-                { "value": "edificio", "label": "Edificio" },
-                { "value": "departamento", "label": "Departamento" },
-                { "value": "casa", "label": "Casa" },
-                { "value": "local", "label": "Local" },
-                { "value": "oficina", "label": "Oficina" },
-                { "value": "galpon", "label": "Galpón" },
-                { "value": "cochera", "label": "Cochera" },
-                { "value": "baulera", "label": "Baulera" }
+                {
+                  "value": "edificio",
+                  "label": "Edificio"
+                },
+                {
+                  "value": "departamento",
+                  "label": "Departamento"
+                },
+                {
+                  "value": "casa",
+                  "label": "Casa"
+                },
+                {
+                  "value": "local",
+                  "label": "Local"
+                },
+                {
+                  "value": "oficina",
+                  "label": "Oficina"
+                },
+                {
+                  "value": "galpon",
+                  "label": "Galpón"
+                },
+                {
+                  "value": "cochera",
+                  "label": "Cochera"
+                },
+                {
+                  "value": "baulera",
+                  "label": "Baulera"
+                }
               ]
             },
             {
@@ -685,10 +869,14 @@
             "id": {
               "type": "string",
               "description": "La propiedad que se quiere ver.",
-              "ref": { "resource": "properties.buildings" }
+              "ref": {
+                "resource": "properties.buildings"
+              }
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -712,9 +900,18 @@
               "label": "Certificados",
               "format": "text",
               "values": [
-                { "value": "ok", "label": "Al día" },
-                { "value": "soon", "label": "Certificado por vencer" },
-                { "value": "expired", "label": "Certificado vencido" }
+                {
+                  "value": "ok",
+                  "label": "Al día"
+                },
+                {
+                  "value": "soon",
+                  "label": "Certificado por vencer"
+                },
+                {
+                  "value": "expired",
+                  "label": "Certificado vencido"
+                }
               ]
             },
             {
@@ -723,14 +920,38 @@
               "label": "Tipo",
               "format": "text",
               "values": [
-                { "value": "edificio", "label": "Edificio" },
-                { "value": "departamento", "label": "Departamento" },
-                { "value": "casa", "label": "Casa" },
-                { "value": "local", "label": "Local" },
-                { "value": "oficina", "label": "Oficina" },
-                { "value": "galpon", "label": "Galpón" },
-                { "value": "cochera", "label": "Cochera" },
-                { "value": "baulera", "label": "Baulera" }
+                {
+                  "value": "edificio",
+                  "label": "Edificio"
+                },
+                {
+                  "value": "departamento",
+                  "label": "Departamento"
+                },
+                {
+                  "value": "casa",
+                  "label": "Casa"
+                },
+                {
+                  "value": "local",
+                  "label": "Local"
+                },
+                {
+                  "value": "oficina",
+                  "label": "Oficina"
+                },
+                {
+                  "value": "galpon",
+                  "label": "Galpón"
+                },
+                {
+                  "value": "cochera",
+                  "label": "Cochera"
+                },
+                {
+                  "value": "baulera",
+                  "label": "Baulera"
+                }
               ]
             },
             {
@@ -785,7 +1006,10 @@
                   ],
                   "description": "Tipo. Opciones: edificio (Edificio), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera). Un departamento NO se carga acá: es una unidad de su edificio y se agrega con «Dar de alta una unidad»."
                 },
-                "name": { "type": "string", "description": "Nombre" },
+                "name": {
+                  "type": "string",
+                  "description": "Nombre"
+                },
                 "description": {
                   "type": "string",
                   "description": "Descripción"
@@ -809,15 +1033,29 @@
                         "description": "Qué se ve en la foto."
                       }
                     },
-                    "required": ["url"],
+                    "required": [
+                      "url"
+                    ],
                     "additionalProperties": false
                   },
                   "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
                 },
-                "street": { "type": "string", "description": "Calle" },
-                "street_number": { "type": "string", "description": "Altura" },
-                "city": { "type": "string", "description": "Localidad" },
-                "zip_code": { "type": "string", "description": "Código postal" },
+                "street": {
+                  "type": "string",
+                  "description": "Calle"
+                },
+                "street_number": {
+                  "type": "string",
+                  "description": "Altura"
+                },
+                "city": {
+                  "type": "string",
+                  "description": "Localidad"
+                },
+                "zip_code": {
+                  "type": "string",
+                  "description": "Código postal"
+                },
                 "province": {
                   "type": "string",
                   "enum": [
@@ -854,22 +1092,43 @@
                 },
                 "ownership_mode": {
                   "type": "string",
-                  "enum": ["propia", "condominio", "sucesion"],
+                  "enum": [
+                    "propia",
+                    "condominio",
+                    "sucesion"
+                  ],
                   "description": "Modo de tenencia. Opciones: propia (Propia), condominio (Condominio), sucesion (Sucesión)."
                 },
                 "admin_name": {
                   "type": "string",
                   "description": "Administrador"
                 },
-                "admin_phone": { "type": "string", "description": "Teléfono" },
-                "admin_email": { "type": "string", "description": "Email" },
-                "notes": { "type": "string", "description": "Notas" }
+                "admin_phone": {
+                  "type": "string",
+                  "description": "Teléfono"
+                },
+                "admin_email": {
+                  "type": "string",
+                  "description": "Email"
+                },
+                "notes": {
+                  "type": "string",
+                  "description": "Notas"
+                }
               },
-              "required": ["type", "name", "street", "street_number", "city"],
+              "required": [
+                "type",
+                "name",
+                "street",
+                "street_number",
+                "city"
+              ],
               "additionalProperties": false
             }
           },
-          "required": ["data"],
+          "required": [
+            "data"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -893,9 +1152,18 @@
               "label": "Certificados",
               "format": "text",
               "values": [
-                { "value": "ok", "label": "Al día" },
-                { "value": "soon", "label": "Certificado por vencer" },
-                { "value": "expired", "label": "Certificado vencido" }
+                {
+                  "value": "ok",
+                  "label": "Al día"
+                },
+                {
+                  "value": "soon",
+                  "label": "Certificado por vencer"
+                },
+                {
+                  "value": "expired",
+                  "label": "Certificado vencido"
+                }
               ]
             },
             {
@@ -904,14 +1172,38 @@
               "label": "Tipo",
               "format": "text",
               "values": [
-                { "value": "edificio", "label": "Edificio" },
-                { "value": "departamento", "label": "Departamento" },
-                { "value": "casa", "label": "Casa" },
-                { "value": "local", "label": "Local" },
-                { "value": "oficina", "label": "Oficina" },
-                { "value": "galpon", "label": "Galpón" },
-                { "value": "cochera", "label": "Cochera" },
-                { "value": "baulera", "label": "Baulera" }
+                {
+                  "value": "edificio",
+                  "label": "Edificio"
+                },
+                {
+                  "value": "departamento",
+                  "label": "Departamento"
+                },
+                {
+                  "value": "casa",
+                  "label": "Casa"
+                },
+                {
+                  "value": "local",
+                  "label": "Local"
+                },
+                {
+                  "value": "oficina",
+                  "label": "Oficina"
+                },
+                {
+                  "value": "galpon",
+                  "label": "Galpón"
+                },
+                {
+                  "value": "cochera",
+                  "label": "Cochera"
+                },
+                {
+                  "value": "baulera",
+                  "label": "Baulera"
+                }
               ]
             },
             {
@@ -952,7 +1244,9 @@
             "id": {
               "type": "string",
               "description": "La propiedad a editar.",
-              "ref": { "resource": "properties.buildings" }
+              "ref": {
+                "resource": "properties.buildings"
+              }
             },
             "data": {
               "type": "object",
@@ -971,7 +1265,10 @@
                   ],
                   "description": "Tipo. Opciones: edificio (Edificio), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera). Un departamento NO se carga acá: es una unidad de su edificio y se agrega con «Dar de alta una unidad»."
                 },
-                "name": { "type": "string", "description": "Nombre" },
+                "name": {
+                  "type": "string",
+                  "description": "Nombre"
+                },
                 "description": {
                   "type": "string",
                   "description": "Descripción"
@@ -995,15 +1292,29 @@
                         "description": "Qué se ve en la foto."
                       }
                     },
-                    "required": ["url"],
+                    "required": [
+                      "url"
+                    ],
                     "additionalProperties": false
                   },
                   "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
                 },
-                "street": { "type": "string", "description": "Calle" },
-                "street_number": { "type": "string", "description": "Altura" },
-                "city": { "type": "string", "description": "Localidad" },
-                "zip_code": { "type": "string", "description": "Código postal" },
+                "street": {
+                  "type": "string",
+                  "description": "Calle"
+                },
+                "street_number": {
+                  "type": "string",
+                  "description": "Altura"
+                },
+                "city": {
+                  "type": "string",
+                  "description": "Localidad"
+                },
+                "zip_code": {
+                  "type": "string",
+                  "description": "Código postal"
+                },
                 "province": {
                   "type": "string",
                   "enum": [
@@ -1040,21 +1351,37 @@
                 },
                 "ownership_mode": {
                   "type": "string",
-                  "enum": ["propia", "condominio", "sucesion"],
+                  "enum": [
+                    "propia",
+                    "condominio",
+                    "sucesion"
+                  ],
                   "description": "Modo de tenencia. Opciones: propia (Propia), condominio (Condominio), sucesion (Sucesión)."
                 },
                 "admin_name": {
                   "type": "string",
                   "description": "Administrador"
                 },
-                "admin_phone": { "type": "string", "description": "Teléfono" },
-                "admin_email": { "type": "string", "description": "Email" },
-                "notes": { "type": "string", "description": "Notas" }
+                "admin_phone": {
+                  "type": "string",
+                  "description": "Teléfono"
+                },
+                "admin_email": {
+                  "type": "string",
+                  "description": "Email"
+                },
+                "notes": {
+                  "type": "string",
+                  "description": "Notas"
+                }
               },
               "additionalProperties": false
             }
           },
-          "required": ["id", "data"],
+          "required": [
+            "id",
+            "data"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -1078,9 +1405,18 @@
               "label": "Certificados",
               "format": "text",
               "values": [
-                { "value": "ok", "label": "Al día" },
-                { "value": "soon", "label": "Certificado por vencer" },
-                { "value": "expired", "label": "Certificado vencido" }
+                {
+                  "value": "ok",
+                  "label": "Al día"
+                },
+                {
+                  "value": "soon",
+                  "label": "Certificado por vencer"
+                },
+                {
+                  "value": "expired",
+                  "label": "Certificado vencido"
+                }
               ]
             },
             {
@@ -1089,14 +1425,38 @@
               "label": "Tipo",
               "format": "text",
               "values": [
-                { "value": "edificio", "label": "Edificio" },
-                { "value": "departamento", "label": "Departamento" },
-                { "value": "casa", "label": "Casa" },
-                { "value": "local", "label": "Local" },
-                { "value": "oficina", "label": "Oficina" },
-                { "value": "galpon", "label": "Galpón" },
-                { "value": "cochera", "label": "Cochera" },
-                { "value": "baulera", "label": "Baulera" }
+                {
+                  "value": "edificio",
+                  "label": "Edificio"
+                },
+                {
+                  "value": "departamento",
+                  "label": "Departamento"
+                },
+                {
+                  "value": "casa",
+                  "label": "Casa"
+                },
+                {
+                  "value": "local",
+                  "label": "Local"
+                },
+                {
+                  "value": "oficina",
+                  "label": "Oficina"
+                },
+                {
+                  "value": "galpon",
+                  "label": "Galpón"
+                },
+                {
+                  "value": "cochera",
+                  "label": "Cochera"
+                },
+                {
+                  "value": "baulera",
+                  "label": "Baulera"
+                }
               ]
             },
             {
@@ -1172,11 +1532,26 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "ocupada", "label": "Ocupada" },
-                { "value": "vacante", "label": "Vacante" },
-                { "value": "en_recambio", "label": "En recambio" },
-                { "value": "con_preaviso", "label": "Con preaviso" },
-                { "value": "no_disponible", "label": "No disponible" }
+                {
+                  "value": "ocupada",
+                  "label": "Ocupada"
+                },
+                {
+                  "value": "vacante",
+                  "label": "Vacante"
+                },
+                {
+                  "value": "en_recambio",
+                  "label": "En recambio"
+                },
+                {
+                  "value": "con_preaviso",
+                  "label": "Con preaviso"
+                },
+                {
+                  "value": "no_disponible",
+                  "label": "No disponible"
+                }
               ]
             },
             {
@@ -1213,10 +1588,14 @@
             "id": {
               "type": "string",
               "description": "La unidad que se quiere ver.",
-              "ref": { "resource": "properties.units" }
+              "ref": {
+                "resource": "properties.units"
+              }
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -1246,11 +1625,26 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "ocupada", "label": "Ocupada" },
-                { "value": "vacante", "label": "Vacante" },
-                { "value": "en_recambio", "label": "En recambio" },
-                { "value": "con_preaviso", "label": "Con preaviso" },
-                { "value": "no_disponible", "label": "No disponible" }
+                {
+                  "value": "ocupada",
+                  "label": "Ocupada"
+                },
+                {
+                  "value": "vacante",
+                  "label": "Vacante"
+                },
+                {
+                  "value": "en_recambio",
+                  "label": "En recambio"
+                },
+                {
+                  "value": "con_preaviso",
+                  "label": "Con preaviso"
+                },
+                {
+                  "value": "no_disponible",
+                  "label": "No disponible"
+                }
               ]
             },
             {
@@ -1290,11 +1684,22 @@
                   "type": "string",
                   "format": "uuid",
                   "description": "La propiedad a la que pertenece la unidad.",
-                  "ref": { "resource": "properties.buildings" }
+                  "ref": {
+                    "resource": "properties.buildings"
+                  }
                 },
-                "name": { "type": "string", "description": "Nombre o número" },
-                "rooms": { "type": "integer", "description": "Ambientes" },
-                "bathrooms": { "type": "integer", "description": "Baños" },
+                "name": {
+                  "type": "string",
+                  "description": "Nombre o número"
+                },
+                "rooms": {
+                  "type": "integer",
+                  "description": "Ambientes"
+                },
+                "bathrooms": {
+                  "type": "integer",
+                  "description": "Baños"
+                },
                 "surface_m2": {
                   "type": "string",
                   "pattern": "^-?\\d+(?:\\.\\d+)?$",
@@ -1320,7 +1725,9 @@
                         "description": "Qué se ve en la foto."
                       }
                     },
-                    "required": ["url"],
+                    "required": [
+                      "url"
+                    ],
                     "additionalProperties": false
                   },
                   "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
@@ -1341,13 +1748,22 @@
                   "pattern": "^-?\\d+(?:\\.\\d+)?$",
                   "description": "Alquiler de referencia"
                 },
-                "notes": { "type": "string", "description": "Notas" }
+                "notes": {
+                  "type": "string",
+                  "description": "Notas"
+                }
               },
-              "required": ["building_id", "name", "status"],
+              "required": [
+                "building_id",
+                "name",
+                "status"
+              ],
               "additionalProperties": false
             }
           },
-          "required": ["data"],
+          "required": [
+            "data"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -1377,11 +1793,26 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "ocupada", "label": "Ocupada" },
-                { "value": "vacante", "label": "Vacante" },
-                { "value": "en_recambio", "label": "En recambio" },
-                { "value": "con_preaviso", "label": "Con preaviso" },
-                { "value": "no_disponible", "label": "No disponible" }
+                {
+                  "value": "ocupada",
+                  "label": "Ocupada"
+                },
+                {
+                  "value": "vacante",
+                  "label": "Vacante"
+                },
+                {
+                  "value": "en_recambio",
+                  "label": "En recambio"
+                },
+                {
+                  "value": "con_preaviso",
+                  "label": "Con preaviso"
+                },
+                {
+                  "value": "no_disponible",
+                  "label": "No disponible"
+                }
               ]
             },
             {
@@ -1416,7 +1847,9 @@
             "id": {
               "type": "string",
               "description": "La unidad a editar.",
-              "ref": { "resource": "properties.units" }
+              "ref": {
+                "resource": "properties.units"
+              }
             },
             "data": {
               "type": "object",
@@ -1426,11 +1859,22 @@
                   "type": "string",
                   "format": "uuid",
                   "description": "Mover la unidad a otra propiedad. Normalmente no se toca.",
-                  "ref": { "resource": "properties.buildings" }
+                  "ref": {
+                    "resource": "properties.buildings"
+                  }
                 },
-                "name": { "type": "string", "description": "Nombre o número" },
-                "rooms": { "type": "integer", "description": "Ambientes" },
-                "bathrooms": { "type": "integer", "description": "Baños" },
+                "name": {
+                  "type": "string",
+                  "description": "Nombre o número"
+                },
+                "rooms": {
+                  "type": "integer",
+                  "description": "Ambientes"
+                },
+                "bathrooms": {
+                  "type": "integer",
+                  "description": "Baños"
+                },
                 "surface_m2": {
                   "type": "string",
                   "pattern": "^-?\\d+(?:\\.\\d+)?$",
@@ -1456,7 +1900,9 @@
                         "description": "Qué se ve en la foto."
                       }
                     },
-                    "required": ["url"],
+                    "required": [
+                      "url"
+                    ],
                     "additionalProperties": false
                   },
                   "description": "Fotos (lista de fotos, en orden: la primera es la principal)"
@@ -1477,12 +1923,18 @@
                   "pattern": "^-?\\d+(?:\\.\\d+)?$",
                   "description": "Alquiler de referencia"
                 },
-                "notes": { "type": "string", "description": "Notas" }
+                "notes": {
+                  "type": "string",
+                  "description": "Notas"
+                }
               },
               "additionalProperties": false
             }
           },
-          "required": ["id", "data"],
+          "required": [
+            "id",
+            "data"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -1512,11 +1964,26 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "ocupada", "label": "Ocupada" },
-                { "value": "vacante", "label": "Vacante" },
-                { "value": "en_recambio", "label": "En recambio" },
-                { "value": "con_preaviso", "label": "Con preaviso" },
-                { "value": "no_disponible", "label": "No disponible" }
+                {
+                  "value": "ocupada",
+                  "label": "Ocupada"
+                },
+                {
+                  "value": "vacante",
+                  "label": "Vacante"
+                },
+                {
+                  "value": "en_recambio",
+                  "label": "En recambio"
+                },
+                {
+                  "value": "con_preaviso",
+                  "label": "Con preaviso"
+                },
+                {
+                  "value": "no_disponible",
+                  "label": "No disponible"
+                }
               ]
             },
             {
@@ -1580,8 +2047,14 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "recibida", "label": "Recibida" },
-                { "value": "pagada", "label": "Pagada" }
+                {
+                  "value": "recibida",
+                  "label": "Recibida"
+                },
+                {
+                  "value": "pagada",
+                  "label": "Pagada"
+                }
               ]
             }
           ],
@@ -1612,10 +2085,14 @@
             "id": {
               "type": "string",
               "description": "La liquidación que se quiere ver.",
-              "ref": { "resource": "properties.buildingExpenses" }
+              "ref": {
+                "resource": "properties.buildingExpenses"
+              }
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -1639,8 +2116,14 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "recibida", "label": "Recibida" },
-                { "value": "pagada", "label": "Pagada" }
+                {
+                  "value": "recibida",
+                  "label": "Recibida"
+                },
+                {
+                  "value": "pagada",
+                  "label": "Pagada"
+                }
               ]
             }
           ],
@@ -1674,9 +2157,14 @@
                   "type": "string",
                   "format": "uuid",
                   "description": "La propiedad a la que el consorcio le liquidó estas expensas.",
-                  "ref": { "resource": "properties.buildings" }
+                  "ref": {
+                    "resource": "properties.buildings"
+                  }
                 },
-                "period": { "type": "string", "description": "Período" },
+                "period": {
+                  "type": "string",
+                  "description": "Período"
+                },
                 "amount": {
                   "type": "string",
                   "pattern": "^-?\\d+(?:\\.\\d+)?$",
@@ -1684,7 +2172,10 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": ["recibida", "pagada"],
+                  "enum": [
+                    "recibida",
+                    "pagada"
+                  ],
                   "description": "Estado. Opciones: recibida (Recibida), pagada (Pagada).",
                   "default": "recibida"
                 },
@@ -1697,13 +2188,22 @@
                   "type": "string",
                   "description": "Link a la liquidación"
                 },
-                "notes": { "type": "string", "description": "Observaciones" }
+                "notes": {
+                  "type": "string",
+                  "description": "Observaciones"
+                }
               },
-              "required": ["building_id", "period", "amount"],
+              "required": [
+                "building_id",
+                "period",
+                "amount"
+              ],
               "additionalProperties": false
             }
           },
-          "required": ["data"],
+          "required": [
+            "data"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -1727,8 +2227,14 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "recibida", "label": "Recibida" },
-                { "value": "pagada", "label": "Pagada" }
+                {
+                  "value": "recibida",
+                  "label": "Recibida"
+                },
+                {
+                  "value": "pagada",
+                  "label": "Pagada"
+                }
               ]
             }
           ],
@@ -1757,7 +2263,9 @@
             "id": {
               "type": "string",
               "description": "La liquidación a corregir.",
-              "ref": { "resource": "properties.buildingExpenses" }
+              "ref": {
+                "resource": "properties.buildingExpenses"
+              }
             },
             "data": {
               "type": "object",
@@ -1767,9 +2275,14 @@
                   "type": "string",
                   "format": "uuid",
                   "description": "La propiedad a la que corresponde la liquidación.",
-                  "ref": { "resource": "properties.buildings" }
+                  "ref": {
+                    "resource": "properties.buildings"
+                  }
                 },
-                "period": { "type": "string", "description": "Período" },
+                "period": {
+                  "type": "string",
+                  "description": "Período"
+                },
                 "amount": {
                   "type": "string",
                   "pattern": "^-?\\d+(?:\\.\\d+)?$",
@@ -1777,7 +2290,10 @@
                 },
                 "status": {
                   "type": "string",
-                  "enum": ["recibida", "pagada"],
+                  "enum": [
+                    "recibida",
+                    "pagada"
+                  ],
                   "description": "Estado. Opciones: recibida (Recibida), pagada (Pagada).",
                   "default": "recibida"
                 },
@@ -1790,12 +2306,18 @@
                   "type": "string",
                   "description": "Link a la liquidación"
                 },
-                "notes": { "type": "string", "description": "Observaciones" }
+                "notes": {
+                  "type": "string",
+                  "description": "Observaciones"
+                }
               },
               "additionalProperties": false
             }
           },
-          "required": ["id", "data"],
+          "required": [
+            "id",
+            "data"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -1819,8 +2341,14 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "recibida", "label": "Recibida" },
-                { "value": "pagada", "label": "Pagada" }
+                {
+                  "value": "recibida",
+                  "label": "Recibida"
+                },
+                {
+                  "value": "pagada",
+                  "label": "Pagada"
+                }
               ]
             }
           ],
@@ -1849,14 +2377,18 @@
             "id": {
               "type": "string",
               "description": "La propiedad de la que se quiere el resumen.",
-              "ref": { "resource": "properties.buildings" }
+              "ref": {
+                "resource": "properties.buildings"
+              }
             },
             "alertDays": {
               "type": "integer",
               "description": "Con cuántos días de anticipación contar un certificado como «por vencer». Si se omite, 30."
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -1880,9 +2412,18 @@
               "label": "Certificados",
               "format": "text",
               "values": [
-                { "value": "ok", "label": "Al día" },
-                { "value": "soon", "label": "Certificado por vencer" },
-                { "value": "expired", "label": "Certificado vencido" }
+                {
+                  "value": "ok",
+                  "label": "Al día"
+                },
+                {
+                  "value": "soon",
+                  "label": "Certificado por vencer"
+                },
+                {
+                  "value": "expired",
+                  "label": "Certificado vencido"
+                }
               ]
             },
             {
@@ -1891,14 +2432,38 @@
               "label": "Tipo",
               "format": "text",
               "values": [
-                { "value": "edificio", "label": "Edificio" },
-                { "value": "departamento", "label": "Departamento" },
-                { "value": "casa", "label": "Casa" },
-                { "value": "local", "label": "Local" },
-                { "value": "oficina", "label": "Oficina" },
-                { "value": "galpon", "label": "Galpón" },
-                { "value": "cochera", "label": "Cochera" },
-                { "value": "baulera", "label": "Baulera" }
+                {
+                  "value": "edificio",
+                  "label": "Edificio"
+                },
+                {
+                  "value": "departamento",
+                  "label": "Departamento"
+                },
+                {
+                  "value": "casa",
+                  "label": "Casa"
+                },
+                {
+                  "value": "local",
+                  "label": "Local"
+                },
+                {
+                  "value": "oficina",
+                  "label": "Oficina"
+                },
+                {
+                  "value": "galpon",
+                  "label": "Galpón"
+                },
+                {
+                  "value": "cochera",
+                  "label": "Cochera"
+                },
+                {
+                  "value": "baulera",
+                  "label": "Baulera"
+                }
               ]
             },
             {
@@ -1939,10 +2504,14 @@
             "buildingId": {
               "type": "string",
               "description": "La propiedad cuyas unidades se quieren listar.",
-              "ref": { "resource": "properties.buildings" }
+              "ref": {
+                "resource": "properties.buildings"
+              }
             }
           },
-          "required": ["buildingId"],
+          "required": [
+            "buildingId"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -1972,11 +2541,26 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "ocupada", "label": "Ocupada" },
-                { "value": "vacante", "label": "Vacante" },
-                { "value": "en_recambio", "label": "En recambio" },
-                { "value": "con_preaviso", "label": "Con preaviso" },
-                { "value": "no_disponible", "label": "No disponible" }
+                {
+                  "value": "ocupada",
+                  "label": "Ocupada"
+                },
+                {
+                  "value": "vacante",
+                  "label": "Vacante"
+                },
+                {
+                  "value": "en_recambio",
+                  "label": "En recambio"
+                },
+                {
+                  "value": "con_preaviso",
+                  "label": "Con preaviso"
+                },
+                {
+                  "value": "no_disponible",
+                  "label": "No disponible"
+                }
               ]
             },
             {
@@ -2013,14 +2597,18 @@
             "buildingId": {
               "type": "string",
               "description": "La propiedad cuyos certificados se quieren ver.",
-              "ref": { "resource": "properties.buildings" }
+              "ref": {
+                "resource": "properties.buildings"
+              }
             },
             "alertDays": {
               "type": "integer",
               "description": "Con cuántos días de anticipación marcar un certificado como «por vencer». Si se omite, cada tipo usa su propio horizonte."
             }
           },
-          "required": ["buildingId"],
+          "required": [
+            "buildingId"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2032,12 +2620,30 @@
               "label": "Certificado",
               "format": "text",
               "values": [
-                { "value": "matafuegos", "label": "Matafuegos" },
-                { "value": "gas", "label": "Instalación de gas" },
-                { "value": "ascensor", "label": "Ascensor" },
-                { "value": "electricidad", "label": "Instalación eléctrica" },
-                { "value": "seguro", "label": "Seguro del inmueble" },
-                { "value": "otro", "label": "Otro" }
+                {
+                  "value": "matafuegos",
+                  "label": "Matafuegos"
+                },
+                {
+                  "value": "gas",
+                  "label": "Instalación de gas"
+                },
+                {
+                  "value": "ascensor",
+                  "label": "Ascensor"
+                },
+                {
+                  "value": "electricidad",
+                  "label": "Instalación eléctrica"
+                },
+                {
+                  "value": "seguro",
+                  "label": "Seguro del inmueble"
+                },
+                {
+                  "value": "otro",
+                  "label": "Otro"
+                }
               ]
             },
             {
@@ -2046,9 +2652,18 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "vigente", "label": "Vigente" },
-                { "value": "por_vencer", "label": "Por vencer" },
-                { "value": "vencido", "label": "Vencido" }
+                {
+                  "value": "vigente",
+                  "label": "Vigente"
+                },
+                {
+                  "value": "por_vencer",
+                  "label": "Por vencer"
+                },
+                {
+                  "value": "vencido",
+                  "label": "Vencido"
+                }
               ]
             },
             {
@@ -2085,10 +2700,14 @@
             "buildingId": {
               "type": "string",
               "description": "La propiedad cuyas liquidaciones se quieren ver.",
-              "ref": { "resource": "properties.buildings" }
+              "ref": {
+                "resource": "properties.buildings"
+              }
             }
           },
-          "required": ["buildingId"],
+          "required": [
+            "buildingId"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2112,8 +2731,14 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "recibida", "label": "Recibida" },
-                { "value": "pagada", "label": "Pagada" }
+                {
+                  "value": "recibida",
+                  "label": "Recibida"
+                },
+                {
+                  "value": "pagada",
+                  "label": "Pagada"
+                }
               ]
             }
           ],
@@ -2144,10 +2769,14 @@
             "id": {
               "type": "string",
               "description": "El propietario que se quiere ver, tal como lo devuelve «Listar propietarios».",
-              "ref": { "resource": "properties.unitOwners" }
+              "ref": {
+                "resource": "properties.unitOwners"
+              }
             }
           },
-          "required": ["id"],
+          "required": [
+            "id"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2189,13 +2818,22 @@
               "label": "Condición frente al IVA",
               "format": "text",
               "values": [
-                { "value": "monotributo", "label": "Monotributo" },
+                {
+                  "value": "monotributo",
+                  "label": "Monotributo"
+                },
                 {
                   "value": "responsable_inscripto",
                   "label": "Responsable inscripto"
                 },
-                { "value": "exento", "label": "Exento" },
-                { "value": "consumidor_final", "label": "Consumidor final" }
+                {
+                  "value": "exento",
+                  "label": "Exento"
+                },
+                {
+                  "value": "consumidor_final",
+                  "label": "Consumidor final"
+                }
               ]
             },
             {
@@ -2204,7 +2842,12 @@
               "label": "Banco",
               "format": "text"
             },
-            { "key": "cbu", "name": "cbu", "label": "CBU", "format": "text" },
+            {
+              "key": "cbu",
+              "name": "cbu",
+              "label": "CBU",
+              "format": "text"
+            },
             {
               "key": "alias",
               "name": "alias",
@@ -2237,7 +2880,9 @@
             "id": {
               "type": "string",
               "description": "El propietario a editar. Omitilo para crear uno nuevo; mandarlo con un id inexistente no crea nada.",
-              "ref": { "resource": "properties.unitOwners" }
+              "ref": {
+                "resource": "properties.unitOwners"
+              }
             },
             "data": {
               "type": "object",
@@ -2249,10 +2894,17 @@
                 },
                 "document_type": {
                   "type": "string",
-                  "enum": ["cuit", "cuil", "dni"],
+                  "enum": [
+                    "cuit",
+                    "cuil",
+                    "dni"
+                  ],
                   "description": "Documento. Opciones: cuit (CUIT), cuil (CUIL), dni (DNI)."
                 },
-                "document_number": { "type": "string", "description": "Número" },
+                "document_number": {
+                  "type": "string",
+                  "description": "Número"
+                },
                 "tax_condition": {
                   "type": "string",
                   "enum": [
@@ -2263,21 +2915,41 @@
                   ],
                   "description": "Condición frente al IVA. Opciones: monotributo (Monotributo), responsable_inscripto (Responsable inscripto), exento (Exento), consumidor_final (Consumidor final)."
                 },
-                "email": { "type": "string", "description": "Email" },
-                "phone": { "type": "string", "description": "Teléfono" },
-                "address": { "type": "string", "description": "Domicilio" },
-                "bank": { "type": "string", "description": "Banco" },
+                "email": {
+                  "type": "string",
+                  "description": "Email"
+                },
+                "phone": {
+                  "type": "string",
+                  "description": "Teléfono"
+                },
+                "address": {
+                  "type": "string",
+                  "description": "Domicilio"
+                },
+                "bank": {
+                  "type": "string",
+                  "description": "Banco"
+                },
                 "account": {
                   "type": "string",
                   "description": "Tipo y número de cuenta"
                 },
-                "cbu": { "type": "string", "description": "CBU" },
-                "alias": { "type": "string", "description": "Alias" },
+                "cbu": {
+                  "type": "string",
+                  "description": "CBU"
+                },
+                "alias": {
+                  "type": "string",
+                  "description": "Alias"
+                },
                 "unit_id": {
                   "type": "string",
                   "format": "uuid",
                   "description": "De qué unidad es dueño. Opcional: sin esto se guarda solo la persona. Con esto se crea el vínculo, o se corrige el que ya tenía con ESA unidad — las otras no se tocan.",
-                  "ref": { "resource": "properties.units" }
+                  "ref": {
+                    "resource": "properties.units"
+                  }
                 },
                 "share_pct": {
                   "type": "number",
@@ -2294,11 +2966,17 @@
                   "description": "Con qué carácter figura en la unidad. Si se omite, «titular» al crear el vínculo y el que ya tenía al corregirlo. Titular, cotitular y nudo propietario reparten el DOMINIO (juntos llegan a 100); el usufructuario percibe los frutos y suma por su cuenta, así que un usufructo sobre una unidad ya escriturada al 100 % es válido."
                 }
               },
-              "required": ["name", "document_type", "document_number"],
+              "required": [
+                "name",
+                "document_type",
+                "document_number"
+              ],
               "additionalProperties": false
             }
           },
-          "required": ["data"],
+          "required": [
+            "data"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2400,7 +3078,9 @@
               "description": "El mes a consultar, como «2026-08». Las expensas son mensuales."
             }
           },
-          "required": ["period"],
+          "required": [
+            "period"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2424,8 +3104,14 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "recibida", "label": "Recibida" },
-                { "value": "pagada", "label": "Pagada" }
+                {
+                  "value": "recibida",
+                  "label": "Recibida"
+                },
+                {
+                  "value": "pagada",
+                  "label": "Pagada"
+                }
               ]
             },
             {
@@ -2466,15 +3152,22 @@
             "unitId": {
               "type": "string",
               "description": "La unidad de la que se saca al titular.",
-              "ref": { "resource": "properties.units" }
+              "ref": {
+                "resource": "properties.units"
+              }
             },
             "contactId": {
               "type": "string",
               "description": "La persona que deja de figurar. Es el id del propietario, no el del vínculo — el mismo que devuelve «Titulares de una unidad» en su columna de contacto.",
-              "ref": { "resource": "properties.unitOwners" }
+              "ref": {
+                "resource": "properties.unitOwners"
+              }
             }
           },
-          "required": ["unitId", "contactId"],
+          "required": [
+            "unitId",
+            "contactId"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2511,10 +3204,14 @@
             "unitId": {
               "type": "string",
               "description": "La unidad que se quiere revisar.",
-              "ref": { "resource": "properties.units" }
+              "ref": {
+                "resource": "properties.units"
+              }
             }
           },
-          "required": ["unitId"],
+          "required": [
+            "unitId"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2575,10 +3272,14 @@
             "unitId": {
               "type": "string",
               "description": "La unidad cuyos titulares se quieren ver.",
-              "ref": { "resource": "properties.units" }
+              "ref": {
+                "resource": "properties.units"
+              }
             }
           },
-          "required": ["unitId"],
+          "required": [
+            "unitId"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2608,10 +3309,22 @@
               "label": "Carácter",
               "format": "text",
               "values": [
-                { "value": "titular", "label": "Titular" },
-                { "value": "cotitular", "label": "Cotitular" },
-                { "value": "usufructuario", "label": "Usufructuario" },
-                { "value": "nudo_propietario", "label": "Nudo propietario" }
+                {
+                  "value": "titular",
+                  "label": "Titular"
+                },
+                {
+                  "value": "cotitular",
+                  "label": "Cotitular"
+                },
+                {
+                  "value": "usufructuario",
+                  "label": "Usufructuario"
+                },
+                {
+                  "value": "nudo_propietario",
+                  "label": "Nudo propietario"
+                }
               ]
             }
           ],
@@ -2642,10 +3355,14 @@
             "buildingId": {
               "type": "string",
               "description": "La propiedad cuyos titulares se quieren ver.",
-              "ref": { "resource": "properties.buildings" }
+              "ref": {
+                "resource": "properties.buildings"
+              }
             }
           },
-          "required": ["buildingId"],
+          "required": [
+            "buildingId"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2675,10 +3392,22 @@
               "label": "Carácter",
               "format": "text",
               "values": [
-                { "value": "titular", "label": "Titular" },
-                { "value": "cotitular", "label": "Cotitular" },
-                { "value": "usufructuario", "label": "Usufructuario" },
-                { "value": "nudo_propietario", "label": "Nudo propietario" }
+                {
+                  "value": "titular",
+                  "label": "Titular"
+                },
+                {
+                  "value": "cotitular",
+                  "label": "Cotitular"
+                },
+                {
+                  "value": "usufructuario",
+                  "label": "Usufructuario"
+                },
+                {
+                  "value": "nudo_propietario",
+                  "label": "Nudo propietario"
+                }
               ]
             }
           ],
@@ -2709,10 +3438,14 @@
             "contactId": {
               "type": "string",
               "description": "La persona de la que se quieren ver las unidades.",
-              "ref": { "resource": "properties.unitOwners" }
+              "ref": {
+                "resource": "properties.unitOwners"
+              }
             }
           },
-          "required": ["contactId"],
+          "required": [
+            "contactId"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2736,10 +3469,22 @@
               "label": "Carácter",
               "format": "text",
               "values": [
-                { "value": "titular", "label": "Titular" },
-                { "value": "cotitular", "label": "Cotitular" },
-                { "value": "usufructuario", "label": "Usufructuario" },
-                { "value": "nudo_propietario", "label": "Nudo propietario" }
+                {
+                  "value": "titular",
+                  "label": "Titular"
+                },
+                {
+                  "value": "cotitular",
+                  "label": "Cotitular"
+                },
+                {
+                  "value": "usufructuario",
+                  "label": "Usufructuario"
+                },
+                {
+                  "value": "nudo_propietario",
+                  "label": "Nudo propietario"
+                }
               ]
             },
             {
@@ -2748,11 +3493,26 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "ocupada", "label": "Ocupada" },
-                { "value": "vacante", "label": "Vacante" },
-                { "value": "en_recambio", "label": "En recambio" },
-                { "value": "con_preaviso", "label": "Con preaviso" },
-                { "value": "no_disponible", "label": "No disponible" }
+                {
+                  "value": "ocupada",
+                  "label": "Ocupada"
+                },
+                {
+                  "value": "vacante",
+                  "label": "Vacante"
+                },
+                {
+                  "value": "en_recambio",
+                  "label": "En recambio"
+                },
+                {
+                  "value": "con_preaviso",
+                  "label": "Con preaviso"
+                },
+                {
+                  "value": "no_disponible",
+                  "label": "No disponible"
+                }
               ]
             }
           ],
@@ -2783,14 +3543,18 @@
             "unitId": {
               "type": "string",
               "description": "La unidad cuyos certificados se quieren ver.",
-              "ref": { "resource": "properties.units" }
+              "ref": {
+                "resource": "properties.units"
+              }
             },
             "alertDays": {
               "type": "integer",
               "description": "Con cuántos días de anticipación marcar un certificado como «por vencer». Si se omite, cada tipo usa su propio horizonte."
             }
           },
-          "required": ["unitId"],
+          "required": [
+            "unitId"
+          ],
           "additionalProperties": false
         },
         "output": {
@@ -2802,12 +3566,30 @@
               "label": "Certificado",
               "format": "text",
               "values": [
-                { "value": "matafuegos", "label": "Matafuegos" },
-                { "value": "gas", "label": "Instalación de gas" },
-                { "value": "ascensor", "label": "Ascensor" },
-                { "value": "electricidad", "label": "Instalación eléctrica" },
-                { "value": "seguro", "label": "Seguro del inmueble" },
-                { "value": "otro", "label": "Otro" }
+                {
+                  "value": "matafuegos",
+                  "label": "Matafuegos"
+                },
+                {
+                  "value": "gas",
+                  "label": "Instalación de gas"
+                },
+                {
+                  "value": "ascensor",
+                  "label": "Ascensor"
+                },
+                {
+                  "value": "electricidad",
+                  "label": "Instalación eléctrica"
+                },
+                {
+                  "value": "seguro",
+                  "label": "Seguro del inmueble"
+                },
+                {
+                  "value": "otro",
+                  "label": "Otro"
+                }
               ]
             },
             {
@@ -2816,8 +3598,14 @@
               "label": "Alcance",
               "format": "text",
               "values": [
-                { "value": "unidad", "label": "De la unidad" },
-                { "value": "edificio", "label": "Del edificio" }
+                {
+                  "value": "unidad",
+                  "label": "De la unidad"
+                },
+                {
+                  "value": "edificio",
+                  "label": "Del edificio"
+                }
               ]
             },
             {
@@ -2826,9 +3614,18 @@
               "label": "Estado",
               "format": "text",
               "values": [
-                { "value": "vigente", "label": "Vigente" },
-                { "value": "por_vencer", "label": "Por vencer" },
-                { "value": "vencido", "label": "Vencido" }
+                {
+                  "value": "vigente",
+                  "label": "Vigente"
+                },
+                {
+                  "value": "por_vencer",
+                  "label": "Por vencer"
+                },
+                {
+                  "value": "vencido",
+                  "label": "Vencido"
+                }
               ]
             },
             {

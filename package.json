@@ -1,6 +1,6 @@
 {
   "name": "@coongro/properties",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "description": "Edificios, unidades, certificados y titularidad para el kit de alquileres. Registra el patrimonio que se alquila: la propiedad, sus unidades con estado de ocupación, los certificados con vencimiento (matafuegos, gas, ascensor) y quién es dueño de cada unidad.",
   "main": "dist/index.js",
