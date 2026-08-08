@@ -85,11 +85,6 @@
                 "icon": "Building2"
               },
               {
-                "value": "departamento",
-                "label": "Departamento",
-                "icon": "Building"
-              },
-              {
                 "value": "casa",
                 "label": "Casa",
                 "icon": "House"
@@ -199,6 +194,11 @@
               "label": "Editar",
               "target": "properties.propiedad.open"
             }
+          },
+          {
+            "label": "Eliminar",
+            "variant": "destructive",
+            "icon": "Trash2"
           }
         ],
         "emptyTitle": "Todavía no hay propiedades",

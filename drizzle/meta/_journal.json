@@ -29,6 +29,20 @@
       "when": 1785902997716,
       "tag": "0003_lonely_moonstone",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1785989397716,
+      "tag": "0004_calm_moondragon",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786075797716,
+      "tag": "0005_wandering_shadowcat",
+      "breakpoints": true
     }
   ]
 }

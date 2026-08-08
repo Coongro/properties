@@ -116,7 +116,6 @@ export function usePropiedadesView() {
       display: 'pill',
       values: [
         { value: 'edificio', label: 'Edificio', icon: 'Building2' },
-        { value: 'departamento', label: 'Departamento', icon: 'Building' },
         { value: 'casa', label: 'Casa', icon: 'House' },
         { value: 'local', label: 'Local', icon: 'Store' },
         { value: 'oficina', label: 'Oficina', icon: 'Briefcase' },
@@ -245,8 +244,8 @@ export function usePropiedadesView() {
       toast.success('Eliminado', 'El registro se eliminó correctamente');
       setPendingDelete(null);
       void load();
-    } catch {
-      toast.error('Error', 'No se pudo eliminar');
+    } catch (err) {
+      toast.error('Error', err instanceof Error ? err.message : 'No se pudo eliminar');
     } finally {
       setDeleting(false);
     }

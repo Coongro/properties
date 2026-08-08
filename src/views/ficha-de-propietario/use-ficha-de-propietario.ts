@@ -65,6 +65,27 @@ export function useFichaDePropietarioView() {
     },
     [metrics]
   );
+
+  const [pendingConfirm, setPendingConfirm] = useState<{
+    title: string;
+    message: string;
+    confirmLabel: string;
+    run: () => void;
+  } | null>(null);
+  const askConfirm = useCallback(
+    (title: string, message: string, confirmLabel: string, run: () => void) => {
+      setPendingConfirm({ title, message, confirmLabel, run });
+    },
+    []
+  );
+  const cancelConfirm = useCallback(() => {
+    setPendingConfirm(null);
+  }, []);
+  const runConfirmed = useCallback(() => {
+    const pend = pendingConfirm;
+    setPendingConfirm(null);
+    pend?.run();
+  }, [pendingConfirm]);
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -275,17 +296,52 @@ export function useFichaDePropietarioView() {
       toast.success('Eliminado', 'El registro se eliminó correctamente');
       setPendingDelete(null);
       void load();
-    } catch {
-      toast.error('Error', 'No se pudo eliminar');
+    } catch (err) {
+      toast.error('Error', err instanceof Error ? err.message : 'No se pudo eliminar');
     } finally {
       setDeleting(false);
     }
     // deps intencionalmente fijas: el efecto corre una sola vez
   }, [pendingDelete, load]);
 
+  // args opcionales: las acciones de fila pasan { id } del registro, y
+  // `record` la fila entera para el handler (el id solo no alcanza
+  // cuando la acción necesita el monto o el estado de esa fila).
+  const runServerAction = useCallback(
+    async (id: string, args?: unknown, record?: Record<string, any>) => {
+      try {
+        if (customHandlers.onAction) {
+          await customHandlers.onAction(id, {
+            execute: function exec<T = unknown>(id: string, args?: unknown): Promise<T> {
+              return actions.execute<T>(id, args);
+            },
+            toast,
+            record,
+            reload: () => {
+              void load();
+              reloadMetrics();
+            },
+          });
+        } else {
+          await actions.execute(id, args);
+        }
+        if (!customHandlers.onAction) toast.success('Listo', id);
+        void load();
+      } catch (err) {
+        toast.error('Error', err instanceof Error ? err.message : 'Falló ' + id);
+      }
+      // deps intencionalmente fijas: el efecto corre una sola vez
+    },
+    []
+  );
+
   return {
     metric,
     reloadMetrics,
+    pendingConfirm,
+    askConfirm,
+    cancelConfirm,
+    runConfirmed,
     sort,
     onSortChange,
     filters,
@@ -308,5 +364,6 @@ export function useFichaDePropietarioView() {
     mapRow,
     visibleRows,
     removeRow,
+    runServerAction,
   };
 }

@@ -95,6 +95,20 @@ export const customHandlers: CustomHandlers = {
       if (!unitId) return Promise.resolve([]);
       return execute<Record<string, unknown>[]>('properties.unitOwners.listByUnit', { unitId });
     },
+
+    /**
+     * Los certificados que alcanzan a esta unidad: los suyos y los del edificio.
+     *
+     * Las dos mitades, porque la pregunta parado acá es «¿está en regla para alquilarse?»
+     * y el ascensor vencido del edificio la contesta que no. El repositorio devuelve
+     * cada fila con su `scope`, que es lo que decide si desde esta pantalla se puede
+     * tocar: los del edificio se ven, y se administran desde su propiedad.
+     */
+    tbl_certificados: ({ execute, record }) => {
+      const unitId = record?.id as string | undefined;
+      if (!unitId) return Promise.resolve([]);
+      return execute<Record<string, unknown>[]>('properties.certificates.listByUnit', { unitId });
+    },
   },
 
   /**
@@ -104,12 +118,20 @@ export const customHandlers: CustomHandlers = {
    * recibe su fila, y `listByUnit` devuelve el `unit_id` justamente para que esto no dependa
    * de desde qué pantalla se la llame.
    */
-  onAction: async (actionId, { execute, record, reload }) => {
+  onAction: async (actionId, { execute, record, toast, reload }) => {
     if (actionId === 'properties.unitOwners.removeOwner') {
       await execute('properties.unitOwners.removeOwner', {
         unitId: record?.unit_id,
         contactId: record?.contact_id,
       });
+      // El aviso va acá y no en el `successToast` del spec: ese se dispara apenas
+      // se hace el click, antes de que el servidor conteste, y también cuando la
+      // baja se rechaza — decía «Titular quitado» sin haber quitado a nadie.
+      toast.success('Titular quitado', '');
+      reload();
+    } else if (actionId === 'properties.certificates.delete') {
+      await execute('properties.certificates.delete', { id: record?.id });
+      toast.success('Certificado eliminado', '');
       reload();
     }
   },

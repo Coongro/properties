@@ -177,6 +177,12 @@
     }
   ],
   "headless": {
-    "handlers": []
+    "handlers": [
+      {
+        "hook": "onInit",
+        "mode": "uiOnly",
+        "reason": "No consulta nada: cuando el alta se abre parado en una unidad, copia el `building_id` que esa unidad ya trae en el registro padre. Sin esto la propiedad —que es requerida— quedaba vacía y había que elegirla a mano de un desplegable con toda la cartera. Para el canal agentic no cambia nada: el contrato ya pide las dos referencias."
+      }
+    ]
   }
 }

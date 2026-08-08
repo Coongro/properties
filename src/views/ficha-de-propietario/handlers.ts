@@ -115,4 +115,27 @@ export const customHandlers: CustomHandlers = {
       });
     },
   },
+
+  /**
+   * Sacarle una unidad de las que tiene a su nombre.
+   *
+   * Es la MISMA operación que el «Quitar» de la ficha de la unidad, pedida desde
+   * el otro lado del vínculo: una titularidad cargada por error se deshace desde
+   * donde se la ve, y desde acá se la ve como «esta persona figura en 1°A».
+   *
+   * La unidad y la persona salen de la FILA y no del registro de la vista —
+   * `listUnitsOf` devuelve `unit_id` y `contact_id` justamente para eso—, así el
+   * vínculo que se corta es el de esa fila y no el de la primera unidad que
+   * aparezca.
+   */
+  onAction: async (actionId, { execute, record, toast, reload }) => {
+    if (actionId === 'properties.unitOwners.removeOwner') {
+      await execute('properties.unitOwners.removeOwner', {
+        unitId: record?.unit_id,
+        contactId: record?.contact_id,
+      });
+      toast.success('Unidad quitada', '');
+      reload();
+    }
+  },
 };

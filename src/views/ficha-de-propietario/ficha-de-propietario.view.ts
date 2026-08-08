@@ -29,6 +29,10 @@ export function FichaDePropietarioView() {
       outline: 'outline',
     })[tone] ?? fallback;
   const {
+    pendingConfirm,
+    askConfirm,
+    cancelConfirm,
+    runConfirmed,
     loading,
     visibleRows,
     COLUMNS,
@@ -41,6 +45,7 @@ export function FichaDePropietarioView() {
     page,
     setPage,
     pagedRows,
+    runServerAction,
     metric,
   } = useFichaDePropietarioView();
 
@@ -155,6 +160,25 @@ export function FichaDePropietarioView() {
         )
       : shown;
   };
+  const ROW_ACTIONS = [
+    {
+      label: 'Quitar',
+      variant: 'destructive' as const,
+      icon: 'UserMinus',
+      onClick: (row: any) => {
+        askConfirm(
+          'Quitar',
+          '¿Sacarle esta unidad de las que tiene a su nombre? La unidad no se borra: queda sin esta persona como titular, y se la puede volver a cargar.',
+          'Quitar',
+          () => {
+            ((row: any) => {
+              void runServerAction('properties.unitOwners.removeOwner', { id: row.id }, row);
+            })(row);
+          }
+        );
+      },
+    },
+  ];
   const renderTable = () =>
     h(
       'div',
@@ -187,6 +211,7 @@ export function FichaDePropietarioView() {
         onRowClick: (row: any) => {
           views.open('properties.ficha-de-unidad.open', { record: row });
         },
+        actions: ROW_ACTIONS,
         mobileRender: (row: any) =>
           h(
             'div',
@@ -222,6 +247,35 @@ export function FichaDePropietarioView() {
                     },
                   },
                   renderCell(row, c)
+                )
+              )
+            ),
+            h(
+              'div',
+              {
+                style: {
+                  display: 'flex',
+                  gap: '4px',
+                  justifyContent: 'flex-end',
+                  borderTop: '1px solid var(--cg-border-light)',
+                  paddingTop: '8px',
+                  marginTop: '2px',
+                },
+              },
+              ...ROW_ACTIONS.filter((a2: any) => !a2.hidden?.(row)).map((a2: any) =>
+                h(
+                  UI.Button,
+                  {
+                    key: a2.label,
+                    size: 'sm' as const,
+                    variant:
+                      a2.variant === 'destructive' ? ('destructive' as const) : ('ghost' as const),
+                    onClick: (e: any) => {
+                      e.stopPropagation();
+                      a2.onClick(row);
+                    },
+                  },
+                  a2.label
                 )
               )
             )
@@ -1105,6 +1159,18 @@ export function FichaDePropietarioView() {
           )
         )
       )
-    )
+    ),
+    h(UI.ConfirmDialog, {
+      open: !!pendingConfirm,
+      onOpenChange: (o: boolean) => {
+        if (!o) cancelConfirm();
+      },
+      title: pendingConfirm?.title ?? '',
+      description: pendingConfirm?.message ?? '',
+      confirmLabel: pendingConfirm?.confirmLabel ?? 'Confirmar',
+      onConfirm: () => {
+        runConfirmed();
+      },
+    })
   );
 }

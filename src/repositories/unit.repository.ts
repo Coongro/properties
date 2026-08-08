@@ -2,8 +2,11 @@ import type { ModuleDatabaseAPI } from '@coongro/plugin-sdk';
 import { and, asc, eq, getTableColumns, inArray, isNull, type SQL } from 'drizzle-orm';
 
 import { buildingTable } from '../schema/building.js';
+import { unitOwnerTable } from '../schema/unit-owner.js';
+import type { NewUnitOwnerRow } from '../schema/unit-owner.js';
 import { unitTable } from '../schema/unit.js';
 import type { UnitRow, NewUnitRow } from '../schema/unit.js';
+import { unitDeletionBlockedMessage } from '../services/property-deletion.js';
 import { unitDetail, unitLabel } from '../services/unit-identity.js';
 
 import { buildingAddressSql } from './building.repository.js';
@@ -112,26 +115,75 @@ export class UnitRepository {
     return this.reread(rows);
   }
 
+  /**
+   * Baja lógica de una unidad, con su titularidad.
+   *
+   * Se niega si está ocupada: eso significa un contrato vigente que vive en
+   * `leases` y que quedaría apuntando a una unidad que ya no está. Es la misma
+   * regla que frena la baja del edificio entero — da igual desde qué pantalla se
+   * la pida.
+   *
+   * Los vínculos de titularidad se dan de baja con ella y con su MISMA marca de
+   * tiempo: un dueño con el 50 % de una unidad que ya no existe no es un dato,
+   * es un resto; y esa marca compartida es la que después le permite a `restore`
+   * devolver exactamente los que se fueron con ella.
+   */
   async delete({ id }: { id: string }): Promise<UnitRow[]> {
-    return this.db.ormQuery((tx) =>
-      tx
+    return this.db.ormQuery(async (tx) => {
+      const [unit] = await tx
+        .select({ name: unitTable.name, status: unitTable.status })
+        .from(unitTable)
+        .where(and(eq(unitTable.id, id), isNull(unitTable.deleted_at)))
+        .limit(1);
+      if (!unit) return [];
+
+      const blocked = unitDeletionBlockedMessage(unit);
+      if (blocked) throw new Error(blocked);
+
+      const deleted_at = new Date().toISOString();
+      await tx
+        .update(unitOwnerTable)
+        .set({ deleted_at, is_active: false } as unknown as Partial<NewUnitOwnerRow>)
+        .where(and(eq(unitOwnerTable.unit_id, id), isNull(unitOwnerTable.deleted_at)));
+
+      return tx
         .update(unitTable)
-        .set({
-          deleted_at: new Date().toISOString(),
-          is_active: false,
-        } as unknown as Partial<NewUnitRow>)
+        .set({ deleted_at, is_active: false } as unknown as Partial<NewUnitRow>)
         .where(eq(unitTable.id, id))
-        .returning()
-    );
+        .returning();
+    });
   }
 
+  /**
+   * Deshace la baja, y con ella la de su titularidad.
+   *
+   * Vuelven solo los vínculos que se dieron de baja EN esa operación —los que
+   * comparten su marca de tiempo—. Un titular que alguien había quitado antes, a
+   * mano, se queda afuera: restaurar la unidad no es motivo para devolverle una
+   * propiedad a quien ya se le había sacado.
+   */
   async restore({ id }: { id: string }): Promise<UnitRow[]> {
-    return this.db.ormQuery((tx) =>
-      tx
+    return this.db.ormQuery(async (tx) => {
+      const [unit] = await tx
+        .select({ deleted_at: unitTable.deleted_at })
+        .from(unitTable)
+        .where(eq(unitTable.id, id))
+        .limit(1);
+
+      if (unit?.deleted_at) {
+        await tx
+          .update(unitOwnerTable)
+          .set({ deleted_at: null, is_active: true } as unknown as Partial<NewUnitOwnerRow>)
+          .where(
+            and(eq(unitOwnerTable.unit_id, id), eq(unitOwnerTable.deleted_at, unit.deleted_at))
+          );
+      }
+
+      return tx
         .update(unitTable)
         .set({ deleted_at: null, is_active: true } as unknown as Partial<NewUnitRow>)
         .where(eq(unitTable.id, id))
-        .returning()
-    );
+        .returning();
+    });
   }
 }

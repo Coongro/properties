@@ -188,7 +188,19 @@
                 ]
               }
             ],
-            "actions": [],
+            "actions": [
+              {
+                "label": "Quitar",
+                "variant": "destructive",
+                "icon": "UserMinus",
+                "confirm": "¿Sacarle esta unidad de las que tiene a su nombre? La unidad no se borra: queda sin esta persona como titular, y se la puede volver a cargar.",
+                "action": {
+                  "id": "serverAction",
+                  "label": "Quitar",
+                  "target": "properties.unitOwners.removeOwner"
+                }
+              }
+            ],
             "emptyTitle": "Todavía no tiene unidades a su nombre",
             "emptySub": "La titularidad se carga parado en la unidad, que es donde se ve si el 100 % está completo."
           }
@@ -301,6 +313,15 @@
         "action": "properties.unitOwners.listUnitsOf",
         "resource": "properties.unitOwners",
         "outputBlockId": "tbl_unidades"
+      },
+      {
+        "hook": "onAction",
+        "key": "properties.unitOwners.removeOwner",
+        "mode": "command",
+        "action": "properties.unitOwners.removeOwner",
+        "resource": "properties.unitOwners",
+        "effect": "destructive",
+        "confirmation": "always"
       }
     ]
   }

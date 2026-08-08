@@ -301,6 +301,17 @@
                   "label": "Editar",
                   "target": "properties.unidad.open"
                 }
+              },
+              {
+                "label": "Eliminar",
+                "variant": "destructive",
+                "icon": "Trash2",
+                "action": {
+                  "id": "serverAction",
+                  "label": "Eliminar",
+                  "target": "properties.units.delete"
+                },
+                "confirm": "La unidad se elimina del edificio. Si tiene contrato vigente no se va a poder."
               }
             ],
             "emptyTitle": "Esta propiedad no tiene unidades",
@@ -399,7 +410,6 @@
                 "variant": "destructive",
                 "icon": "UserMinus",
                 "confirm": "¿Sacar a esta persona de la titularidad? La persona no se borra: queda sin esta propiedad a su nombre, y se la puede volver a cargar.",
-                "successToast": "Titular quitado",
                 "action": {
                   "id": "serverAction",
                   "label": "Quitar",
@@ -506,7 +516,19 @@
                       ]
                     ],
                     "filters": [],
-                    "actions": [],
+                    "actions": [
+                      {
+                        "label": "Eliminar",
+                        "variant": "destructive",
+                        "icon": "Trash2",
+                        "action": {
+                          "id": "serverAction",
+                          "label": "Eliminar",
+                          "target": "properties.buildingExpenses.delete"
+                        },
+                        "confirm": "La expensa del período se elimina de esta propiedad."
+                      }
+                    ],
                     "emptyTitle": "Sin expensas cargadas",
                     "emptySub": "Cargá lo que liquidó el consorcio para que se reparta entre las unidades."
                   }
@@ -643,9 +665,21 @@
                       ]
                     ],
                     "filters": [],
-                    "actions": [],
                     "emptyTitle": "Sin certificados cargados",
-                    "emptySub": "Cargá matafuegos, gas o ascensor para que te avise antes del vencimiento."
+                    "emptySub": "Cargá matafuegos, gas o ascensor para que te avise antes del vencimiento.",
+                    "actions": [
+                      {
+                        "label": "Eliminar",
+                        "variant": "destructive",
+                        "icon": "Trash2",
+                        "action": {
+                          "id": "serverAction",
+                          "label": "Eliminar",
+                          "target": "properties.certificates.delete"
+                        },
+                        "confirm": "El certificado se elimina de esta propiedad."
+                      }
+                    ]
                   }
                 }
               ]
@@ -788,6 +822,33 @@
         "key": "properties.unitOwners.removeOwner",
         "mode": "command",
         "action": "properties.unitOwners.removeOwner",
+        "effect": "destructive",
+        "confirmation": "always"
+      },
+      {
+        "hook": "onAction",
+        "key": "properties.units.delete",
+        "mode": "command",
+        "action": "properties.units.delete",
+        "resource": "properties.units",
+        "effect": "destructive",
+        "confirmation": "always"
+      },
+      {
+        "hook": "onAction",
+        "key": "properties.certificates.delete",
+        "mode": "command",
+        "action": "properties.certificates.delete",
+        "resource": "properties.certificates",
+        "effect": "destructive",
+        "confirmation": "always"
+      },
+      {
+        "hook": "onAction",
+        "key": "properties.buildingExpenses.delete",
+        "mode": "command",
+        "action": "properties.buildingExpenses.delete",
+        "resource": "properties.buildingExpenses",
         "effect": "destructive",
         "confirmation": "always"
       }

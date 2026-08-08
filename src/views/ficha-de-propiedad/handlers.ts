@@ -212,18 +212,41 @@ export const customHandlers: CustomHandlers = {
   },
 
   /**
-   * Sacar a alguien de la titularidad.
+   * Las bajas de la ficha, una rama por cosa que se saca.
    *
-   * La unidad y la persona salen de la FILA, no del registro de la vista: acá el
-   * registro es la PROPIEDAD, y `listByUnit` devuelve el `unit_id` justamente
-   * para que la baja no dependa de desde qué pantalla se la pida.
+   * Todas pasan por acá y no por el aviso automático del motor porque ese muestra
+   * el id crudo de la action («properties.certificates.delete»): quien está
+   * mirando la pantalla necesita leer QUÉ se borró, no cómo se llama por dentro.
+   * Cada rama avisa con el sustantivo de la fila y recarga, así la tabla no queda
+   * mostrando algo que ya no está.
+   *
+   * El motivo de un rechazo llega solo: si el repositorio corta la baja —una
+   * unidad ocupada tiene contrato vigente—, el `execute` tira y el error sube con
+   * su mensaje.
    */
-  onAction: async (actionId, { execute, record, reload }) => {
+  onAction: async (actionId, { execute, record, toast, reload }) => {
+    // Sacar a alguien de la titularidad. La unidad y la persona salen de la FILA,
+    // no del registro de la vista: acá el registro es la PROPIEDAD, y `listByUnit`
+    // devuelve el `unit_id` justamente para que la baja no dependa de desde qué
+    // pantalla se la pida.
     if (actionId === 'properties.unitOwners.removeOwner') {
       await execute('properties.unitOwners.removeOwner', {
         unitId: record?.unit_id,
         contactId: record?.contact_id,
       });
+      toast.success('Titular quitado', '');
+      reload();
+    } else if (actionId === 'properties.units.delete') {
+      await execute('properties.units.delete', { id: record?.id });
+      toast.success('Unidad eliminada', '');
+      reload();
+    } else if (actionId === 'properties.certificates.delete') {
+      await execute('properties.certificates.delete', { id: record?.id });
+      toast.success('Certificado eliminado', '');
+      reload();
+    } else if (actionId === 'properties.buildingExpenses.delete') {
+      await execute('properties.buildingExpenses.delete', { id: record?.id });
+      toast.success('Expensa eliminada', '');
       reload();
     }
   },
