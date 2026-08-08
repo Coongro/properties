@@ -8,19 +8,12 @@
  */
 
 import { formatMoney, type CustomHandlers } from '@coongro/plugin-sdk';
-/** Ambientes y superficie en una línea: «3 ambientes · 72 m²». */
-function unitDetail(u: Record<string, unknown>): string {
-  const partes: string[] = [];
-  const amb = Number(u.rooms ?? 0);
-  if (amb > 0) partes.push(`${amb} ambiente${amb === 1 ? '' : 's'}`);
-  const banios = Number(u.bathrooms ?? 0);
-  if (banios > 0) partes.push(`${banios} baño${banios === 1 ? '' : 's'}`);
-  const sup = Number(u.surface_m2 ?? 0);
-  if (sup > 0) partes.push(`${sup} m²`);
-  return partes.join(' · ');
-}
 
-/** Resumen que devuelve `properties.buildings.getSummary` — los mismos agregados del listado. */
+/**
+ * Resumen que devuelve `properties.buildings.getSummary`: los agregados del
+ * listado más, cuando la propiedad ES una sola unidad, el estado y el reparto de
+ * esa unidad — para que la ficha de una casa salga de UNA lectura.
+ */
 interface BuildingSummary {
   name?: string;
   type?: string;
@@ -31,7 +24,36 @@ interface BuildingSummary {
   occupancy?: string;
   reference_rent?: string;
   certs?: 'ok' | 'soon' | 'expired';
+  single_unit_id?: string | null;
+  single_unit_status?: string | null;
+  ownership_summary?: string | null;
+  ownership_missing?: number | null;
+  ownership_complete?: boolean | null;
+  ownership_owners?: number | null;
 }
+
+/**
+ * Los tipos de propiedad que CONTIENEN unidades. Hoy solo el edificio — misma
+ * regla que `services/single-unit.ts`, que es quien crea la unidad de las demás.
+ */
+const MULTI_UNIT_TYPES = ['edificio'];
+
+const isSingleUnit = (type?: string | null) =>
+  !MULTI_UNIT_TYPES.includes(String(type ?? '').trim());
+
+/** Cómo se lee cada estado de ocupación, con el tono que le corresponde. */
+const STATUS_LABELS: Record<string, { label: string; tone: 'success' | 'warning' | 'neutral' }> = {
+  ocupada: { label: 'Ocupada', tone: 'success' },
+  vacante: { label: 'Vacante', tone: 'warning' },
+  en_recambio: { label: 'En recambio', tone: 'neutral' },
+  con_preaviso: { label: 'Con preaviso', tone: 'warning' },
+  no_disponible: { label: 'No disponible', tone: 'neutral' },
+};
+
+/** «50 %», «33,33 %» — sin decimales cuando es redondo. */
+const formatPercent = (n: number) => `${String(Math.round(n * 100) / 100).replace('.', ',')} %`;
+
+const pluralize = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 const TIPOS: Record<string, string> = {
   edificio: 'Edificio',
@@ -76,11 +98,28 @@ export const customHandlers: CustomHandlers = {
       .filter(Boolean)
       .join(' · ');
 
+    // Una propiedad que ES una sola unidad no se cuenta por unidades: lo que
+    // importa de una casa es si está alquilada y de quién es. Los dos primeros
+    // indicadores cambian de sujeto (el spec decide cuál se ve, con `showWhen`).
+    //
+    // Todo eso viene en el MISMO resumen: encadenar tres lecturas acá dejaba la
+    // composición del lado de la pantalla, donde un agente no la puede repetir.
+    const single = isSingleUnit(s.type);
+    const status = STATUS_LABELS[String(s.single_unit_status ?? '')] ?? {
+      label: '—',
+      tone: 'neutral' as const,
+    };
+
     return {
       hdr: {
         name: nombre,
         sub: subtitulo,
-        badge: total === 1 ? '1 unidad' : `${total} unidades`,
+        // En una casa «1 unidad» no dice nada: el tipo sí.
+        badge: single
+          ? (TIPOS[s.type ?? ''] ?? 'Propiedad')
+          : total === 1
+            ? '1 unidad'
+            : `${total} unidades`,
         // El avatar toma la inicial del nombre de la propiedad.
         avatar: nombre,
       },
@@ -88,13 +127,28 @@ export const customHandlers: CustomHandlers = {
         value: String(total),
         sub: total === 1 ? 'una unidad' : `${total} unidades registradas`,
       },
+      k1_unica: {
+        value: status.label,
+        sub: s.single_unit_status === 'ocupada' ? 'según el contrato' : 'sin contrato vigente',
+        tone: status.tone,
+      },
       k2: {
         value: s.occupancy ?? `${ocupadas} de ${total}`,
         sub: libres > 0 ? `${libres} sin alquilar` : 'todas alquiladas',
       },
+      k2_unica: {
+        value: s.ownership_complete
+          ? 'Completa'
+          : `Falta ${formatPercent(Number(s.ownership_missing ?? 100))}`,
+        sub: s.ownership_owners
+          ? pluralize(Number(s.ownership_owners), 'titular cargado', 'titulares cargados')
+          : 'sin titulares cargados',
+        tone: s.ownership_complete ? 'success' : 'warning',
+      },
       k3: {
         value: formatMoney(Number(s.reference_rent ?? 0)),
-        sub: 'suma de las unidades',
+        // En una casa el número no es una suma de nada: es su propio alquiler.
+        sub: single ? 'valor de publicación' : 'suma de las unidades',
       },
       k4: {
         // El KPI cuenta el estado del conjunto: el detalle por certificado está
@@ -110,12 +164,12 @@ export const customHandlers: CustomHandlers = {
     tbl_unidades: async ({ execute, record }) => {
       const buildingId = record?.id as string | undefined;
       if (!buildingId) return [];
-      const unidades = await execute<Record<string, unknown>[]>('properties.units.listByBuilding', {
+      // `detail` ya viene armado desde el repositorio: se componía acá, y por eso el
+      // catálogo agentic prometía un campo que solo existía dentro de esta vista — un
+      // agente que llamara `units.list` nunca lo recibía. El inquilino llega en F2.
+      return execute<Record<string, unknown>[]>('properties.units.listByBuilding', {
         buildingId,
       });
-      // `detail` no es una columna: se arma acá para que la tarjeta lo muestre
-      // bajo el nombre de la unidad. El inquilino llega en F2, con los contratos.
-      return unidades.map((u) => ({ ...u, detail: unitDetail(u) }));
     },
 
     /** Certificados del edificio y de sus unidades, con el estado ya resuelto. */
@@ -127,8 +181,73 @@ export const customHandlers: CustomHandlers = {
       });
     },
 
+    /** Las liquidaciones DE ESTE edificio: `.list` traería las de todos. */
+    tbl_expensas: ({ execute, record }) => {
+      const buildingId = record?.id as string | undefined;
+      if (!buildingId) return Promise.resolve([]);
+      return execute<Record<string, unknown>[]>('properties.buildingExpenses.forBuilding', {
+        buildingId,
+      });
+    },
+
+    /**
+     * Los titulares de una propiedad que ES una sola unidad.
+     *
+     * La titularidad siempre cuelga de una unidad; lo que cambia acá es que quien
+     * mira una casa no tiene por qué saberlo. Por eso se resuelve la unidad y se
+     * pregunta por ella, en vez de pedirle a la persona que entre a una pantalla
+     * intermedia que para su inmueble no significa nada.
+     */
+    tbl_titulares_prop: ({ execute, record }) => {
+      const buildingId = record?.id as string | undefined;
+      if (!buildingId) return Promise.resolve([]);
+      return execute<Record<string, unknown>[]>('properties.unitOwners.listByBuilding', {
+        buildingId,
+      });
+    },
+
     // Las órdenes de trabajo llegan con el plugin `maintenance` (F5). Hasta
     // entonces la sección muestra su estado vacío, que ya dice qué va a aparecer.
     tbl_ot: () => Promise.resolve([]),
+  },
+
+  /**
+   * Las bajas de la ficha, una rama por cosa que se saca.
+   *
+   * Todas pasan por acá y no por el aviso automático del motor porque ese muestra
+   * el id crudo de la action («properties.certificates.delete»): quien está
+   * mirando la pantalla necesita leer QUÉ se borró, no cómo se llama por dentro.
+   * Cada rama avisa con el sustantivo de la fila y recarga, así la tabla no queda
+   * mostrando algo que ya no está.
+   *
+   * El motivo de un rechazo llega solo: si el repositorio corta la baja —una
+   * unidad ocupada tiene contrato vigente—, el `execute` tira y el error sube con
+   * su mensaje.
+   */
+  onAction: async (actionId, { execute, record, toast, reload }) => {
+    // Sacar a alguien de la titularidad. La unidad y la persona salen de la FILA,
+    // no del registro de la vista: acá el registro es la PROPIEDAD, y `listByUnit`
+    // devuelve el `unit_id` justamente para que la baja no dependa de desde qué
+    // pantalla se la pida.
+    if (actionId === 'properties.unitOwners.removeOwner') {
+      await execute('properties.unitOwners.removeOwner', {
+        unitId: record?.unit_id,
+        contactId: record?.contact_id,
+      });
+      toast.success('Titular quitado', '');
+      reload();
+    } else if (actionId === 'properties.units.delete') {
+      await execute('properties.units.delete', { id: record?.id });
+      toast.success('Unidad eliminada', '');
+      reload();
+    } else if (actionId === 'properties.certificates.delete') {
+      await execute('properties.certificates.delete', { id: record?.id });
+      toast.success('Certificado eliminado', '');
+      reload();
+    } else if (actionId === 'properties.buildingExpenses.delete') {
+      await execute('properties.buildingExpenses.delete', { id: record?.id });
+      toast.success('Expensa eliminada', '');
+      reload();
+    }
   },
 };

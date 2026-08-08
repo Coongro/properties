@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const buildingTable = pgTable('module_properties_buildings', {
   id: uuid('id')
@@ -20,7 +20,15 @@ export const buildingTable = pgTable('module_properties_buildings', {
   admin_name: text('admin_name'),
   admin_phone: text('admin_phone'),
   admin_email: text('admin_email'),
-  photo_url: text('photo_url'),
+  /**
+   * Fotos de la propiedad, en orden: `[{ url, caption? }]`. La primera es la que
+   * muestra la tarjeta del listado.
+   *
+   * Reemplaza al `photo_url` original —una sola dirección escrita a mano—, que
+   * llegó a producción sin una sola foto cargada: pegarla exigía tener la imagen
+   * publicada en otro lado.
+   */
+  photos: jsonb('photos').$type<{ url: string; caption?: string }[]>(),
   notes: text('notes'),
   created_at: timestamp('created_at', { mode: 'string' })
     .notNull()

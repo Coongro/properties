@@ -29,8 +29,8 @@ export function usePropiedadView() {
     type: null,
     name: null,
     description: null,
-    photo_url: null,
     year_built: null,
+    photos: null,
     street: null,
     street_number: null,
     city: null,
@@ -57,6 +57,7 @@ export function usePropiedadView() {
       },
       editingId,
       record: initialRecord,
+      parentRecord,
     })
       .then((initial) => {
         if (!initial || !mounted.current) return;
@@ -75,6 +76,10 @@ export function usePropiedadView() {
   // record con el que se abrió la vista (views.open(id, { record })), si hubo — lo
   // reciben los handlers en onSubmit (ej. una acción de fila que necesita el id).
   const initialRecord = ((views.params as any)?.record ?? null) as Record<string, any> | null;
+  // Contexto padre (views.open(id, { parentRecord })): el registro DESDE el que
+  // se abrió — «Nueva unidad» desde la ficha del edificio. A diferencia de
+  // { record }, NUNCA activa el modo edición ni el prefill general de campos.
+  const parentRecord = ((views.params as any)?.parentRecord ?? null) as Record<string, any> | null;
   // Abierta con { record } → modo edición: guardar actualiza, no crea
   const [editingId, setEditingId] = useState<string | null>(
     initialRecord?.id !== null && initialRecord?.id !== undefined ? String(initialRecord.id) : null
@@ -151,6 +156,7 @@ export function usePropiedadView() {
           toast,
           editingId,
           record: initialRecord,
+          parentRecord,
         };
         await customHandlers.onSubmit(values, ctx);
       } else if (editingId) {
@@ -164,8 +170,8 @@ export function usePropiedadView() {
         type: null,
         name: null,
         description: null,
-        photo_url: null,
         year_built: null,
+        photos: null,
         street: null,
         street_number: null,
         city: null,

@@ -6,6 +6,7 @@
  */
 import { getHostReact, getHostUI, usePlugin } from '@coongro/plugin-sdk';
 
+import { customHandlers } from './handlers.js';
 import { useCertificadoView } from './use-certificado.js';
 
 const React = getHostReact();
@@ -18,7 +19,8 @@ export function CertificadoView() {
   const {
     views: { closeDialog },
   } = usePlugin();
-  const { values, errors, setField, submit, editingId } = useCertificadoView();
+  const { values, errors, setField, refOptions, refLabel, submit, editingId } =
+    useCertificadoView();
 
   return h(
     'div',
@@ -28,6 +30,114 @@ export function CertificadoView() {
       {
         style: { padding: '20px', display: 'flex', flexDirection: 'column' as const, gap: '16px' },
       },
+      h(
+        'div',
+        { 'data-cg-block-id': 's0', style: { display: 'contents' } },
+        h(
+          UI.FormSection,
+          { icon: 'Building2', title: 'De qué inmueble' },
+          h(
+            'div',
+            {
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                alignItems: 'stretch',
+              },
+            },
+            h(
+              'div',
+              { style: { display: 'flex', gap: '14px', alignItems: 'flex-start' } },
+              h(
+                'div',
+                { 'data-cg-block-id': 'f_building', style: { display: 'contents' } },
+                h(
+                  'div',
+                  { style: { flex: '1 1 260px', minWidth: 0 } },
+                  h(
+                    UI.Label,
+                    { htmlFor: 'building_id', style: { display: 'block', marginBottom: '6px' } },
+                    'Propiedad',
+                    h('span', { style: { color: 'var(--cg-danger)' } }, ' *')
+                  ),
+                  h(
+                    UI.Select,
+                    {
+                      value: String(values['building_id'] ?? ''),
+                      onValueChange: (v: string) => setField('building_id', v),
+                      placeholder: 'Elegir…',
+                      clearable: true,
+                    },
+                    ...(refOptions['building_id'] ?? []).map((r: any) =>
+                      h(
+                        UI.SelectItem,
+                        {
+                          key: String(r.id),
+                          value: String(r.id),
+                          subtitle: String(r['address'] ?? ''),
+                        },
+                        String(r['name'] ?? refLabel(r))
+                      )
+                    )
+                  ),
+                  errors['building_id']
+                    ? h(
+                        'div',
+                        {
+                          style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
+                        },
+                        errors['building_id']
+                      )
+                    : null
+                )
+              ),
+              h(
+                'div',
+                { 'data-cg-block-id': 'f_unit', style: { display: 'contents' } },
+                h(
+                  'div',
+                  { style: { flex: '1 1 260px', minWidth: 0 } },
+                  h(
+                    UI.Label,
+                    { htmlFor: 'unit_id', style: { display: 'block', marginBottom: '6px' } },
+                    'Unidad'
+                  ),
+                  h(
+                    UI.Select,
+                    {
+                      value: String(values['unit_id'] ?? ''),
+                      onValueChange: (v: string) => setField('unit_id', v),
+                      placeholder: 'Elegir…',
+                      clearable: true,
+                    },
+                    ...(refOptions['unit_id'] ?? []).map((r: any) =>
+                      h(
+                        UI.SelectItem,
+                        {
+                          key: String(r.id),
+                          value: String(r.id),
+                          subtitle: String(r['detail'] ?? ''),
+                        },
+                        String(r['label'] ?? refLabel(r))
+                      )
+                    )
+                  ),
+                  errors['unit_id']
+                    ? h(
+                        'div',
+                        {
+                          style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
+                        },
+                        errors['unit_id']
+                      )
+                    : null
+                )
+              )
+            )
+          )
+        )
+      ),
       h(
         'div',
         { 'data-cg-block-id': 's1', style: { display: 'contents' } },
@@ -130,55 +240,63 @@ export function CertificadoView() {
             ),
             h(
               'div',
-              { 'data-cg-block-id': 'f_done', style: { display: 'contents' } },
+              { style: { display: 'flex', gap: '14px', alignItems: 'flex-start' } },
               h(
                 'div',
-                { style: { flex: '1 1 100%', minWidth: 0 } },
+                { 'data-cg-block-id': 'f_done', style: { display: 'contents' } },
                 h(
-                  UI.Label,
-                  { htmlFor: 'done_at', style: { display: 'block', marginBottom: '6px' } },
-                  'Fecha de realización'
-                ),
-                h(UI.Input, {
-                  id: 'done_at',
-                  type: 'date',
-                  value: String(values['done_at'] ?? ''),
-                  onChange: (e: any) => setField('done_at', e.target.value),
-                }),
-                errors['done_at']
-                  ? h(
-                      'div',
-                      { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
-                      errors['done_at']
-                    )
-                  : null
-              )
-            ),
-            h(
-              'div',
-              { 'data-cg-block-id': 'f_expires', style: { display: 'contents' } },
+                  'div',
+                  { style: { flex: '1 1 260px', minWidth: 0 } },
+                  h(
+                    UI.Label,
+                    { htmlFor: 'done_at', style: { display: 'block', marginBottom: '6px' } },
+                    'Fecha de realización'
+                  ),
+                  h(UI.Input, {
+                    id: 'done_at',
+                    type: 'date',
+                    value: String(values['done_at'] ?? ''),
+                    onChange: (e: any) => setField('done_at', e.target.value),
+                  }),
+                  errors['done_at']
+                    ? h(
+                        'div',
+                        {
+                          style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
+                        },
+                        errors['done_at']
+                      )
+                    : null
+                )
+              ),
               h(
                 'div',
-                { style: { flex: '1 1 100%', minWidth: 0 } },
+                { 'data-cg-block-id': 'f_expires', style: { display: 'contents' } },
                 h(
-                  UI.Label,
-                  { htmlFor: 'expires_at', style: { display: 'block', marginBottom: '6px' } },
-                  'Vence',
-                  h('span', { style: { color: 'var(--cg-danger)' } }, ' *')
-                ),
-                h(UI.Input, {
-                  id: 'expires_at',
-                  type: 'date',
-                  value: String(values['expires_at'] ?? ''),
-                  onChange: (e: any) => setField('expires_at', e.target.value),
-                }),
-                errors['expires_at']
-                  ? h(
-                      'div',
-                      { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
-                      errors['expires_at']
-                    )
-                  : null
+                  'div',
+                  { style: { flex: '1 1 260px', minWidth: 0 } },
+                  h(
+                    UI.Label,
+                    { htmlFor: 'expires_at', style: { display: 'block', marginBottom: '6px' } },
+                    'Vence',
+                    h('span', { style: { color: 'var(--cg-danger)' } }, ' *')
+                  ),
+                  h(UI.Input, {
+                    id: 'expires_at',
+                    type: 'date',
+                    value: String(values['expires_at'] ?? ''),
+                    onChange: (e: any) => setField('expires_at', e.target.value),
+                  }),
+                  errors['expires_at']
+                    ? h(
+                        'div',
+                        {
+                          style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
+                        },
+                        errors['expires_at']
+                      )
+                    : null
+                )
               )
             ),
             h(
@@ -246,14 +364,14 @@ export function CertificadoView() {
                 h(
                   UI.Label,
                   { htmlFor: 'file_url', style: { display: 'block', marginBottom: '6px' } },
-                  'Certificado (URL)'
+                  'Certificado'
                 ),
-                h(UI.Input, {
+                h(UI.ImageInput, {
                   id: 'file_url',
-                  type: 'text',
-                  value: String(values['file_url'] ?? ''),
-                  placeholder: 'https://…',
-                  onChange: (e: any) => setField('file_url', e.target.value),
+                  multiple: false,
+                  value: values['file_url'] ?? null,
+                  onChange: (v: any) => setField('file_url', v),
+                  onUpload: customHandlers.uploadImage,
                 }),
                 errors['file_url']
                   ? h(

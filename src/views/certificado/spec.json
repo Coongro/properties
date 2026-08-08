@@ -7,6 +7,42 @@
   },
   "blocks": [
     {
+      "id": "s0",
+      "kind": "container",
+      "ctype": "card",
+      "label": "De qué inmueble",
+      "icon": "Building2",
+      "children": [
+        {
+          "id": "f_building",
+          "kind": "field",
+          "name": "building_id",
+          "fieldType": "ref",
+          "label": "Propiedad",
+          "refEntity": "properties.buildings",
+          "refDisplay": "name",
+          "refSubtitle": "address",
+          "width": "half",
+          "validations": [
+            "required"
+          ]
+        },
+        {
+          "id": "f_unit",
+          "kind": "field",
+          "name": "unit_id",
+          "fieldType": "ref",
+          "label": "Unidad",
+          "refEntity": "properties.units",
+          "refDisplay": "label",
+          "refSubtitle": "detail",
+          "width": "half",
+          "validations": [],
+          "help": "Solo si el certificado es de una unidad puntual. Vacío = alcanza a toda la propiedad."
+        }
+      ]
+    },
+    {
       "id": "s1",
       "kind": "container",
       "ctype": "card",
@@ -61,6 +97,7 @@
           "name": "done_at",
           "fieldType": "date",
           "label": "Fecha de realización",
+          "width": "half",
           "validations": []
         },
         {
@@ -69,6 +106,7 @@
           "name": "expires_at",
           "fieldType": "date",
           "label": "Vence",
+          "width": "half",
           "validations": [
             "required"
           ]
@@ -102,10 +140,10 @@
           "id": "f_file",
           "kind": "field",
           "name": "file_url",
-          "fieldType": "text",
-          "label": "Certificado (URL)",
+          "fieldType": "image",
+          "label": "Certificado",
           "validations": [],
-          "placeholder": "https://…"
+          "help": "Sacale una foto al papel o arrastrá el archivo. Antes había que pegar una dirección, así que hacía falta tenerlo publicado en otro lado — y por eso nadie cargaba ninguno."
         }
       ]
     },
@@ -123,7 +161,8 @@
           "fieldType": "number",
           "label": "Avisarme con (días de anticipación)",
           "validations": [],
-          "placeholder": "Ej: 30"
+          "placeholder": "Ej: 30",
+          "help": "Vacío = el que corresponde al tipo (matafuegos 30, gas 45, ascensor 60)."
         },
         {
           "id": "f_notes",
@@ -136,5 +175,14 @@
         }
       ]
     }
-  ]
+  ],
+  "headless": {
+    "handlers": [
+      {
+        "hook": "onInit",
+        "mode": "uiOnly",
+        "reason": "No consulta nada: cuando el alta se abre parado en una unidad, copia el `building_id` que esa unidad ya trae en el registro padre. Sin esto la propiedad —que es requerida— quedaba vacía y había que elegirla a mano de un desplegable con toda la cartera. Para el canal agentic no cambia nada: el contrato ya pide las dos referencias."
+      }
+    ]
+  }
 }

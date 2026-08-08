@@ -59,24 +59,40 @@
             "key": "photo_url",
             "label": "Foto",
             "visible": false
+          },
+          {
+            "key": "unit_count",
+            "label": "Cantidad de unidades",
+            "visible": false,
+            "internal": true
+          },
+          {
+            "key": "many_units",
+            "label": "Tiene varias",
+            "visible": false,
+            "internal": true
           }
         ],
         "cells": [
           [
             "Axel Fernández",
             "CUIT 20-28994120-5",
-            "4 unidades · 100%",
+            "4 unidades",
             "axel.alquileres",
             "Banco Nación",
-            ""
+            "",
+            "4",
+            "si"
           ],
           [
             "Ana María Ruiz",
             "CUIT 27-11402887-3",
-            "2 unidades · 50%",
+            "2 unidades",
             "ana.ruiz.mp",
             "Banco Galicia",
-            ""
+            "",
+            "2",
+            "si"
           ]
         ],
         "filters": [],
@@ -89,11 +105,46 @@
               "label": "Editar",
               "target": "properties.propietario.open"
             }
+          },
+          {
+            "label": "Eliminar",
+            "variant": "destructive",
+            "icon": "Trash2",
+            "confirm": "La persona se da de baja de la cartera. Si tiene unidades a su nombre no se va a poder: primero hay que quitarle la titularidad.",
+            "action": {
+              "id": "serverAction",
+              "label": "Eliminar",
+              "target": "properties.unitOwners.deleteOwner"
+            }
           }
         ],
         "emptyTitle": "Todavía no hay propietarios",
-        "emptySub": "Cargá los titulares para poder repartir lo cobrado."
+        "emptySub": "Cargá los titulares para poder repartir lo cobrado.",
+        "rowAction": {
+          "id": "navigate",
+          "label": "Ver ficha",
+          "target": "properties.ficha-de-propietario.open"
+        }
       }
     }
-  ]
+  ],
+  "headless": {
+    "handlers": [
+      {
+        "hook": "loadData",
+        "mode": "query",
+        "action": "properties.unitOwners.listOwners",
+        "resource": "properties.unitOwners"
+      },
+      {
+        "hook": "onAction",
+        "key": "properties.unitOwners.deleteOwner",
+        "mode": "command",
+        "action": "properties.unitOwners.deleteOwner",
+        "resource": "properties.unitOwners",
+        "effect": "destructive",
+        "confirmation": "always"
+      }
+    ]
+  }
 }

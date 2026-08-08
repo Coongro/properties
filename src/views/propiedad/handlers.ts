@@ -7,7 +7,15 @@
  * existen — acá va lo que el diseño no puede expresar.
  */
 
-import type { CustomHandlers } from '@coongro/plugin-sdk';
+import { files, type CustomHandlers } from '@coongro/plugin-sdk';
+
 export const customHandlers: CustomHandlers = {
-  // onSubmit: async (values, { execute, toast }) => { ... },
+  /**
+   * Guarda la foto en el storage del tenant y devuelve su dirección.
+   *
+   * Sin este handler el campo de fotos solo aceptaría pegar direcciones de
+   * imágenes que viven en otro servidor — y el día que las borren de ahí, la
+   * propiedad se queda sin foto.
+   */
+  uploadImage: (file) => files.upload(file),
 };

@@ -6,6 +6,7 @@
  */
 import { getHostReact, getHostUI, usePlugin } from '@coongro/plugin-sdk';
 
+import { customHandlers } from './handlers.js';
 import { usePropiedadView } from './use-propiedad.js';
 
 const React = getHostReact();
@@ -75,15 +76,6 @@ export function PropiedadView() {
                         icon: h(UI.DynamicIcon, { icon: 'Building2', size: 16 }),
                       },
                       'Edificio'
-                    ),
-                    h(
-                      UI.SelectItem,
-                      {
-                        key: 'departamento',
-                        value: 'departamento',
-                        icon: h(UI.DynamicIcon, { icon: 'Building', size: 16 }),
-                      },
-                      'Departamento'
                     ),
                     h(
                       UI.SelectItem,
@@ -211,65 +203,68 @@ export function PropiedadView() {
             ),
             h(
               'div',
-              { style: { display: 'flex', gap: '14px', alignItems: 'flex-start' } },
+              { 'data-cg-block-id': 'f_year', style: { display: 'contents' } },
               h(
                 'div',
-                { 'data-cg-block-id': 'f_photo', style: { display: 'contents' } },
+                { style: { flex: '1 1 100%', minWidth: 0 } },
                 h(
-                  'div',
-                  { style: { flex: '1 1 260px', minWidth: 0 } },
-                  h(
-                    UI.Label,
-                    { htmlFor: 'photo_url', style: { display: 'block', marginBottom: '6px' } },
-                    'Foto (URL)'
-                  ),
-                  h(UI.Input, {
-                    id: 'photo_url',
-                    type: 'text',
-                    value: String(values['photo_url'] ?? ''),
-                    placeholder: 'https://…',
-                    onChange: (e: any) => setField('photo_url', e.target.value),
-                  }),
-                  errors['photo_url']
-                    ? h(
-                        'div',
-                        {
-                          style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
-                        },
-                        errors['photo_url']
-                      )
-                    : null
-                )
-              ),
+                  UI.Label,
+                  { htmlFor: 'year_built', style: { display: 'block', marginBottom: '6px' } },
+                  'Año de construcción'
+                ),
+                h(UI.Input, {
+                  id: 'year_built',
+                  type: 'number',
+                  value: values['year_built'] ?? '',
+                  placeholder: 'Ej: 1998',
+                  onChange: (e: any) =>
+                    setField('year_built', e.target.value === '' ? null : Number(e.target.value)),
+                }),
+                errors['year_built']
+                  ? h(
+                      'div',
+                      { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
+                      errors['year_built']
+                    )
+                  : null
+              )
+            ),
+            h(
+              'div',
+              { 'data-cg-block-id': 'f_photo', style: { display: 'contents' } },
               h(
                 'div',
-                { 'data-cg-block-id': 'f_year', style: { display: 'contents' } },
+                { style: { flex: '1 1 100%', minWidth: 0 } },
                 h(
-                  'div',
-                  { style: { flex: '1 1 260px', minWidth: 0 } },
-                  h(
-                    UI.Label,
-                    { htmlFor: 'year_built', style: { display: 'block', marginBottom: '6px' } },
-                    'Año de construcción'
-                  ),
-                  h(UI.Input, {
-                    id: 'year_built',
-                    type: 'number',
-                    value: values['year_built'] ?? '',
-                    placeholder: 'Ej: 1998',
-                    onChange: (e: any) =>
-                      setField('year_built', e.target.value === '' ? null : Number(e.target.value)),
-                  }),
-                  errors['year_built']
-                    ? h(
-                        'div',
-                        {
-                          style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
-                        },
-                        errors['year_built']
-                      )
-                    : null
-                )
+                  UI.Label,
+                  { htmlFor: 'photos', style: { display: 'block', marginBottom: '6px' } },
+                  'Fotos'
+                ),
+                h(UI.ImageInput, {
+                  id: 'photos',
+                  multiple: true,
+                  value: (() => {
+                    const raw = values['photos'];
+                    if (Array.isArray(raw)) return raw;
+                    if (typeof raw === 'string' && raw.trim().startsWith('[')) {
+                      try {
+                        return JSON.parse(raw);
+                      } catch {
+                        return [];
+                      }
+                    }
+                    return raw ? [raw] : [];
+                  })(),
+                  onChange: (v: any) => setField('photos', v),
+                  onUpload: customHandlers.uploadImage,
+                }),
+                errors['photos']
+                  ? h(
+                      'div',
+                      { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
+                      errors['photos']
+                    )
+                  : null
               )
             )
           )

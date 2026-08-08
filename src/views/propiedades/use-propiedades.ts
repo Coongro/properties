@@ -116,7 +116,6 @@ export function usePropiedadesView() {
       display: 'pill',
       values: [
         { value: 'edificio', label: 'Edificio', icon: 'Building2' },
-        { value: 'departamento', label: 'Departamento', icon: 'Building' },
         { value: 'casa', label: 'Casa', icon: 'House' },
         { value: 'local', label: 'Local', icon: 'Store' },
         { value: 'oficina', label: 'Oficina', icon: 'Briefcase' },
@@ -133,7 +132,7 @@ export function usePropiedadesView() {
   const SUB_COL = COLUMNS.find((c) => c.key === 'address');
   const ITEM_COLS = COLUMNS.filter((c) => c.key !== 'address');
   // imagen del registro: su URL sale de esta columna (puede estar oculta)
-  const IMAGE_COL: (typeof COLUMNS)[number] = { key: 'photo_url', label: 'Foto' };
+  const IMAGE_COL: (typeof COLUMNS)[number] = { key: 'photos', label: 'Fotos' };
   const cellValue = (
     row: any,
     c: { key: string; ref?: string; refDisplay?: string; refPath?: string; ref2?: string }
@@ -245,8 +244,8 @@ export function usePropiedadesView() {
       toast.success('Eliminado', 'El registro se eliminó correctamente');
       setPendingDelete(null);
       void load();
-    } catch {
-      toast.error('Error', 'No se pudo eliminar');
+    } catch (err) {
+      toast.error('Error', err instanceof Error ? err.message : 'No se pudo eliminar');
     } finally {
       setDeleting(false);
     }

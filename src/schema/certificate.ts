@@ -3,8 +3,14 @@ import { boolean, index, integer, pgTable, text, timestamp, uuid } from 'drizzle
 
 /**
  * Certificados con vencimiento del inmueble (gas, electricidad, ascensor, matafuegos…).
- * Uno de los dos alcances está seteado: `building_id` si aplica a todo el edificio,
- * `unit_id` si es de una unidad puntual.
+ *
+ * El alcance es JERÁRQUICO, no excluyente: `building_id` va **siempre** —el certificado
+ * pertenece a una propiedad— y `unit_id` lo precisa cuando el control es de una unidad
+ * puntual. No hay caso al revés: el ascensor es del edificio y de ninguna unidad; el gas
+ * del 3°B es del 3°B **y** del edificio en el que está.
+ *
+ * Esto estaba documentado como excluyente («uno de los dos») y el formulario nunca lo
+ * cumplió. La regla, con su porqué y su validación, vive en `services/certificate-scope.ts`.
  */
 export const certificateTable = pgTable(
   'module_properties_certificates',
