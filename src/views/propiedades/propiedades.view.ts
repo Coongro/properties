@@ -20,6 +20,11 @@ export function PropiedadesView() {
     loading,
     visibleRows,
     COLUMNS,
+    removeRow,
+    pendingDelete,
+    deleting,
+    confirmDelete,
+    cancelDelete,
     sort,
     onSortChange,
     cellValue,
@@ -161,6 +166,14 @@ export function PropiedadesView() {
       icon: 'Pencil',
       onClick: (row: any) => {
         views.open('properties.propiedad.open', { record: row }, { mode: 'dialog' });
+      },
+    },
+    {
+      label: 'Eliminar',
+      variant: 'destructive' as const,
+      icon: 'Trash2',
+      onClick: (row: any) => {
+        void removeRow(row);
       },
     },
   ];
@@ -396,6 +409,19 @@ export function PropiedadesView() {
         )
       ),
       h('div', { 'data-cg-block-id': 'tbl', style: { display: 'contents' } }, renderTable())
-    )
+    ),
+    h(UI.ConfirmDialog, {
+      open: !!pendingDelete,
+      onOpenChange: (o: boolean) => {
+        if (!o) cancelDelete();
+      },
+      title: 'Eliminar registro',
+      description: '¿Seguro que querés eliminar este registro? No se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      loading: deleting,
+      onConfirm: () => {
+        void confirmDelete();
+      },
+    })
   );
 }

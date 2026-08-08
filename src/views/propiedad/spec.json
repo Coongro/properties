@@ -30,11 +30,6 @@
               "icon": "Building2"
             },
             {
-              "value": "departamento",
-              "label": "Departamento",
-              "icon": "Building"
-            },
-            {
               "value": "casa",
               "label": "Casa",
               "icon": "House"

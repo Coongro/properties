@@ -131,10 +131,10 @@ export function useFichaDePropiedadView() {
     }, [load]);
     useEffect(() => {
       const offs = [
-        'properties.buildings.create',
-        'properties.buildings.update',
-        'properties.buildings.delete',
-        'properties.buildings.restore',
+        'properties.units.create',
+        'properties.units.update',
+        'properties.units.delete',
+        'properties.units.restore',
       ].map((id) =>
         events.on(id, () => {
           void load();
@@ -279,29 +279,12 @@ export function useFichaDePropiedadView() {
       () => visibleRows.slice((page - 1) * 20, page * 20),
       [visibleRows, page]
     );
-    const [pendingDelete, setPendingDelete] = useState<any>(null);
-    const [deleting, setDeleting] = useState(false);
-    const removeRow = useCallback((row: any) => {
-      setPendingDelete(row ?? null);
+    const removeRow = useCallback((_row: any) => {
+      toast.warning(
+        'Acción sin declarar',
+        'Las filas de esta tabla son de otra entidad: declarale sus acciones en el Builder o implementá onAction en handlers.ts'
+      );
     }, []);
-    const cancelDelete = useCallback(() => {
-      if (!deleting) setPendingDelete(null);
-    }, [deleting]);
-    const confirmDelete = useCallback(async () => {
-      if (!pendingDelete) return;
-      setDeleting(true);
-      try {
-        await actions.execute('properties.buildings.delete', { id: pendingDelete.id });
-        toast.success('Eliminado', 'El registro se eliminó correctamente');
-        setPendingDelete(null);
-        void load();
-      } catch {
-        toast.error('Error', 'No se pudo eliminar');
-      } finally {
-        setDeleting(false);
-      }
-      // deps intencionalmente fijas: el efecto corre una sola vez
-    }, [pendingDelete, load]);
     return {
       sort,
       onSortChange,
@@ -313,10 +296,6 @@ export function useFichaDePropiedadView() {
       page,
       setPage,
       pagedRows,
-      pendingDelete,
-      deleting,
-      confirmDelete,
-      cancelDelete,
       loading,
       search,
       setSearch,
@@ -367,10 +346,10 @@ export function useFichaDePropiedadView() {
     }, [load]);
     useEffect(() => {
       const offs = [
-        'properties.buildings.create',
-        'properties.buildings.update',
-        'properties.buildings.delete',
-        'properties.buildings.restore',
+        'properties.unitOwners.create',
+        'properties.unitOwners.update',
+        'properties.unitOwners.delete',
+        'properties.unitOwners.restore',
       ].map((id) =>
         events.on(id, () => {
           void load();
@@ -512,29 +491,12 @@ export function useFichaDePropiedadView() {
       () => visibleRows.slice((page - 1) * 20, page * 20),
       [visibleRows, page]
     );
-    const [pendingDelete, setPendingDelete] = useState<any>(null);
-    const [deleting, setDeleting] = useState(false);
-    const removeRow = useCallback((row: any) => {
-      setPendingDelete(row ?? null);
+    const removeRow = useCallback((_row: any) => {
+      toast.warning(
+        'Acción sin declarar',
+        'Las filas de esta tabla son de otra entidad: declarale sus acciones en el Builder o implementá onAction en handlers.ts'
+      );
     }, []);
-    const cancelDelete = useCallback(() => {
-      if (!deleting) setPendingDelete(null);
-    }, [deleting]);
-    const confirmDelete = useCallback(async () => {
-      if (!pendingDelete) return;
-      setDeleting(true);
-      try {
-        await actions.execute('properties.buildings.delete', { id: pendingDelete.id });
-        toast.success('Eliminado', 'El registro se eliminó correctamente');
-        setPendingDelete(null);
-        void load();
-      } catch {
-        toast.error('Error', 'No se pudo eliminar');
-      } finally {
-        setDeleting(false);
-      }
-      // deps intencionalmente fijas: el efecto corre una sola vez
-    }, [pendingDelete, load]);
     return {
       sort,
       onSortChange,
@@ -546,10 +508,6 @@ export function useFichaDePropiedadView() {
       page,
       setPage,
       pagedRows,
-      pendingDelete,
-      deleting,
-      confirmDelete,
-      cancelDelete,
       loading,
       search,
       setSearch,
@@ -597,10 +555,10 @@ export function useFichaDePropiedadView() {
     }, [load]);
     useEffect(() => {
       const offs = [
-        'properties.buildings.create',
-        'properties.buildings.update',
-        'properties.buildings.delete',
-        'properties.buildings.restore',
+        'properties.buildingExpenses.create',
+        'properties.buildingExpenses.update',
+        'properties.buildingExpenses.delete',
+        'properties.buildingExpenses.restore',
       ].map((id) =>
         events.on(id, () => {
           void load();
@@ -737,29 +695,12 @@ export function useFichaDePropiedadView() {
       () => visibleRows.slice((page - 1) * 10, page * 10),
       [visibleRows, page]
     );
-    const [pendingDelete, setPendingDelete] = useState<any>(null);
-    const [deleting, setDeleting] = useState(false);
-    const removeRow = useCallback((row: any) => {
-      setPendingDelete(row ?? null);
+    const removeRow = useCallback((_row: any) => {
+      toast.warning(
+        'Acción sin declarar',
+        'Las filas de esta tabla son de otra entidad: declarale sus acciones en el Builder o implementá onAction en handlers.ts'
+      );
     }, []);
-    const cancelDelete = useCallback(() => {
-      if (!deleting) setPendingDelete(null);
-    }, [deleting]);
-    const confirmDelete = useCallback(async () => {
-      if (!pendingDelete) return;
-      setDeleting(true);
-      try {
-        await actions.execute('properties.buildings.delete', { id: pendingDelete.id });
-        toast.success('Eliminado', 'El registro se eliminó correctamente');
-        setPendingDelete(null);
-        void load();
-      } catch {
-        toast.error('Error', 'No se pudo eliminar');
-      } finally {
-        setDeleting(false);
-      }
-      // deps intencionalmente fijas: el efecto corre una sola vez
-    }, [pendingDelete, load]);
     return {
       sort,
       onSortChange,
@@ -771,10 +712,6 @@ export function useFichaDePropiedadView() {
       page,
       setPage,
       pagedRows,
-      pendingDelete,
-      deleting,
-      confirmDelete,
-      cancelDelete,
       loading,
       search,
       setSearch,
@@ -824,10 +761,10 @@ export function useFichaDePropiedadView() {
     }, [load]);
     useEffect(() => {
       const offs = [
-        'properties.buildings.create',
-        'properties.buildings.update',
-        'properties.buildings.delete',
-        'properties.buildings.restore',
+        'properties.certificates.create',
+        'properties.certificates.update',
+        'properties.certificates.delete',
+        'properties.certificates.restore',
       ].map((id) =>
         events.on(id, () => {
           void load();
@@ -977,29 +914,12 @@ export function useFichaDePropiedadView() {
       () => visibleRows.slice((page - 1) * 10, page * 10),
       [visibleRows, page]
     );
-    const [pendingDelete, setPendingDelete] = useState<any>(null);
-    const [deleting, setDeleting] = useState(false);
-    const removeRow = useCallback((row: any) => {
-      setPendingDelete(row ?? null);
+    const removeRow = useCallback((_row: any) => {
+      toast.warning(
+        'Acción sin declarar',
+        'Las filas de esta tabla son de otra entidad: declarale sus acciones en el Builder o implementá onAction en handlers.ts'
+      );
     }, []);
-    const cancelDelete = useCallback(() => {
-      if (!deleting) setPendingDelete(null);
-    }, [deleting]);
-    const confirmDelete = useCallback(async () => {
-      if (!pendingDelete) return;
-      setDeleting(true);
-      try {
-        await actions.execute('properties.buildings.delete', { id: pendingDelete.id });
-        toast.success('Eliminado', 'El registro se eliminó correctamente');
-        setPendingDelete(null);
-        void load();
-      } catch {
-        toast.error('Error', 'No se pudo eliminar');
-      } finally {
-        setDeleting(false);
-      }
-      // deps intencionalmente fijas: el efecto corre una sola vez
-    }, [pendingDelete, load]);
     return {
       sort,
       onSortChange,
@@ -1011,10 +931,6 @@ export function useFichaDePropiedadView() {
       page,
       setPage,
       pagedRows,
-      pendingDelete,
-      deleting,
-      confirmDelete,
-      cancelDelete,
       loading,
       search,
       setSearch,
@@ -1061,21 +977,6 @@ export function useFichaDePropiedadView() {
     }, []);
     useEffect(() => {
       void load();
-    }, [load]);
-    useEffect(() => {
-      const offs = [
-        'properties.buildings.create',
-        'properties.buildings.update',
-        'properties.buildings.delete',
-        'properties.buildings.restore',
-      ].map((id) =>
-        events.on(id, () => {
-          void load();
-        })
-      );
-      return () => {
-        for (const off of offs) off();
-      };
     }, [load]);
 
     // columnas de la tabla: key + label (+ ref/refDisplay/refPath/ref2/display/values/prefix/suffix/format/iconFrom/empty*)
@@ -1206,29 +1107,12 @@ export function useFichaDePropiedadView() {
       () => visibleRows.slice((page - 1) * 10, page * 10),
       [visibleRows, page]
     );
-    const [pendingDelete, setPendingDelete] = useState<any>(null);
-    const [deleting, setDeleting] = useState(false);
-    const removeRow = useCallback((row: any) => {
-      setPendingDelete(row ?? null);
+    const removeRow = useCallback((_row: any) => {
+      toast.warning(
+        'Acción sin declarar',
+        'Las filas de esta tabla son de otra entidad: declarale sus acciones en el Builder o implementá onAction en handlers.ts'
+      );
     }, []);
-    const cancelDelete = useCallback(() => {
-      if (!deleting) setPendingDelete(null);
-    }, [deleting]);
-    const confirmDelete = useCallback(async () => {
-      if (!pendingDelete) return;
-      setDeleting(true);
-      try {
-        await actions.execute('properties.buildings.delete', { id: pendingDelete.id });
-        toast.success('Eliminado', 'El registro se eliminó correctamente');
-        setPendingDelete(null);
-        void load();
-      } catch {
-        toast.error('Error', 'No se pudo eliminar');
-      } finally {
-        setDeleting(false);
-      }
-      // deps intencionalmente fijas: el efecto corre una sola vez
-    }, [pendingDelete, load]);
     return {
       sort,
       onSortChange,
@@ -1240,10 +1124,6 @@ export function useFichaDePropiedadView() {
       page,
       setPage,
       pagedRows,
-      pendingDelete,
-      deleting,
-      confirmDelete,
-      cancelDelete,
       loading,
       search,
       setSearch,

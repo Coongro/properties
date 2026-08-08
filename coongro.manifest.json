@@ -122,6 +122,7 @@
         "actions": [
           "list",
           "listByBuilding",
+          "listByUnit",
           "getById",
           "create",
           "update",
@@ -140,6 +141,7 @@
           "getOwner",
           "saveOwner",
           "removeOwner",
+          "deleteOwner",
           "ownershipOf",
           "listByUnit",
           "listByBuilding",
@@ -774,7 +776,6 @@
                   "type": "string",
                   "enum": [
                     "edificio",
-                    "departamento",
                     "casa",
                     "local",
                     "oficina",
@@ -782,7 +783,7 @@
                     "cochera",
                     "baulera"
                   ],
-                  "description": "Tipo. Opciones: edificio (Edificio), departamento (Departamento), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera)."
+                  "description": "Tipo. Opciones: edificio (Edificio), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera). Un departamento NO se carga acá: es una unidad de su edificio y se agrega con «Dar de alta una unidad»."
                 },
                 "name": { "type": "string", "description": "Nombre" },
                 "description": {
@@ -961,7 +962,6 @@
                   "type": "string",
                   "enum": [
                     "edificio",
-                    "departamento",
                     "casa",
                     "local",
                     "oficina",
@@ -969,7 +969,7 @@
                     "cochera",
                     "baulera"
                   ],
-                  "description": "Tipo. Opciones: edificio (Edificio), departamento (Departamento), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera)."
+                  "description": "Tipo. Opciones: edificio (Edificio), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera). Un departamento NO se carga acá: es una unidad de su edificio y se agrega con «Dar de alta una unidad»."
                 },
                 "name": { "type": "string", "description": "Nombre" },
                 "description": {
@@ -2769,11 +2769,93 @@
           "coverage": "partial",
           "validated": false
         }
+      },
+      {
+        "id": "properties.certificates.listByUnit",
+        "action": "properties.certificates.listByUnit",
+        "title": "Certificados de una unidad",
+        "description": "Los certificados que alcanzan a UNA unidad: los suyos y los del edificio donde está, que la cubren igual. Cada uno viene con su alcance —«de la unidad» o «del edificio»— y con el estado ya resuelto contra la fecha de hoy. Es la lectura para contestar si una unidad está en regla para alquilarse. Los certificados de las unidades hermanas no entran: el gas del 5°A no dice nada del 3°B.",
+        "effect": "read",
+        "confirmation": "never",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "unitId": {
+              "type": "string",
+              "description": "La unidad cuyos certificados se quieren ver.",
+              "ref": { "resource": "properties.units" }
+            },
+            "alertDays": {
+              "type": "integer",
+              "description": "Con cuántos días de anticipación marcar un certificado como «por vencer». Si se omite, cada tipo usa su propio horizonte."
+            }
+          },
+          "required": ["unitId"],
+          "additionalProperties": false
+        },
+        "output": {
+          "kind": "collection",
+          "fields": [
+            {
+              "key": "type",
+              "name": "type",
+              "label": "Certificado",
+              "format": "text",
+              "values": [
+                { "value": "matafuegos", "label": "Matafuegos" },
+                { "value": "gas", "label": "Instalación de gas" },
+                { "value": "ascensor", "label": "Ascensor" },
+                { "value": "electricidad", "label": "Instalación eléctrica" },
+                { "value": "seguro", "label": "Seguro del inmueble" },
+                { "value": "otro", "label": "Otro" }
+              ]
+            },
+            {
+              "key": "scope",
+              "name": "scope",
+              "label": "Alcance",
+              "format": "text",
+              "values": [
+                { "value": "unidad", "label": "De la unidad" },
+                { "value": "edificio", "label": "Del edificio" }
+              ]
+            },
+            {
+              "key": "status",
+              "name": "status",
+              "label": "Estado",
+              "format": "text",
+              "values": [
+                { "value": "vigente", "label": "Vigente" },
+                { "value": "por_vencer", "label": "Por vencer" },
+                { "value": "vencido", "label": "Vencido" }
+              ]
+            },
+            {
+              "key": "expires_at",
+              "name": "expiresAt",
+              "label": "Vence",
+              "format": "date"
+            }
+          ],
+          "identifierKey": "id",
+          "defaultLimit": 10,
+          "maxLimit": 50
+        },
+        "generatedBy": "agentic-graph",
+        "evidence": {
+          "level": 3,
+          "id": "cruzado",
+          "floor": 3,
+          "authority": "module",
+          "coverage": "partial",
+          "validated": false
+        }
       }
     ],
     "actionContracts": "./dist/agentic/contracts.js",
-    "copilotCatalogFingerprint": "b3b64f981b274bb57b8f6fa2f9b7cd23",
-    "copilotCatalogContentFingerprint": "1d2dd9e61e43e69a03cfc23c0fba7d30"
+    "copilotCatalogFingerprint": "718e79e5e15630703825659bdbf90f01",
+    "copilotCatalogContentFingerprint": "3a0634dc798a11f879a51f6a4da2a5b8"
   },
   "initView": null
 }

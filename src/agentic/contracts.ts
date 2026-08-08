@@ -9,6 +9,11 @@
 
 import { defineAction, none } from '@coongro/plugin-sdk/agentic';
 
+// Los tipos que se pueden crear salen de la regla, no de una copia: si mañana entra un
+// «PH», el modelo se entera por el mismo lugar que la pantalla. La lista NO incluye
+// «departamento» a propósito — es una unidad de su edificio, no una propiedad.
+import { PROPERTY_TYPES } from '../services/property-type.js';
+
 export const listCertificates = defineAction({
   id: 'properties.certificates.list',
   title: 'Listar certificados',
@@ -706,18 +711,9 @@ export const createBuildings = defineAction({
         properties: {
           type: {
             type: 'string',
-            enum: [
-              'edificio',
-              'departamento',
-              'casa',
-              'local',
-              'oficina',
-              'galpon',
-              'cochera',
-              'baulera',
-            ],
+            enum: [...PROPERTY_TYPES],
             description:
-              'Tipo. Opciones: edificio (Edificio), departamento (Departamento), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera).',
+              'Tipo. Opciones: edificio (Edificio), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera). Un departamento NO se carga acá: es una unidad de su edificio y se agrega con «Dar de alta una unidad».',
           },
           name: {
             type: 'string',
@@ -946,18 +942,9 @@ export const updateBuildings = defineAction({
         properties: {
           type: {
             type: 'string',
-            enum: [
-              'edificio',
-              'departamento',
-              'casa',
-              'local',
-              'oficina',
-              'galpon',
-              'cochera',
-              'baulera',
-            ],
+            enum: [...PROPERTY_TYPES],
             description:
-              'Tipo. Opciones: edificio (Edificio), departamento (Departamento), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera).',
+              'Tipo. Opciones: edificio (Edificio), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera). Un departamento NO se carga acá: es una unidad de su edificio y se agrega con «Dar de alta una unidad».',
           },
           name: {
             type: 'string',
@@ -2952,6 +2939,125 @@ export const listUnitsOfUnitOwners = defineAction({
     // encadena hacia su ficha o hacia un contrato.
     identifierKey: 'unit_id',
     defaultLimit: 20,
+    maxLimit: 50,
+  },
+});
+
+/**
+ * REVISAR: generado desde el formulario de la vista.
+ *
+ * El borrador describe lo que la pantalla envía hoy. El contrato tiene que
+ * describir lo que ESTE handler exige — incluidos los valores que la UI
+ * resuelve por contexto de apertura y que en el formulario no se ven.
+ */
+export const listByUnitCertificates = defineAction({
+  id: 'properties.certificates.listByUnit',
+  title: 'Certificados de una unidad',
+  description:
+    'Los certificados que alcanzan a UNA unidad: los suyos y los del edificio donde está, que la cubren igual. Cada uno viene con su alcance —«de la unidad» o «del edificio»— y con el estado ya resuelto contra la fecha de hoy. Es la lectura para contestar si una unidad está en regla para alquilarse. Los certificados de las unidades hermanas no entran: el gas del 5°A no dice nada del 3°B.',
+  effect: 'read',
+  confirmation: 'never',
+  tenantScope: 'required',
+  // El borrador decía `none()` porque la PANTALLA no manda nada: la ficha resuelve la
+  // unidad del registro con el que se abrió. El handler sí la exige, y un agente no
+  // tiene ese contexto — sin declararlo, la capability quedaba imposible de llamar.
+  input: {
+    type: 'object',
+    properties: {
+      unitId: {
+        type: 'string',
+        description: 'La unidad cuyos certificados se quieren ver.',
+        ref: { resource: 'properties.units' },
+      },
+      alertDays: {
+        type: 'integer',
+        description:
+          'Con cuántos días de anticipación marcar un certificado como «por vencer». Si se omite, cada tipo usa su propio horizonte.',
+      },
+    },
+    required: ['unitId'],
+    additionalProperties: false,
+  },
+  output: {
+    kind: 'collection',
+    fields: [
+      {
+        key: 'type',
+        name: 'type',
+        label: 'Certificado',
+        format: 'text',
+        values: [
+          {
+            value: 'matafuegos',
+            label: 'Matafuegos',
+          },
+          {
+            value: 'gas',
+            label: 'Instalación de gas',
+          },
+          {
+            value: 'ascensor',
+            label: 'Ascensor',
+          },
+          {
+            value: 'electricidad',
+            label: 'Instalación eléctrica',
+          },
+          {
+            value: 'seguro',
+            label: 'Seguro del inmueble',
+          },
+          {
+            value: 'otro',
+            label: 'Otro',
+          },
+        ],
+      },
+      {
+        key: 'scope',
+        name: 'scope',
+        label: 'Alcance',
+        format: 'text',
+        values: [
+          {
+            value: 'unidad',
+            label: 'De la unidad',
+          },
+          {
+            value: 'edificio',
+            label: 'Del edificio',
+          },
+        ],
+      },
+      {
+        key: 'status',
+        name: 'status',
+        label: 'Estado',
+        format: 'text',
+        values: [
+          {
+            value: 'vigente',
+            label: 'Vigente',
+          },
+          {
+            value: 'por_vencer',
+            label: 'Por vencer',
+          },
+          {
+            value: 'vencido',
+            label: 'Vencido',
+          },
+        ],
+      },
+      {
+        key: 'expires_at',
+        name: 'expiresAt',
+        label: 'Vence',
+        format: 'date',
+      },
+    ],
+    identifierKey: 'id',
+    defaultLimit: 10,
     maxLimit: 50,
   },
 });

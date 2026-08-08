@@ -279,6 +279,34 @@ export class UnitOwnerRepository {
    * persona tiene que poder sacarla, y bloquear eso obligaría a inventar un titular falso
    * para poder corregir. Lo que sí se hace es devolver cómo quedó la unidad.
    */
+  /**
+   * Da de baja a un propietario cargado por error.
+   *
+   * La persona vive en `contacts`, que es un plugin compartido y no sabe nada de
+   * inmuebles: si la baja se pidiera allá, borraría a alguien que acá figura como
+   * dueño de media cartera. Por eso la operación vive en properties, que es quien
+   * puede contestar la única pregunta que importa —**¿tiene algo a su nombre?**—
+   * antes de dejar que desaparezca.
+   *
+   * Con unidades a su nombre no se borra: primero hay que quitarle la titularidad,
+   * que es una decisión aparte y tiene su propio botón en la ficha. Con ninguna, la
+   * baja es lógica, así que un borrado equivocado se revierte.
+   */
+  async deleteOwner({ contactId }: { contactId: string }): Promise<{ deleted: boolean }> {
+    const suyas = await this.listUnitsOf({ contactId });
+    if (suyas.length > 0) {
+      const cuales = suyas.map((u) => `«${u.label}»`).join(', ');
+      const cuantas =
+        suyas.length === 1 ? 'una unidad a su nombre' : `${suyas.length} unidades a su nombre`;
+      throw new Error(
+        `Esta persona tiene ${cuantas} (${cuales}): si se la da de baja, esas unidades quedan sin dueño y la liquidación no sabría a quién pagarle. Quitale primero la titularidad desde su ficha y después dala de baja.`
+      );
+    }
+
+    await new ContactRepository(this.db).softDelete({ id: contactId });
+    return { deleted: true };
+  }
+
   async removeOwner({
     unitId,
     contactId,

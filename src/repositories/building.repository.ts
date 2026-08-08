@@ -6,6 +6,7 @@ import type { BuildingRow, NewBuildingRow } from '../schema/building.js';
 import { certificateTable } from '../schema/certificate.js';
 import { unitOwnerTable } from '../schema/unit-owner.js';
 import { unitTable } from '../schema/unit.js';
+import type { NewUnitRow } from '../schema/unit.js';
 import {
   buildingAtSameAddress,
   duplicateMessage,
@@ -14,6 +15,8 @@ import {
   type PropertyIdentity,
 } from '../services/duplicate-property.js';
 import { summarizeOwnership } from '../services/ownership-shares.js';
+import { deletionBlockedMessage } from '../services/property-deletion.js';
+import { isUnitOnlyType, unitOnlyTypeMessage } from '../services/property-type.js';
 import { isSingleUnit, singleUnitName } from '../services/single-unit.js';
 
 /** Días de anticipación con que un certificado empieza a mostrarse "por vencer". */
@@ -137,6 +140,12 @@ async function rejectIfAlreadyLoaded(
   tx: Parameters<Parameters<ModuleDatabaseAPI['ormQuery']>[0]>[0],
   property: PropertyIdentity & { type?: string | null }
 ): Promise<void> {
+  // Un departamento no es una propiedad, tenga o no su edificio cargado. Va antes
+  // que la comparación con lo existente porque no depende de ella: el chequeo de
+  // abajo solo lo agarraba cuando el edificio YA estaba, y con el edificio todavía
+  // sin cargar la puerta quedaba abierta.
+  if (isUnitOnlyType(property.type)) throw new Error(unitOnlyTypeMessage());
+
   const existing = await tx
     .select({
       id: buildingTable.id,
@@ -367,26 +376,78 @@ export class BuildingRepository {
     });
   }
 
+  /**
+   * Baja lógica de una propiedad, con las unidades que cuelgan de ella.
+   *
+   * Las unidades se dan de baja en la MISMA transacción y con la MISMA marca de
+   * tiempo. Lo primero porque dejarlas vivas las convertía en unidades sin
+   * inmueble, que seguían ofreciéndose en los desplegables que piden elegir una;
+   * lo segundo porque esa marca compartida es lo único que después distingue «las
+   * que se fueron con la propiedad» de las que ya estaban dadas de baja por su
+   * cuenta — y es lo que le permite a `restore` devolver exactamente las mismas.
+   *
+   * Con una unidad ocupada no se borra nada: hay un contrato vigente que Coongro
+   * no puede ver entero —lo administra `leases`— y el inmueble se le desaparecería
+   * por abajo.
+   */
   async delete({ id }: { id: string }): Promise<BuildingRow[]> {
-    return this.db.ormQuery((tx) =>
-      tx
+    return this.db.ormQuery(async (tx) => {
+      const [property] = await tx
+        .select({ name: buildingTable.name })
+        .from(buildingTable)
+        .where(and(eq(buildingTable.id, id), isNull(buildingTable.deleted_at)))
+        .limit(1);
+      if (!property) return [];
+
+      const units = await tx
+        .select({ name: unitTable.name, status: unitTable.status })
+        .from(unitTable)
+        .where(and(eq(unitTable.building_id, id), isNull(unitTable.deleted_at)));
+
+      const blocked = deletionBlockedMessage(property, units);
+      if (blocked) throw new Error(blocked);
+
+      const deleted_at = new Date().toISOString();
+      await tx
+        .update(unitTable)
+        .set({ deleted_at, is_active: false } as unknown as Partial<NewUnitRow>)
+        .where(and(eq(unitTable.building_id, id), isNull(unitTable.deleted_at)));
+
+      return tx
         .update(buildingTable)
-        .set({
-          deleted_at: new Date().toISOString(),
-          is_active: false,
-        } as unknown as Partial<NewBuildingRow>)
+        .set({ deleted_at, is_active: false } as unknown as Partial<NewBuildingRow>)
         .where(eq(buildingTable.id, id))
-        .returning()
-    );
+        .returning();
+    });
   }
 
+  /**
+   * Deshace la baja, y con ella la de sus unidades.
+   *
+   * Vuelven solo las que se dieron de baja EN ESA operación —las que comparten su
+   * marca de tiempo—. Una unidad que alguien había eliminado antes, a mano, se
+   * queda donde estaba: restaurar la propiedad no es motivo para resucitarla.
+   */
   async restore({ id }: { id: string }): Promise<BuildingRow[]> {
-    return this.db.ormQuery((tx) =>
-      tx
+    return this.db.ormQuery(async (tx) => {
+      const [property] = await tx
+        .select({ deleted_at: buildingTable.deleted_at })
+        .from(buildingTable)
+        .where(eq(buildingTable.id, id))
+        .limit(1);
+
+      if (property?.deleted_at) {
+        await tx
+          .update(unitTable)
+          .set({ deleted_at: null, is_active: true } as unknown as Partial<NewUnitRow>)
+          .where(and(eq(unitTable.building_id, id), eq(unitTable.deleted_at, property.deleted_at)));
+      }
+
+      return tx
         .update(buildingTable)
         .set({ deleted_at: null, is_active: true } as unknown as Partial<NewBuildingRow>)
         .where(eq(buildingTable.id, id))
-        .returning()
-    );
+        .returning();
+    });
   }
 }

@@ -17,6 +17,10 @@ const UI = getHostUI() as any;
 export function PropietariosView() {
   const isMobile = useIsMobile();
   const {
+    pendingConfirm,
+    askConfirm,
+    cancelConfirm,
+    runConfirmed,
     loading,
     visibleRows,
     sort,
@@ -31,6 +35,7 @@ export function PropietariosView() {
     IMAGE_COL,
     SUB_COL,
     ITEM_COLS,
+    runServerAction,
   } = usePropietariosView();
 
   const cellText = (row: any, c: any) => {
@@ -165,6 +170,23 @@ export function PropietariosView() {
       icon: 'Pencil',
       onClick: (row: any) => {
         views.open('properties.propietario.open', { record: row }, { mode: 'dialog' });
+      },
+    },
+    {
+      label: 'Eliminar',
+      variant: 'destructive' as const,
+      icon: 'Trash2',
+      onClick: (row: any) => {
+        askConfirm(
+          'Eliminar',
+          'La persona se da de baja de la cartera. Si tiene unidades a su nombre no se va a poder: primero hay que quitarle la titularidad.',
+          'Eliminar',
+          () => {
+            ((row: any) => {
+              void runServerAction('properties.unitOwners.deleteOwner', { id: row.id }, row);
+            })(row);
+          }
+        );
       },
     },
   ];
@@ -389,6 +411,18 @@ export function PropietariosView() {
         )
       ),
       h('div', { 'data-cg-block-id': 'tbl', style: { display: 'contents' } }, renderTable())
-    )
+    ),
+    h(UI.ConfirmDialog, {
+      open: !!pendingConfirm,
+      onOpenChange: (o: boolean) => {
+        if (!o) cancelConfirm();
+      },
+      title: pendingConfirm?.title ?? '',
+      description: pendingConfirm?.message ?? '',
+      confirmLabel: pendingConfirm?.confirmLabel ?? 'Confirmar',
+      onConfirm: () => {
+        runConfirmed();
+      },
+    })
   );
 }

@@ -171,7 +171,6 @@
                 "variant": "destructive",
                 "icon": "UserMinus",
                 "confirm": "¿Sacar a esta persona de la titularidad de la unidad? La persona no se borra: queda sin esta unidad a su nombre, y se la puede volver a cargar.",
-                "successToast": "Titular quitado",
                 "action": {
                   "id": "serverAction",
                   "label": "Quitar",
@@ -181,6 +180,174 @@
             ],
             "emptyTitle": "Esta unidad no tiene titulares cargados",
             "emptySub": "Sin dueño cargado no hay a quién liquidarle lo que se cobra."
+          }
+        }
+      ]
+    },
+    {
+      "id": "sec_certificados",
+      "kind": "container",
+      "ctype": "section",
+      "label": "Certificados",
+      "icon": "ShieldCheck",
+      "children": [
+        {
+          "id": "btn_cert",
+          "kind": "component",
+          "comp": "Button",
+          "align": "right",
+          "props": {
+            "label": "Registrar certificado",
+            "variant": "secondary",
+            "action": {
+              "id": "openForm",
+              "label": "Registrar certificado",
+              "target": "properties.certificado.open"
+            }
+          }
+        },
+        {
+          "id": "tbl_certificados",
+          "kind": "component",
+          "comp": "DataTable",
+          "props": {
+            "view": "list",
+            "subtitle": "status",
+            "pageSize": "10",
+            "rowAction": {
+              "id": "openForm",
+              "label": "Editar certificado",
+              "target": "properties.certificado.open"
+            },
+            "columns": [
+              {
+                "key": "type",
+                "label": "Certificado",
+                "display": "pill",
+                "values": [
+                  {
+                    "value": "matafuegos",
+                    "label": "Matafuegos",
+                    "tone": "outline",
+                    "icon": "FireExtinguisher"
+                  },
+                  {
+                    "value": "gas",
+                    "label": "Instalación de gas",
+                    "tone": "outline",
+                    "icon": "Flame"
+                  },
+                  {
+                    "value": "ascensor",
+                    "label": "Ascensor",
+                    "tone": "outline",
+                    "icon": "MoveVertical"
+                  },
+                  {
+                    "value": "electricidad",
+                    "label": "Instalación eléctrica",
+                    "tone": "outline",
+                    "icon": "Zap"
+                  },
+                  {
+                    "value": "seguro",
+                    "label": "Seguro del inmueble",
+                    "tone": "outline",
+                    "icon": "Umbrella"
+                  },
+                  {
+                    "value": "otro",
+                    "label": "Otro",
+                    "tone": "outline",
+                    "icon": "FileText"
+                  }
+                ]
+              },
+              {
+                "key": "scope",
+                "label": "Alcance",
+                "display": "pill",
+                "values": [
+                  {
+                    "value": "unidad",
+                    "label": "De la unidad",
+                    "tone": "neutral",
+                    "icon": "DoorOpen"
+                  },
+                  {
+                    "value": "edificio",
+                    "label": "Del edificio",
+                    "tone": "outline",
+                    "icon": "Building2"
+                  }
+                ]
+              },
+              {
+                "key": "status",
+                "label": "Estado",
+                "display": "pill",
+                "values": [
+                  {
+                    "value": "vigente",
+                    "label": "Vigente",
+                    "tone": "success"
+                  },
+                  {
+                    "value": "por_vencer",
+                    "label": "Por vencer",
+                    "tone": "warning"
+                  },
+                  {
+                    "value": "vencido",
+                    "label": "Vencido",
+                    "tone": "danger"
+                  }
+                ]
+              },
+              {
+                "key": "expires_at",
+                "label": "Vence",
+                "format": "date"
+              }
+            ],
+            "cells": [
+              [
+                "gas",
+                "unidad",
+                "vigente",
+                "2027-03-20"
+              ],
+              [
+                "ascensor",
+                "edificio",
+                "por_vencer",
+                "2026-09-05"
+              ],
+              [
+                "matafuegos",
+                "edificio",
+                "vigente",
+                "2026-12-01"
+              ]
+            ],
+            "filters": [],
+            "actions": [
+              {
+                "label": "Eliminar",
+                "variant": "destructive",
+                "icon": "Trash2",
+                "confirm": "El certificado se elimina de esta unidad.",
+                "action": {
+                  "id": "serverAction",
+                  "label": "Eliminar",
+                  "target": "properties.certificates.delete"
+                },
+                "showWhenColumn": "scope",
+                "showWhenValues": "unidad"
+              }
+            ],
+            "emptyTitle": "Sin certificados que alcancen a esta unidad",
+            "emptySub": "Se ven los suyos y los del edificio: cargá el primero para que te avise antes del vencimiento."
           }
         }
       ]
@@ -202,10 +369,27 @@
         "outputBlockId": "tbl_titulares"
       },
       {
+        "hook": "loadDataFor",
+        "key": "tbl_certificados",
+        "mode": "query",
+        "action": "properties.certificates.listByUnit",
+        "resource": "properties.certificates",
+        "outputBlockId": "tbl_certificados"
+      },
+      {
         "hook": "onAction",
         "key": "properties.unitOwners.removeOwner",
         "mode": "command",
         "action": "properties.unitOwners.removeOwner",
+        "effect": "destructive",
+        "confirmation": "always"
+      },
+      {
+        "hook": "onAction",
+        "key": "properties.certificates.delete",
+        "mode": "command",
+        "action": "properties.certificates.delete",
+        "resource": "properties.certificates",
         "effect": "destructive",
         "confirmation": "always"
       }

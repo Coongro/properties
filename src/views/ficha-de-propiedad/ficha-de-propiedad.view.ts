@@ -4,7 +4,7 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { getHostReact, getHostUI, useIsMobile, usePlugin, views } from '@coongro/plugin-sdk';
+import { getHostReact, getHostUI, useIsMobile, views } from '@coongro/plugin-sdk';
 
 import { useFichaDePropiedadView } from './use-ficha-de-propiedad.js';
 
@@ -16,7 +16,6 @@ const UI = getHostUI() as any;
 
 export function FichaDePropiedadView() {
   const isMobile = useIsMobile();
-  const { toast } = usePlugin();
   // Tono del badge: el que devuelven los datos, y si no el del diseño.
   // ⚠️ MISMO mapa que el TONE_VARIANT de las tablas: el mismo estado tiene
   // que pintarse igual en la lista y en la ficha (neutral era 'secondary'
@@ -182,6 +181,23 @@ export function FichaDePropiedadView() {
         icon: 'Pencil',
         onClick: (row: any) => {
           views.open('properties.unidad.open', { record: row }, { mode: 'sheet' });
+        },
+      },
+      {
+        label: 'Eliminar',
+        variant: 'destructive' as const,
+        icon: 'Trash2',
+        onClick: (row: any) => {
+          askConfirm(
+            'Eliminar',
+            'La unidad se elimina del edificio. Si tiene contrato vigente no se va a poder.',
+            'Eliminar',
+            () => {
+              ((row: any) => {
+                void runServerAction('properties.units.delete', { id: row.id }, row);
+              })(row);
+            }
+          );
         },
       },
     ];
@@ -504,10 +520,7 @@ export function FichaDePropiedadView() {
             'Quitar',
             () => {
               ((row: any) => {
-                ((row: any) => {
-                  void runServerAction('properties.unitOwners.removeOwner', { id: row.id }, row);
-                })(row);
-                toast.success('Titular quitado', '');
+                void runServerAction('properties.unitOwners.removeOwner', { id: row.id }, row);
               })(row);
             }
           );
@@ -580,6 +593,37 @@ export function FichaDePropiedadView() {
                       },
                     },
                     renderCell(row, c)
+                  )
+                )
+              ),
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    gap: '4px',
+                    justifyContent: 'flex-end',
+                    borderTop: '1px solid var(--cg-border-light)',
+                    paddingTop: '8px',
+                    marginTop: '2px',
+                  },
+                },
+                ...ROW_ACTIONS.filter((a2: any) => !a2.hidden?.(row)).map((a2: any) =>
+                  h(
+                    UI.Button,
+                    {
+                      key: a2.label,
+                      size: 'sm' as const,
+                      variant:
+                        a2.variant === 'destructive'
+                          ? ('destructive' as const)
+                          : ('ghost' as const),
+                      onClick: (e: any) => {
+                        e.stopPropagation();
+                        a2.onClick(row);
+                      },
+                    },
+                    a2.label
                   )
                 )
               )
@@ -729,6 +773,25 @@ export function FichaDePropiedadView() {
           )
         : shown;
     };
+    const ROW_ACTIONS = [
+      {
+        label: 'Eliminar',
+        variant: 'destructive' as const,
+        icon: 'Trash2',
+        onClick: (row: any) => {
+          askConfirm(
+            'Eliminar',
+            'La expensa del período se elimina de esta propiedad.',
+            'Eliminar',
+            () => {
+              ((row: any) => {
+                void runServerAction('properties.buildingExpenses.delete', { id: row.id }, row);
+              })(row);
+            }
+          );
+        },
+      },
+    ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
     const renderTable = () =>
       h(
@@ -774,6 +837,7 @@ export function FichaDePropiedadView() {
           onRowClick: (row: any) => {
             views.open('properties.expensas-del-mes.open', { record: row }, { mode: 'dialog' });
           },
+          actions: ROW_ACTIONS,
           view: 'list' as const,
           renderItem: (row: any) =>
             h(
@@ -841,7 +905,38 @@ export function FichaDePropiedadView() {
                     { style: { flexShrink: 0, display: 'flex', alignItems: 'center' } },
                     renderCell(row, ITEM_COLS[ITEM_COLS.length - 1])
                   )
-                : null
+                : null,
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    gap: '4px',
+                    justifyContent: 'flex-end',
+                    borderTop: '1px solid var(--cg-border-light)',
+                    paddingTop: '8px',
+                    marginTop: '2px',
+                  },
+                },
+                ...ROW_ACTIONS.filter((a2: any) => !a2.hidden?.(row)).map((a2: any) =>
+                  h(
+                    UI.Button,
+                    {
+                      key: a2.label,
+                      size: 'sm' as const,
+                      variant:
+                        a2.variant === 'destructive'
+                          ? ('destructive' as const)
+                          : ('ghost' as const),
+                      onClick: (e: any) => {
+                        e.stopPropagation();
+                        a2.onClick(row);
+                      },
+                    },
+                    a2.label
+                  )
+                )
+              )
             ),
           onClearFilters: () => {
             clearFilters();
@@ -996,6 +1091,20 @@ export function FichaDePropiedadView() {
           )
         : shown;
     };
+    const ROW_ACTIONS = [
+      {
+        label: 'Eliminar',
+        variant: 'destructive' as const,
+        icon: 'Trash2',
+        onClick: (row: any) => {
+          askConfirm('Eliminar', 'El certificado se elimina de esta propiedad.', 'Eliminar', () => {
+            ((row: any) => {
+              void runServerAction('properties.certificates.delete', { id: row.id }, row);
+            })(row);
+          });
+        },
+      },
+    ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
     const renderTable = () =>
       h(
@@ -1041,6 +1150,7 @@ export function FichaDePropiedadView() {
           onRowClick: (row: any) => {
             views.open('properties.certificado.open', { record: row }, { mode: 'sheet' });
           },
+          actions: ROW_ACTIONS,
           view: 'list' as const,
           renderItem: (row: any) =>
             h(
@@ -1108,7 +1218,38 @@ export function FichaDePropiedadView() {
                     { style: { flexShrink: 0, display: 'flex', alignItems: 'center' } },
                     renderCell(row, ITEM_COLS[ITEM_COLS.length - 1])
                   )
-                : null
+                : null,
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    gap: '4px',
+                    justifyContent: 'flex-end',
+                    borderTop: '1px solid var(--cg-border-light)',
+                    paddingTop: '8px',
+                    marginTop: '2px',
+                  },
+                },
+                ...ROW_ACTIONS.filter((a2: any) => !a2.hidden?.(row)).map((a2: any) =>
+                  h(
+                    UI.Button,
+                    {
+                      key: a2.label,
+                      size: 'sm' as const,
+                      variant:
+                        a2.variant === 'destructive'
+                          ? ('destructive' as const)
+                          : ('ghost' as const),
+                      onClick: (e: any) => {
+                        e.stopPropagation();
+                        a2.onClick(row);
+                      },
+                    },
+                    a2.label
+                  )
+                )
+              )
             ),
           onClearFilters: () => {
             clearFilters();

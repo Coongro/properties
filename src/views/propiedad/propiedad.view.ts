@@ -80,15 +80,6 @@ export function PropiedadView() {
                     h(
                       UI.SelectItem,
                       {
-                        key: 'departamento',
-                        value: 'departamento',
-                        icon: h(UI.DynamicIcon, { icon: 'Building', size: 16 }),
-                      },
-                      'Departamento'
-                    ),
-                    h(
-                      UI.SelectItem,
-                      {
                         key: 'casa',
                         value: 'casa',
                         icon: h(UI.DynamicIcon, { icon: 'House', size: 16 }),
