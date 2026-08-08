@@ -6,6 +6,7 @@
  */
 import { getHostReact, getHostUI, usePlugin } from '@coongro/plugin-sdk';
 
+import { customHandlers } from './handlers.js';
 import { useUnidadView } from './use-unidad.js';
 
 const React = getHostReact();
@@ -18,7 +19,7 @@ export function UnidadView() {
   const {
     views: { closeDialog },
   } = usePlugin();
-  const { values, errors, setField, submit, editingId } = useUnidadView();
+  const { values, errors, setField, refOptions, refLabel, submit, editingId } = useUnidadView();
 
   return h(
     'div',
@@ -44,6 +45,39 @@ export function UnidadView() {
                 alignItems: 'stretch',
               },
             },
+            h(
+              'div',
+              { 'data-cg-block-id': 'f_building', style: { display: 'contents' } },
+              h(
+                'div',
+                { style: { flex: '1 1 100%', minWidth: 0 } },
+                h(
+                  UI.Label,
+                  { htmlFor: 'building_id', style: { display: 'block', marginBottom: '6px' } },
+                  'Propiedad',
+                  h('span', { style: { color: 'var(--cg-danger)' } }, ' *')
+                ),
+                h(
+                  UI.Select,
+                  {
+                    value: String(values['building_id'] ?? ''),
+                    onValueChange: (v: string) => setField('building_id', v),
+                    placeholder: 'Elegir…',
+                    clearable: true,
+                  },
+                  ...(refOptions['building_id'] ?? []).map((r: any) =>
+                    h(UI.SelectItem, { key: String(r.id), value: String(r.id) }, refLabel(r))
+                  )
+                ),
+                errors['building_id']
+                  ? h(
+                      'div',
+                      { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
+                      errors['building_id']
+                    )
+                  : null
+              )
+            ),
             h(
               'div',
               { 'data-cg-block-id': 'f_name', style: { display: 'contents' } },
@@ -192,21 +226,32 @@ export function UnidadView() {
                 { style: { flex: '1 1 100%', minWidth: 0 } },
                 h(
                   UI.Label,
-                  { htmlFor: 'photo_url', style: { display: 'block', marginBottom: '6px' } },
-                  'Foto (URL)'
+                  { htmlFor: 'photos', style: { display: 'block', marginBottom: '6px' } },
+                  'Fotos'
                 ),
-                h(UI.Input, {
-                  id: 'photo_url',
-                  type: 'text',
-                  value: String(values['photo_url'] ?? ''),
-                  placeholder: 'https://…',
-                  onChange: (e: any) => setField('photo_url', e.target.value),
+                h(UI.ImageInput, {
+                  id: 'photos',
+                  multiple: true,
+                  value: (() => {
+                    const raw = values['photos'];
+                    if (Array.isArray(raw)) return raw;
+                    if (typeof raw === 'string' && raw.trim().startsWith('[')) {
+                      try {
+                        return JSON.parse(raw);
+                      } catch {
+                        return [];
+                      }
+                    }
+                    return raw ? [raw] : [];
+                  })(),
+                  onChange: (v: any) => setField('photos', v),
+                  onUpload: customHandlers.uploadImage,
                 }),
-                errors['photo_url']
+                errors['photos']
                   ? h(
                       'div',
                       { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
-                      errors['photo_url']
+                      errors['photos']
                     )
                   : null
               )

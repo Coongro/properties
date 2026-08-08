@@ -15,6 +15,34 @@
       "when": 1785371742062,
       "tag": "0001_massive_echo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785806138519,
+      "tag": "0002_vengeful_mordo",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1785902997716,
+      "tag": "0003_lonely_moonstone",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1785989397716,
+      "tag": "0004_calm_moondragon",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786075797716,
+      "tag": "0005_wandering_shadowcat",
+      "breakpoints": true
     }
   ]
 }

@@ -30,7 +30,7 @@
         "view": "cards",
         "cardMin": 280,
         "cardBand": false,
-        "imageCol": "photo_url",
+        "imageCol": "photos",
         "imageLayout": "cover",
         "subtitle": "address",
         "pageSize": "20",
@@ -85,11 +85,6 @@
                 "icon": "Building2"
               },
               {
-                "value": "departamento",
-                "label": "Departamento",
-                "icon": "Building"
-              },
-              {
                 "value": "casa",
                 "label": "Casa",
                 "icon": "House"
@@ -133,8 +128,8 @@
             "format": "money"
           },
           {
-            "key": "photo_url",
-            "label": "Foto",
+            "key": "photos",
+            "label": "Fotos",
             "visible": false
           }
         ],
@@ -199,11 +194,26 @@
               "label": "Editar",
               "target": "properties.propiedad.open"
             }
+          },
+          {
+            "label": "Eliminar",
+            "variant": "destructive",
+            "icon": "Trash2"
           }
         ],
         "emptyTitle": "Todavía no hay propiedades",
         "emptySub": "Cargá la primera para empezar a registrar unidades y contratos."
       }
     }
-  ]
+  ],
+  "headless": {
+    "handlers": [
+      {
+        "hook": "loadData",
+        "mode": "query",
+        "action": "properties.buildings.list",
+        "resource": "properties.buildings"
+      }
+    ]
+  }
 }

@@ -127,6 +127,99 @@
       ]
     },
     {
+      "id": "s4",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Qué unidad le pertenece",
+      "icon": "DoorOpen",
+      "children": [
+        {
+          "id": "f_unit",
+          "kind": "field",
+          "name": "unit_id",
+          "fieldType": "ref",
+          "label": "Unidad",
+          "refEntity": "properties.units",
+          "refDisplay": "label",
+          "refSubtitle": "detail",
+          "width": "half",
+          "validations": [],
+          "help": "Opcional: se puede cargar la persona ahora y decir de qué unidad es dueña después."
+        },
+        {
+          "id": "f_share",
+          "kind": "field",
+          "name": "share_pct",
+          "fieldType": "number",
+          "label": "Participación (%)",
+          "width": "half",
+          "validations": [],
+          "placeholder": "Ej: 50 · vacío = 100 %",
+          "help": "Si es dueño único, dejalo vacío: se toma 100 %. Entre todos los dueños de una unidad no puede pasar de 100 %."
+        },
+        {
+          "id": "f_role",
+          "kind": "field",
+          "name": "role",
+          "fieldType": "enum",
+          "label": "Carácter",
+          "validations": [],
+          "options": [
+            {
+              "value": "titular",
+              "label": "Titular",
+              "icon": "UserCheck"
+            },
+            {
+              "value": "cotitular",
+              "label": "Cotitular",
+              "icon": "Users"
+            },
+            {
+              "value": "usufructuario",
+              "label": "Usufructuario",
+              "icon": "HandCoins"
+            },
+            {
+              "value": "nudo_propietario",
+              "label": "Nudo propietario",
+              "icon": "KeyRound"
+            }
+          ],
+          "help": "El usufructuario percibe el alquiler; el nudo propietario conserva el dominio sin cobrarlo."
+        }
+      ],
+      "showWhen": {
+        "column": "many_units",
+        "values": "si",
+        "negate": true
+      }
+    },
+    {
+      "id": "s4_varias",
+      "kind": "container",
+      "ctype": "card",
+      "label": "Qué unidades le pertenecen",
+      "icon": "DoorOpen",
+      "showWhen": {
+        "column": "many_units",
+        "values": "si"
+      },
+      "children": [
+        {
+          "id": "cal_varias",
+          "kind": "component",
+          "comp": "Callout",
+          "props": {
+            "tone": "neutral",
+            "icon": "Info",
+            "title": "Tiene varias unidades a su nombre",
+            "text": "Se ven todas, con su participación, en su ficha. Para cambiar la parte de una unidad, entrá a esa unidad: es donde se ve si el 100 % está completo."
+          }
+        }
+      ]
+    },
+    {
       "id": "s3",
       "kind": "container",
       "ctype": "card",
@@ -137,11 +230,144 @@
           "id": "f_bank",
           "kind": "field",
           "name": "bank",
-          "fieldType": "text",
+          "fieldType": "enum",
           "label": "Banco",
           "width": "half",
           "validations": [],
-          "placeholder": "Ej: Banco Galicia"
+          "options": [
+            {
+              "value": "Banco Nación",
+              "label": "Banco Nación"
+            },
+            {
+              "value": "Banco Provincia",
+              "label": "Banco Provincia"
+            },
+            {
+              "value": "Banco Ciudad",
+              "label": "Banco Ciudad"
+            },
+            {
+              "value": "Banco Galicia",
+              "label": "Banco Galicia"
+            },
+            {
+              "value": "Banco Santander",
+              "label": "Banco Santander"
+            },
+            {
+              "value": "BBVA",
+              "label": "BBVA"
+            },
+            {
+              "value": "Banco Macro",
+              "label": "Banco Macro"
+            },
+            {
+              "value": "Banco Credicoop",
+              "label": "Banco Credicoop"
+            },
+            {
+              "value": "Banco Patagonia",
+              "label": "Banco Patagonia"
+            },
+            {
+              "value": "Banco Supervielle",
+              "label": "Banco Supervielle"
+            },
+            {
+              "value": "ICBC",
+              "label": "ICBC"
+            },
+            {
+              "value": "Banco Comafi",
+              "label": "Banco Comafi"
+            },
+            {
+              "value": "Banco Hipotecario",
+              "label": "Banco Hipotecario"
+            },
+            {
+              "value": "Banco Industrial (BIND)",
+              "label": "Banco Industrial (BIND)"
+            },
+            {
+              "value": "Banco de Córdoba",
+              "label": "Banco de Córdoba"
+            },
+            {
+              "value": "Nuevo Banco de Santa Fe",
+              "label": "Nuevo Banco de Santa Fe"
+            },
+            {
+              "value": "Banco Municipal de Rosario",
+              "label": "Banco Municipal de Rosario"
+            },
+            {
+              "value": "Banco de Corrientes",
+              "label": "Banco de Corrientes"
+            },
+            {
+              "value": "Banco Entre Ríos",
+              "label": "Banco Entre Ríos"
+            },
+            {
+              "value": "Banco de La Pampa",
+              "label": "Banco de La Pampa"
+            },
+            {
+              "value": "Banco del Chubut",
+              "label": "Banco del Chubut"
+            },
+            {
+              "value": "Banco de San Juan",
+              "label": "Banco de San Juan"
+            },
+            {
+              "value": "Banco Santa Cruz",
+              "label": "Banco Santa Cruz"
+            },
+            {
+              "value": "Banco de Tierra del Fuego",
+              "label": "Banco de Tierra del Fuego"
+            },
+            {
+              "value": "Nuevo Banco del Chaco",
+              "label": "Nuevo Banco del Chaco"
+            },
+            {
+              "value": "Banco de Formosa",
+              "label": "Banco de Formosa"
+            },
+            {
+              "value": "Banco del Sol",
+              "label": "Banco del Sol"
+            },
+            {
+              "value": "Brubank",
+              "label": "Brubank"
+            },
+            {
+              "value": "Naranja X",
+              "label": "Naranja X"
+            },
+            {
+              "value": "Mercado Pago",
+              "label": "Mercado Pago"
+            },
+            {
+              "value": "Ualá",
+              "label": "Ualá"
+            },
+            {
+              "value": "Personal Pay",
+              "label": "Personal Pay"
+            },
+            {
+              "value": "Otro",
+              "label": "Otro"
+            }
+          ]
         },
         {
           "id": "f_account",
@@ -175,5 +401,21 @@
         }
       ]
     }
-  ]
+  ],
+  "headless": {
+    "handlers": [
+      {
+        "hook": "onInit",
+        "mode": "query",
+        "action": "properties.unitOwners.getOwner"
+      },
+      {
+        "hook": "onSubmit",
+        "mode": "command",
+        "action": "properties.unitOwners.saveOwner",
+        "effect": "write",
+        "confirmation": "always"
+      }
+    ]
+  }
 }

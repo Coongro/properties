@@ -17,6 +17,10 @@ const UI = getHostUI() as any;
 export function PropietariosView() {
   const isMobile = useIsMobile();
   const {
+    pendingConfirm,
+    askConfirm,
+    cancelConfirm,
+    runConfirmed,
     loading,
     visibleRows,
     sort,
@@ -31,6 +35,7 @@ export function PropietariosView() {
     IMAGE_COL,
     SUB_COL,
     ITEM_COLS,
+    runServerAction,
   } = usePropietariosView();
 
   const cellText = (row: any, c: any) => {
@@ -167,6 +172,23 @@ export function PropietariosView() {
         views.open('properties.propietario.open', { record: row }, { mode: 'dialog' });
       },
     },
+    {
+      label: 'Eliminar',
+      variant: 'destructive' as const,
+      icon: 'Trash2',
+      onClick: (row: any) => {
+        askConfirm(
+          'Eliminar',
+          'La persona se da de baja de la cartera. Si tiene unidades a su nombre no se va a poder: primero hay que quitarle la titularidad.',
+          'Eliminar',
+          () => {
+            ((row: any) => {
+              void runServerAction('properties.unitOwners.deleteOwner', { id: row.id }, row);
+            })(row);
+          }
+        );
+      },
+    },
   ];
   const renderTable = () =>
     h(
@@ -210,11 +232,26 @@ export function PropietariosView() {
         pagination: { page, pageSize: 20, total: visibleRows.length },
         onPageChange: setPage,
         onRowClick: (row: any) => {
-          views.open('properties.propietario.open', { record: row }, { mode: 'dialog' });
+          views.open('properties.ficha-de-propietario.open', { record: row });
         },
         actions: ROW_ACTIONS,
         view: 'list' as const,
-        itemImage: (row: any) => cellText(row, IMAGE_COL),
+        itemImage: (row: any) => {
+          let v: any = cellValue(row, IMAGE_COL);
+          if (typeof v === 'string' && v.trim().startsWith('[')) {
+            try {
+              v = JSON.parse(v);
+            } catch {
+              /* no era JSON: se usa como URL */
+            }
+          }
+          // La lista se devuelve ENTERA, no solo la primera: con varias fotos la
+          // tarjeta las pasa con flechas, y recortar acá dejaría el resto invisible.
+          if (Array.isArray(v))
+            return v.filter((it: any) => it && (typeof it === 'string' || it.url));
+          if (v && typeof v === 'object') v = v.url;
+          return typeof v === 'string' ? v : '';
+        },
         imageLayout: 'avatar' as const,
         renderItem: (row: any) =>
           h(
@@ -374,6 +411,18 @@ export function PropietariosView() {
         )
       ),
       h('div', { 'data-cg-block-id': 'tbl', style: { display: 'contents' } }, renderTable())
-    )
+    ),
+    h(UI.ConfirmDialog, {
+      open: !!pendingConfirm,
+      onOpenChange: (o: boolean) => {
+        if (!o) cancelConfirm();
+      },
+      title: pendingConfirm?.title ?? '',
+      description: pendingConfirm?.message ?? '',
+      confirmLabel: pendingConfirm?.confirmLabel ?? 'Confirmar',
+      onConfirm: () => {
+        runConfirmed();
+      },
+    })
   );
 }
