@@ -6,6 +6,7 @@ import { unitOwnerTable } from '../schema/unit-owner.js';
 import type { NewUnitOwnerRow } from '../schema/unit-owner.js';
 import { unitTable } from '../schema/unit.js';
 import type { UnitRow, NewUnitRow } from '../schema/unit.js';
+import { effectiveStatus, reservedFrom } from '../services/occupancy.js';
 import { unitDeletionBlockedMessage } from '../services/property-deletion.js';
 import { unitDetail, unitLabel } from '../services/unit-identity.js';
 
@@ -33,6 +34,12 @@ export interface UnitListRow extends UnitRow {
   label: string;
   /** Ambientes, baños y superficie en una línea: «3 ambientes · 2 baños · 72 m²». */
   detail: string;
+  /**
+   * Desde cuándo está comprometida, si el contrato todavía no empezó. `null` si está
+   * libre de verdad o ya ocupada. Sin esto, «vacante» esconde que ya está prometida y
+   * alguien la vuelve a ofrecer.
+   */
+  reserved_from: string | null;
 }
 
 export class UnitRepository {
@@ -79,8 +86,15 @@ export class UnitRepository {
         .orderBy(asc(buildingTable.name), asc(unitTable.name))
     );
 
+    // La ocupación se calcula acá, no se lee de la columna: `status` guarda lo que decidió
+    // la persona y las fechas dicen qué contrato rige HOY. Antes se guardaba «ocupada» al
+    // firmar, así que una unidad comprometida para el mes siguiente ya figuraba alquilada
+    // y una con el contrato vencido no se liberaba nunca.
+    const hoy = new Date().toISOString().slice(0, 10);
     return rows.map((row) => ({
       ...row,
+      status: effectiveStatus(row, hoy),
+      reserved_from: reservedFrom(row, hoy),
       label: unitLabel({
         unitName: row.name,
         buildingName: row.building_name,

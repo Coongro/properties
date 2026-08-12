@@ -43,6 +43,13 @@
       "when": 1786075797716,
       "tag": "0005_wandering_shadowcat",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786491312849,
+      "tag": "0006_odd_korvac",
+      "breakpoints": true
     }
   ]
 }

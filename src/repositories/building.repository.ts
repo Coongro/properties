@@ -14,6 +14,7 @@ import {
   insideBuildingMessage,
   type PropertyIdentity,
 } from '../services/duplicate-property.js';
+import { occupiedInSql } from '../services/occupancy.js';
 import { summarizeOwnership } from '../services/ownership-shares.js';
 import { deletionBlockedMessage } from '../services/property-deletion.js';
 import { isUnitOnlyType, unitOnlyTypeMessage } from '../services/property-type.js';
@@ -278,8 +279,10 @@ export class BuildingRepository {
       select count(*) from ${unitTable} u
       where u.building_id = ${b} and u.deleted_at is null ${extra ?? sql``}
     )`;
-    // El estado se guarda con el valor del enum del formulario, que está en español.
-    const occupied = units(sql`and u.status = 'ocupada'`);
+    // Ocupada es tener HOY un contrato en curso, no una columna que alguien haya puesto
+    // en 'ocupada' al firmar: así una unidad comprometida para el mes que viene no cuenta
+    // todavía, y una cuyo contrato venció deja de contar sin que corra nada.
+    const occupied = units(sql`and ${occupiedInSql('u', today)}`);
     const total = units(null);
 
     return this.db.ormQuery((tx) =>
