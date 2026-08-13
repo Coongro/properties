@@ -122,7 +122,27 @@ export class UnitRepository {
     return this.reread(rows);
   }
 
+  /**
+   * Se niega a que le pidan «ocupada» o «vacante».
+   *
+   * Esos dos no son estados que alguien fije: se DERIVAN de `occupied_from` /
+   * `occupied_until`, que escribe `leases` al firmar. Hasta ahora el update los
+   * aceptaba, guardaba la columna y devolvía la unidad releída — o sea con el
+   * estado derivado de siempre. Respondía «listo» y no cambiaba nada.
+   *
+   * Lo encontró el agente ciego: pidió marcar una unidad como ocupada, confirmó,
+   * y en la misma respuesta leyó «Estado: Vacante». Una persona frente a la
+   * pantalla lo nota; un agente cree que actualizó y sigue de largo. Fallar con
+   * el motivo cuesta lo mismo que mentir, y dice dónde está la palanca real.
+   */
   async update({ id, data }: { id: string; data: Partial<NewUnitRow> }): Promise<UnitListRow[]> {
+    const pedido = String((data as { status?: string }).status ?? '');
+    if (pedido === 'ocupada' || pedido === 'vacante') {
+      throw new Error(
+        'La ocupación de una unidad no se fija a mano: sale de las fechas del contrato. Para que figure alquilada, firmá el contrato en Contratos; para liberarla, rescindilo o dejá que venza. Acá se elige «no disponible», «en recambio» o «con preaviso».'
+      );
+    }
+
     const rows = await this.db.ormQuery((tx) =>
       tx.update(unitTable).set(data).where(eq(unitTable.id, id)).returning()
     );
