@@ -1546,11 +1546,14 @@ export const updateUnits = defineAction({
             },
             description: 'Fotos (lista de fotos, en orden: la primera es la principal)',
           },
+          // Sin «vacante» ni «ocupada»: esos dos se derivan de las fechas del
+          // contrato, así que pedirlos acá no cambiaba nada y la respuesta decía
+          // que sí. Lo que se elige a mano es la disponibilidad.
           status: {
             type: 'string',
-            enum: ['vacante', 'ocupada', 'en_recambio', 'con_preaviso', 'no_disponible'],
+            enum: ['en_recambio', 'con_preaviso', 'no_disponible'],
             description:
-              'Estado. Opciones: vacante (Vacante), ocupada (Ocupada), en_recambio (En recambio), con_preaviso (Con preaviso), no_disponible (No disponible).',
+              'Disponibilidad decidida por quien administra: en_recambio (En recambio), con_preaviso (Con preaviso), no_disponible (No disponible). Si está alquilada o libre NO se elige acá: sale de las fechas del contrato — se firma en Contratos y se libera al rescindir o al vencer.',
           },
           reference_rent: {
             type: 'string',
