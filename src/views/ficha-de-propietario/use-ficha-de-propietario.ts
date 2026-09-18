@@ -173,7 +173,7 @@ export function useFichaDePropietarioView() {
       ],
     },
     {
-      key: 'status',
+      key: 'occupancy',
       label: 'Estado',
       display: 'pill',
       values: [

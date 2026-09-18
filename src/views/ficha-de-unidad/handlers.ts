@@ -53,7 +53,11 @@ export const customHandlers: CustomHandlers = {
       unitId,
     });
 
-    const status = STATUS_LABELS[String(record?.status ?? '')] ?? {
+    // `occupancy` y no `status`: lo que la ficha muestra es cómo está HOY la unidad
+    // —derivado de las fechas del contrato—, no la decisión guardada. Son dos campos
+    // distintos justamente para que el formulario pueda editar uno sin que la pantalla
+    // mienta con el otro.
+    const status = STATUS_LABELS[String(record?.occupancy ?? record?.status ?? '')] ?? {
       label: '—',
       tone: 'neutral' as const,
     };
@@ -70,7 +74,7 @@ export const customHandlers: CustomHandlers = {
         value: status.label,
         // El contrato vive en `leases`: mientras no esté cableado, la ficha dice de dónde
         // sale el estado en vez de insinuar que miró un contrato.
-        sub: record?.status === 'ocupada' ? 'según el contrato' : 'sin contrato vigente',
+        sub: record?.occupancy === 'ocupada' ? 'según el contrato' : 'sin contrato vigente',
       },
       k_renta: {
         value: rent > 0 ? formatMoney(rent) : 'Sin definir',

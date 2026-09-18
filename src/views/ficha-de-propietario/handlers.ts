@@ -61,7 +61,20 @@ export const customHandlers: CustomHandlers = {
     if (!contactId) return {};
 
     const owner = await execute<OwnerDetail>('properties.unitOwners.getOwner', { id: contactId });
-    const units = Number(record?.unit_count ?? 0);
+    // El listado ya las contó y manda el número en la fila: cuando está, se usa.
+    // Cuando NO está hay que ir a buscarlo, porque esta ficha se abre desde más de un
+    // lado —ahora también desde la tabla de titulares de una unidad— y ahí la fila no
+    // trae el conteo. Dando por sentado que venía, el encabezado decía «Sin unidades»
+    // de alguien con cuatro, con la tabla de sus unidades listándolas justo abajo.
+    const contadas = record?.unit_count;
+    const units =
+      contadas === undefined || contadas === null
+        ? (
+            await execute<unknown[]>('properties.unitOwners.listUnitsOf', {
+              contactId,
+            })
+          ).length
+        : Number(contadas);
     const document = documentOf(owner);
 
     // El alias es el que la persona dicta por teléfono; el CBU, el que se pega en el

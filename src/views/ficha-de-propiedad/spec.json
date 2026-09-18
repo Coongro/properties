@@ -199,7 +199,7 @@
                 "label": "Detalle"
               },
               {
-                "key": "status",
+                "key": "occupancy",
                 "label": "Estado",
                 "display": "pill",
                 "values": [
@@ -418,7 +418,12 @@
               }
             ],
             "emptyTitle": "Esta propiedad no tiene titulares cargados",
-            "emptySub": "Sin dueño cargado no hay a quién liquidarle lo que se cobra."
+            "emptySub": "Sin dueño cargado no hay a quién liquidarle lo que se cobra.",
+            "rowAction": {
+              "id": "navigate",
+              "label": "Ver al titular",
+              "target": "properties.ficha-de-propietario.open"
+            }
           }
         }
       ]

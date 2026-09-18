@@ -28,12 +28,19 @@ describe('editar una unidad', () => {
     ).rejects.toThrow(/no se fija a mano|firmá el contrato/i);
   });
 
-  it('se niega también con «vacante»: liberar es rescindir, no editar', async () => {
+  /**
+   * Antes esto también se rechazaba, y dejaba a la unidad sin salida: marcada «no
+   * disponible» a mano, la única forma de sacarle la marca era volver a `vacante` —
+   * el valor neutro de una columna `notNull`— y guardar tiraba error. Aceptarlo no
+   * libera nada: con el contrato vigente, la unidad sigue leyéndose «ocupada»,
+   * porque eso lo dicen las fechas y no esta columna.
+   */
+  it('acepta «vacante», que es sacar la marca y no liberar la unidad', async () => {
     const db = baseVacia();
 
     await expect(
       new UnitRepository(db).update({ id: 'u-1', data: { status: 'vacante' } as never })
-    ).rejects.toThrow(/no se fija a mano/i);
+    ).resolves.toEqual([]);
   });
 
   it('deja pasar la disponibilidad, que sí la decide quien administra', async () => {

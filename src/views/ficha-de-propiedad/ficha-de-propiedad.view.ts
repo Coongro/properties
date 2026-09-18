@@ -557,6 +557,9 @@ export function FichaDePropiedadView() {
           onSortChange,
           pagination: { page, pageSize: 20, total: visibleRows.length },
           onPageChange: setPage,
+          onRowClick: (row: any) => {
+            views.open('properties.ficha-de-propietario.open', { record: row });
+          },
           actions: ROW_ACTIONS,
           mobileRender: (row: any) =>
             h(

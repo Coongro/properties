@@ -166,7 +166,7 @@ export function useFichaDePropiedadView() {
       { key: 'name', label: 'Unidad' },
       { key: 'detail', label: 'Detalle' },
       {
-        key: 'status',
+        key: 'occupancy',
         label: 'Estado',
         display: 'pill',
         values: [
