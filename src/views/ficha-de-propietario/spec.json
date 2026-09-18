@@ -186,6 +186,12 @@
                     "icon": "Ban"
                   }
                 ]
+              },
+              {
+                "key": "reserved_from",
+                "label": "Comprometida desde",
+                "format": "date",
+                "emptyLabel": "—"
               }
             ],
             "actions": [

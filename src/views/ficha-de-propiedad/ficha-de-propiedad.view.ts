@@ -76,14 +76,45 @@ export function FichaDePropiedadView() {
       outline: 'outline',
     };
     const enumVal = (c: any, raw: string) => (c.values ?? []).find((e: any) => e.value === raw);
+    const formatDate = (fmt: string, raw: string) => {
+      const s = String(raw ?? '');
+      const only = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+      if (only) return only[3] + '/' + only[2] + '/' + only[1];
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return s;
+      const p = (n: number) => String(n).padStart(2, '0');
+      const dmy = p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear();
+      const hm = p(d.getHours()) + ':' + p(d.getMinutes());
+      return fmt === 'datetime' ? dmy + ' ' + hm : fmt === 'time' ? hm : dmy;
+    };
     const formatMoney = (raw: string) => {
       const n = Number(raw);
       return isNaN(n) ? raw : '$' + n.toLocaleString('es-AR');
     };
     const renderCell = (row: any, c: any) => {
       const raw = cellText(row, c);
+      if (raw === '' && c.emptyLabel) {
+        return h(
+          'span',
+          {
+            style: {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--cg-text-muted)',
+            },
+          },
+          c.emptyIcon ? h(UI.DynamicIcon, { icon: c.emptyIcon, size: 15 }) : null,
+          c.emptyLabel
+        );
+      }
       const ev = enumVal(c, raw);
-      const label = c.format === 'money' ? formatMoney(raw) : (ev?.label ?? raw);
+      const label =
+        c.format === 'money'
+          ? formatMoney(raw)
+          : c.format
+            ? formatDate(c.format, raw)
+            : (ev?.label ?? raw);
       const shown = raw !== '' ? (c.prefix ?? '') + label + (c.suffix ?? '') : label;
       if (c.display === 'avatar') {
         const initial = (String(raw).trim().charAt(0) || '?').toUpperCase();
@@ -1001,6 +1032,21 @@ export function FichaDePropiedadView() {
     };
     const renderCell = (row: any, c: any) => {
       const raw = cellText(row, c);
+      if (raw === '' && c.emptyLabel) {
+        return h(
+          'span',
+          {
+            style: {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--cg-text-muted)',
+            },
+          },
+          c.emptyIcon ? h(UI.DynamicIcon, { icon: c.emptyIcon, size: 15 }) : null,
+          c.emptyLabel
+        );
+      }
       const ev = enumVal(c, raw);
       const label = c.format ? formatDate(c.format, raw) : (ev?.label ?? raw);
       const shown = raw !== '' ? (c.prefix ?? '') + label + (c.suffix ?? '') : label;

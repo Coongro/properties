@@ -184,6 +184,7 @@ export function useFichaDePropietarioView() {
         { value: 'no_disponible', label: 'No disponible', tone: 'outline', icon: 'Ban' },
       ],
     },
+    { key: 'reserved_from', label: 'Comprometida desde', format: 'date', emptyLabel: '—' },
   ];
   const cellValue = (
     row: any,
