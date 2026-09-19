@@ -14,7 +14,7 @@ import {
   insideBuildingMessage,
   type PropertyIdentity,
 } from '../services/duplicate-property.js';
-import { occupiedInSql } from '../services/occupancy.js';
+import { effectiveStatus, occupiedInSql } from '../services/occupancy.js';
 import { summarizeOwnership } from '../services/ownership-shares.js';
 import { deletionBlockedMessage } from '../services/property-deletion.js';
 import { isUnitOnlyType, unitOnlyTypeMessage } from '../services/property-type.js';
@@ -216,7 +216,13 @@ export class BuildingRepository {
     // hechos —alguien la subdividió— y no hay una a la que referirse.
     const units = await this.db.ormQuery((tx) =>
       tx
-        .select({ id: unitTable.id, status: unitTable.status })
+        .select({
+          id: unitTable.id,
+          status: unitTable.status,
+          // Las fechas, porque la ocupación se deriva: la columna guarda la marca manual.
+          occupied_from: unitTable.occupied_from,
+          occupied_until: unitTable.occupied_until,
+        })
         .from(unitTable)
         .where(and(eq(unitTable.building_id, id), isNull(unitTable.deleted_at)))
         .limit(2)
@@ -234,7 +240,9 @@ export class BuildingRepository {
     return {
       ...building,
       single_unit_id: units[0].id,
-      single_unit_status: units[0].status,
+      // El estado que se MUESTRA es el derivado: la columna dice si alguien la marcó a
+      // mano, y una casa alquilada tiene esa marca en «vacante».
+      single_unit_status: effectiveStatus(units[0], new Date().toISOString().slice(0, 10)),
       ownership_summary: ownership.summary,
       ownership_missing: ownership.missing,
       ownership_complete: ownership.complete,

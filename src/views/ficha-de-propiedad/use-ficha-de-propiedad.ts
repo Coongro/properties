@@ -166,7 +166,7 @@ export function useFichaDePropiedadView() {
       { key: 'name', label: 'Unidad' },
       { key: 'detail', label: 'Detalle' },
       {
-        key: 'status',
+        key: 'occupancy',
         label: 'Estado',
         display: 'pill',
         values: [
@@ -177,6 +177,7 @@ export function useFichaDePropiedadView() {
           { value: 'no_disponible', label: 'No disponible', tone: 'outline', icon: 'Ban' },
         ],
       },
+      { key: 'reserved_from', label: 'Comprometida desde', format: 'date', emptyLabel: '—' },
       { key: 'reference_rent', label: 'Alquiler de referencia', display: 'mono', format: 'money' },
     ];
     // el subtítulo se muda bajo el título: fuera de las columnas propias
@@ -815,6 +816,22 @@ export function useFichaDePropiedadView() {
           { value: 'por_vencer', label: 'Por vencer', tone: 'warning' },
           { value: 'vencido', label: 'Vencido', tone: 'danger' },
         ],
+      },
+      {
+        key: 'result',
+        label: 'Resultado',
+        display: 'pill',
+        values: [
+          { value: 'apto', label: 'Apto', tone: 'success', icon: 'CircleCheck' },
+          {
+            value: 'apto_con_observaciones',
+            label: 'Con observaciones',
+            tone: 'warning',
+            icon: 'TriangleAlert',
+          },
+          { value: 'rechazado', label: 'Rechazado', tone: 'danger', icon: 'CircleX' },
+        ],
+        emptyLabel: 'Sin cargar',
       },
       { key: 'expires_at', label: 'Vence', format: 'date' },
     ];

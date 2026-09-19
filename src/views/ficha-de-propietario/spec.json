@@ -151,7 +151,7 @@
                 ]
               },
               {
-                "key": "status",
+                "key": "occupancy",
                 "label": "Estado",
                 "display": "pill",
                 "values": [
@@ -186,6 +186,12 @@
                     "icon": "Ban"
                   }
                 ]
+              },
+              {
+                "key": "reserved_from",
+                "label": "Comprometida desde",
+                "format": "date",
+                "emptyLabel": "—"
               }
             ],
             "actions": [

@@ -35,6 +35,15 @@ export interface UnitListRow extends UnitRow {
   /** Ambientes, baños y superficie en una línea: «3 ambientes · 2 baños · 72 m²». */
   detail: string;
   /**
+   * Cómo está HOY, derivado de las fechas del contrato (`services/occupancy.ts`).
+   *
+   * Va separado de `status` a propósito: `status` es la decisión que alguien tomó y se
+   * puede volver a escribir; esto es un cálculo y no se guarda. Para mostrar en pantalla
+   * se usa ESTE campo; el otro solo viaja para que el formulario de la unidad pueda
+   * editarlo sin inventar.
+   */
+  occupancy: string;
+  /**
    * Desde cuándo está comprometida, si el contrato todavía no empezó. `null` si está
    * libre de verdad o ya ocupada. Sin esto, «vacante» esconde que ya está prometida y
    * alguien la vuelve a ofrecer.
@@ -93,7 +102,13 @@ export class UnitRepository {
     const hoy = new Date().toISOString().slice(0, 10);
     return rows.map((row) => ({
       ...row,
-      status: effectiveStatus(row, hoy),
+      // `status` sale TAL CUAL está guardado y la ocupación viaja aparte, en `occupancy`.
+      // Antes esta proyección pisaba `status` con el estado derivado, y eso volvía por la
+      // puerta de atrás lo que COONG-300 sacó: la fila llega al formulario de la unidad,
+      // que la usa de prefill, y guardar escribía «ocupada» en la columna — el estado
+      // guardado que nadie renueva y que a los dos días miente. Lo que se muestra en una
+      // tabla y lo que se vuelve a escribir no pueden ser el mismo campo.
+      occupancy: effectiveStatus(row, hoy),
       reserved_from: reservedFrom(row, hoy),
       label: unitLabel({
         unitName: row.name,
@@ -123,10 +138,10 @@ export class UnitRepository {
   }
 
   /**
-   * Se niega a que le pidan «ocupada» o «vacante».
+   * Se niega a que le pidan «ocupada».
    *
-   * Esos dos no son estados que alguien fije: se DERIVAN de `occupied_from` /
-   * `occupied_until`, que escribe `leases` al firmar. Hasta ahora el update los
+   * No es un estado que alguien fije: se DERIVA de `occupied_from` /
+   * `occupied_until`, que escribe `leases` al firmar. Hasta ahora el update lo
    * aceptaba, guardaba la columna y devolvía la unidad releída — o sea con el
    * estado derivado de siempre. Respondía «listo» y no cambiaba nada.
    *
@@ -134,12 +149,20 @@ export class UnitRepository {
    * y en la misma respuesta leyó «Estado: Vacante». Una persona frente a la
    * pantalla lo nota; un agente cree que actualizó y sigue de largo. Fallar con
    * el motivo cuesta lo mismo que mentir, y dice dónde está la palanca real.
+   *
+   * **`vacante` sí se acepta, y no es una excepción a la regla: es SACAR la marca.**
+   * La columna es `notNull` y `vacante` es su valor neutro —«acá no hay ninguna
+   * decisión manual, que mande el contrato»—, así que rechazarlo dejaba una unidad
+   * marcada «no disponible» sin ninguna forma de volver atrás desde la pantalla: el
+   * formulario ofrecía el valor y guardar tiraba error. Liberar de verdad sigue sin
+   * pasar por acá —eso son las fechas—, y guardar `vacante` no libera nada: si el
+   * contrato está vigente, `effectiveStatus` sigue diciendo «ocupada».
    */
   async update({ id, data }: { id: string; data: Partial<NewUnitRow> }): Promise<UnitListRow[]> {
     const pedido = String((data as { status?: string }).status ?? '');
-    if (pedido === 'ocupada' || pedido === 'vacante') {
+    if (pedido === 'ocupada') {
       throw new Error(
-        'La ocupación de una unidad no se fija a mano: sale de las fechas del contrato. Para que figure alquilada, firmá el contrato en Contratos; para liberarla, rescindilo o dejá que venza. Acá se elige «no disponible», «en recambio» o «con preaviso».'
+        'Una unidad no se marca «ocupada» a mano: sale de las fechas del contrato. Para que figure alquilada, firmá el contrato en Contratos; para liberarla, rescindilo o dejá que venza. Acá se elige «sin marca», «no disponible», «en recambio» o «con preaviso».'
       );
     }
 
@@ -165,13 +188,25 @@ export class UnitRepository {
   async delete({ id }: { id: string }): Promise<UnitRow[]> {
     return this.db.ormQuery(async (tx) => {
       const [unit] = await tx
-        .select({ name: unitTable.name, status: unitTable.status })
+        .select({
+          name: unitTable.name,
+          status: unitTable.status,
+          occupied_from: unitTable.occupied_from,
+          occupied_until: unitTable.occupied_until,
+        })
         .from(unitTable)
         .where(and(eq(unitTable.id, id), isNull(unitTable.deleted_at)))
         .limit(1);
       if (!unit) return [];
 
-      const blocked = unitDeletionBlockedMessage(unit);
+      // Contra el estado DERIVADO, no contra la columna. Leyendo la columna este freno
+      // no frenaba nada: desde COONG-300 una unidad alquilada tiene ahí «vacante» —el
+      // contrato vive en las fechas—, así que se podía borrar una unidad con contrato
+      // vigente y dejar a `leases` apuntando a algo que ya no está.
+      const blocked = unitDeletionBlockedMessage({
+        ...unit,
+        status: effectiveStatus(unit, new Date().toISOString().slice(0, 10)),
+      });
       if (blocked) throw new Error(blocked);
 
       const deleted_at = new Date().toISOString();

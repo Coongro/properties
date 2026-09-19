@@ -230,6 +230,9 @@ export function FichaDeUnidadView() {
           onSortChange,
           pagination: { page, pageSize: 20, total: visibleRows.length },
           onPageChange: setPage,
+          onRowClick: (row: any) => {
+            views.open('properties.ficha-de-propietario.open', { record: row });
+          },
           actions: ROW_ACTIONS,
           mobileRender: (row: any) =>
             h(
@@ -266,6 +269,37 @@ export function FichaDeUnidadView() {
                       },
                     },
                     renderCell(row, c)
+                  )
+                )
+              ),
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    gap: '4px',
+                    justifyContent: 'flex-end',
+                    borderTop: '1px solid var(--cg-border-light)',
+                    paddingTop: '8px',
+                    marginTop: '2px',
+                  },
+                },
+                ...ROW_ACTIONS.filter((a2: any) => !a2.hidden?.(row)).map((a2: any) =>
+                  h(
+                    UI.Button,
+                    {
+                      key: a2.label,
+                      size: 'sm' as const,
+                      variant:
+                        a2.variant === 'destructive'
+                          ? ('destructive' as const)
+                          : ('ghost' as const),
+                      onClick: (e: any) => {
+                        e.stopPropagation();
+                        a2.onClick(row);
+                      },
+                    },
+                    a2.label
                   )
                 )
               )
@@ -329,6 +363,21 @@ export function FichaDeUnidadView() {
     };
     const renderCell = (row: any, c: any) => {
       const raw = cellText(row, c);
+      if (raw === '' && c.emptyLabel) {
+        return h(
+          'span',
+          {
+            style: {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--cg-text-muted)',
+            },
+          },
+          c.emptyIcon ? h(UI.DynamicIcon, { icon: c.emptyIcon, size: 15 }) : null,
+          c.emptyLabel
+        );
+      }
       const ev = enumVal(c, raw);
       const label = c.format ? formatDate(c.format, raw) : (ev?.label ?? raw);
       const shown = raw !== '' ? (c.prefix ?? '') + label + (c.suffix ?? '') : label;
@@ -428,11 +477,16 @@ export function FichaDeUnidadView() {
         variant: 'destructive' as const,
         icon: 'Trash2',
         onClick: (row: any) => {
-          askConfirm('Eliminar', 'El certificado se elimina de esta unidad.', 'Eliminar', () => {
-            ((row: any) => {
-              void runServerAction('properties.certificates.delete', { id: row.id }, row);
-            })(row);
-          });
+          askConfirm(
+            'Eliminar',
+            'El certificado se va de la lista y deja de avisar cuando vence. Volver a tenerlo es cargarlo de nuevo con su fecha, su resultado y su archivo.',
+            'Eliminar',
+            () => {
+              ((row: any) => {
+                void runServerAction('properties.certificates.delete', { id: row.id }, row);
+              })(row);
+            }
+          );
         },
         hidden: (row: any) => !['unidad'].includes(String(row?.['scope'] ?? '')),
       },

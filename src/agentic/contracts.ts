@@ -1200,8 +1200,10 @@ export const listUnits = defineAction({
         format: 'text',
       },
       {
-        key: 'status',
-        name: 'status',
+        // Cómo está HOY: sale de las fechas del contrato, no de la columna. La columna
+        // `status` sigue existiendo, pero sólo guarda la marca que puso una persona.
+        key: 'occupancy',
+        name: 'occupancy',
         label: 'Estado',
         format: 'text',
         values: [
@@ -1288,8 +1290,10 @@ export const getByIdUnits = defineAction({
         format: 'text',
       },
       {
-        key: 'status',
-        name: 'status',
+        // Cómo está HOY: sale de las fechas del contrato, no de la columna. La columna
+        // `status` sigue existiendo, pero sólo guarda la marca que puso una persona.
+        key: 'occupancy',
+        name: 'occupancy',
         label: 'Estado',
         format: 'text',
         values: [
@@ -1391,9 +1395,9 @@ export const createUnits = defineAction({
           },
           status: {
             type: 'string',
-            enum: ['vacante', 'ocupada', 'en_recambio', 'con_preaviso', 'no_disponible'],
+            enum: ['vacante', 'en_recambio', 'con_preaviso', 'no_disponible'],
             description:
-              'Estado. Opciones: vacante (Vacante), ocupada (Ocupada), en_recambio (En recambio), con_preaviso (Con preaviso), no_disponible (No disponible).',
+              'La marca que pone quien administra, y NO cómo está la unidad: «ocupada» no se escribe acá porque sale de las fechas del contrato (firmá o rescindí en Contratos). «vacante» significa sacar la marca. Opciones: vacante (Sin marca), en_recambio (En recambio), con_preaviso (Con preaviso), no_disponible (No disponible).',
           },
           reference_rent: {
             type: 'string',
@@ -1405,7 +1409,7 @@ export const createUnits = defineAction({
             description: 'Notas',
           },
         },
-        required: ['building_id', 'name', 'status'],
+        required: ['building_id', 'name'],
         additionalProperties: false,
       },
     },
@@ -1440,8 +1444,10 @@ export const createUnits = defineAction({
         format: 'text',
       },
       {
-        key: 'status',
-        name: 'status',
+        // Cómo está HOY: sale de las fechas del contrato, no de la columna. La columna
+        // `status` sigue existiendo, pero sólo guarda la marca que puso una persona.
+        key: 'occupancy',
+        name: 'occupancy',
         label: 'Estado',
         format: 'text',
         values: [
@@ -1599,8 +1605,10 @@ export const updateUnits = defineAction({
         format: 'text',
       },
       {
-        key: 'status',
-        name: 'status',
+        // Cómo está HOY: sale de las fechas del contrato, no de la columna. La columna
+        // `status` sigue existiendo, pero sólo guarda la marca que puso una persona.
+        key: 'occupancy',
+        name: 'occupancy',
         label: 'Estado',
         format: 'text',
         values: [
@@ -2108,8 +2116,10 @@ export const listByBuildingUnits = defineAction({
         format: 'text',
       },
       {
-        key: 'status',
-        name: 'status',
+        // Cómo está HOY: sale de las fechas del contrato, no de la columna. La columna
+        // `status` sigue existiendo, pero sólo guarda la marca que puso una persona.
+        key: 'occupancy',
+        name: 'occupancy',
         label: 'Estado',
         format: 'text',
         values: [
@@ -2925,8 +2935,9 @@ export const listUnitsOfUnitOwners = defineAction({
         ],
       },
       {
-        key: 'status',
-        name: 'status',
+        // Derivado de las fechas del contrato, igual que en el resto de las unidades.
+        key: 'occupancy',
+        name: 'occupancy',
         label: 'Estado',
         format: 'text',
         values: [

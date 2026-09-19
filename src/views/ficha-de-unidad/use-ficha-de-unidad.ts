@@ -406,6 +406,22 @@ export function useFichaDeUnidadView() {
           { value: 'vencido', label: 'Vencido', tone: 'danger' },
         ],
       },
+      {
+        key: 'result',
+        label: 'Resultado',
+        display: 'pill',
+        values: [
+          { value: 'apto', label: 'Apto', tone: 'success', icon: 'CircleCheck' },
+          {
+            value: 'apto_con_observaciones',
+            label: 'Con observaciones',
+            tone: 'warning',
+            icon: 'TriangleAlert',
+          },
+          { value: 'rechazado', label: 'Rechazado', tone: 'danger', icon: 'CircleX' },
+        ],
+        emptyLabel: 'Sin cargar',
+      },
       { key: 'expires_at', label: 'Vence', format: 'date' },
     ];
     // el subtítulo se muda bajo el título: fuera de las columnas propias

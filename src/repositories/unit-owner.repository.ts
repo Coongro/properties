@@ -1,18 +1,20 @@
 import { ContactRepository, contactTable } from '@coongro/contacts/server';
 import type { NewContactRow } from '@coongro/contacts/server';
 import type { ModuleDatabaseAPI } from '@coongro/plugin-sdk';
-import { and, asc, eq, isNull, ne, sql, type SQL } from 'drizzle-orm';
+import { and, asc, eq, getTableColumns, isNull, ne, sql, type SQL } from 'drizzle-orm';
 
 import { buildingTable } from '../schema/building.js';
 import { unitOwnerTable } from '../schema/unit-owner.js';
 import type { UnitOwnerRow, NewUnitOwnerRow } from '../schema/unit-owner.js';
 import { unitTable } from '../schema/unit.js';
+import type { UnitRow } from '../schema/unit.js';
 import {
   documentKey,
   findSamePerson,
   samePersonMessage,
   type PersonIdentity,
 } from '../services/duplicate-person.js';
+import { effectiveStatus } from '../services/occupancy.js';
 import {
   DEFAULT_OWNER_ROLE,
   OWNER_ROLES,
@@ -22,7 +24,7 @@ import {
   summarizeOwnership,
 } from '../services/ownership-shares.js';
 import type { OwnerRole, OwnershipSummary } from '../services/ownership-shares.js';
-import { unitLabel } from '../services/unit-identity.js';
+import { unitDetail, unitLabel } from '../services/unit-identity.js';
 
 import { buildingAddressSql } from './building.repository.js';
 
@@ -78,8 +80,18 @@ export interface OwnerInput {
  * y con qué carácter.
  */
 export interface UnitOwnerListRow {
-  /** El id del VÍNCULO, no el de la persona. */
+  /**
+   * El id de la PERSONA.
+   *
+   * Era el del vínculo, y por eso la fila de «Titulares» no llevaba a ningún lado: una
+   * fila de una tabla se lee como el registro que muestra —acá, un titular—, así que
+   * clickearla tiene que abrir a esa persona. Con el id del vínculo, la ficha del
+   * propietario se pedía con una clave que no existe entre los contactos y abría vacía.
+   * El vínculo sigue disponible en `ownership_id` para lo que sí es del vínculo.
+   */
   id: string;
+  /** El id del VÍNCULO unidad–persona. Lo que se da de baja al quitar un titular. */
+  ownership_id: string;
   /**
    * La unidad a la que pertenece este vínculo. Viaja en la fila para que dar de baja a un
    * titular no dependa de qué pantalla lo pide: la acción de fila recibe la fila, no el
@@ -96,23 +108,32 @@ export interface UnitOwnerListRow {
   photo_url: string | null;
 }
 
-/** Una unidad a nombre de una persona, como la muestra su ficha. */
-export interface OwnerUnitRow {
-  /** El id del VÍNCULO. */
-  id: string;
-  unit_id: string;
+/**
+ * Una unidad a nombre de una persona, como la muestra su ficha.
+ *
+ * **La fila ES la unidad**, con el vínculo anotado encima. Antes era al revés —el
+ * vínculo con el nombre de la unidad al lado— y eso rompía todo lo que cuelga de
+ * clickearla: la ficha de unidad se abría con el id del vínculo, así que no encontraba
+ * ni sus titulares ni sus certificados, y «Editar unidad» abría el formulario en blanco
+ * porque la fila no traía ninguno de los campos que edita. Una fila que se puede abrir
+ * tiene que ser el registro que promete.
+ */
+export interface OwnerUnitRow extends UnitRow {
+  /** El id del VÍNCULO unidad–persona. */
+  ownership_id: string;
   contact_id: string;
   /** Nombre calificado: «Belgrano 1240 · 1°A» — una unidad suelta no identifica nada. */
   label: string;
   unit_name: string;
   building_name: string | null;
   building_address: string | null;
-  share_pct: string | null;
+  /** Qué parte de la unidad es de esta persona. La alícuota de expensas es `share_pct`. */
+  ownership_share_pct: string | null;
   /** «50 %», o «Sin definir» cuando la parte todavía no se cargó. */
   share_label: string;
   role: string;
-  /** Estado de ocupación de la unidad, con el vocabulario de siempre. */
-  status: string | null;
+  /** Cómo está HOY, derivado de las fechas. `status` es lo guardado. */
+  occupancy: string;
 }
 
 /** Lo que se va a escribir en el vínculo, ya validado contra el resto de los dueños. */
@@ -186,15 +207,16 @@ export class UnitOwnerRepository {
     const rows = await this.db.ormQuery((tx) =>
       tx
         .select({
-          id: unitOwnerTable.id,
+          // La unidad entera: es lo que la fila representa y lo que se abre al clickearla.
+          ...getTableColumns(unitTable),
+          ownership_id: unitOwnerTable.id,
           unit_id: unitOwnerTable.unit_id,
           contact_id: unitOwnerTable.contact_id,
-          share_pct: unitOwnerTable.share_pct,
+          ownership_share_pct: unitOwnerTable.share_pct,
           role: unitOwnerTable.role,
           unit_name: unitTable.name,
           building_name: buildingTable.name,
           building_address: buildingAddressSql,
-          status: unitTable.status,
         })
         .from(unitOwnerTable)
         .innerJoin(unitTable, eq(unitTable.id, unitOwnerTable.unit_id))
@@ -209,6 +231,7 @@ export class UnitOwnerRepository {
         .orderBy(asc(buildingTable.name), asc(unitTable.name))
     );
 
+    const hoy = new Date().toISOString().slice(0, 10);
     return rows.map((f) => ({
       ...f,
       label: unitLabel({
@@ -216,7 +239,14 @@ export class UnitOwnerRepository {
         buildingName: f.building_name,
         buildingAddress: f.building_address,
       }),
-      share_label: f.share_pct === null ? 'Sin definir' : `${Number(f.share_pct)} %`,
+      // La ocupación se deriva acá con el mismo criterio que en `units`: mostrar el estado
+      // guardado diría «vacante» de una unidad alquilada.
+      occupancy: effectiveStatus(f, hoy),
+      // «3 ambientes · 2 baños · 72 m²»: lo mismo que arma `units`, porque desde acá se
+      // abre la misma ficha y su encabezado lo espera.
+      detail: unitDetail(f),
+      share_label:
+        f.ownership_share_pct === null ? 'Sin definir' : `${Number(f.ownership_share_pct)} %`,
       role: f.role ?? DEFAULT_OWNER_ROLE,
     }));
   }
@@ -226,7 +256,8 @@ export class UnitOwnerRepository {
     const rows = await this.db.ormQuery((tx) =>
       tx
         .select({
-          id: unitOwnerTable.id,
+          id: contactTable.id,
+          ownership_id: unitOwnerTable.id,
           unit_id: unitOwnerTable.unit_id,
           contact_id: unitOwnerTable.contact_id,
           share_pct: unitOwnerTable.share_pct,

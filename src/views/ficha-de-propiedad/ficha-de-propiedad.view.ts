@@ -76,14 +76,45 @@ export function FichaDePropiedadView() {
       outline: 'outline',
     };
     const enumVal = (c: any, raw: string) => (c.values ?? []).find((e: any) => e.value === raw);
+    const formatDate = (fmt: string, raw: string) => {
+      const s = String(raw ?? '');
+      const only = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+      if (only) return only[3] + '/' + only[2] + '/' + only[1];
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return s;
+      const p = (n: number) => String(n).padStart(2, '0');
+      const dmy = p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear();
+      const hm = p(d.getHours()) + ':' + p(d.getMinutes());
+      return fmt === 'datetime' ? dmy + ' ' + hm : fmt === 'time' ? hm : dmy;
+    };
     const formatMoney = (raw: string) => {
       const n = Number(raw);
       return isNaN(n) ? raw : '$' + n.toLocaleString('es-AR');
     };
     const renderCell = (row: any, c: any) => {
       const raw = cellText(row, c);
+      if (raw === '' && c.emptyLabel) {
+        return h(
+          'span',
+          {
+            style: {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--cg-text-muted)',
+            },
+          },
+          c.emptyIcon ? h(UI.DynamicIcon, { icon: c.emptyIcon, size: 15 }) : null,
+          c.emptyLabel
+        );
+      }
       const ev = enumVal(c, raw);
-      const label = c.format === 'money' ? formatMoney(raw) : (ev?.label ?? raw);
+      const label =
+        c.format === 'money'
+          ? formatMoney(raw)
+          : c.format
+            ? formatDate(c.format, raw)
+            : (ev?.label ?? raw);
       const shown = raw !== '' ? (c.prefix ?? '') + label + (c.suffix ?? '') : label;
       if (c.display === 'avatar') {
         const initial = (String(raw).trim().charAt(0) || '?').toUpperCase();
@@ -557,6 +588,9 @@ export function FichaDePropiedadView() {
           onSortChange,
           pagination: { page, pageSize: 20, total: visibleRows.length },
           onPageChange: setPage,
+          onRowClick: (row: any) => {
+            views.open('properties.ficha-de-propietario.open', { record: row });
+          },
           actions: ROW_ACTIONS,
           mobileRender: (row: any) =>
             h(
@@ -781,7 +815,7 @@ export function FichaDePropiedadView() {
         onClick: (row: any) => {
           askConfirm(
             'Eliminar',
-            'La expensa del período se elimina de esta propiedad.',
+            'La liquidación del período se va de la propiedad y los meses que se facturen desde ahora vuelven a las expensas pactadas en cada contrato. Los recibos ya emitidos no cambian.',
             'Eliminar',
             () => {
               ((row: any) => {
@@ -998,6 +1032,21 @@ export function FichaDePropiedadView() {
     };
     const renderCell = (row: any, c: any) => {
       const raw = cellText(row, c);
+      if (raw === '' && c.emptyLabel) {
+        return h(
+          'span',
+          {
+            style: {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--cg-text-muted)',
+            },
+          },
+          c.emptyIcon ? h(UI.DynamicIcon, { icon: c.emptyIcon, size: 15 }) : null,
+          c.emptyLabel
+        );
+      }
       const ev = enumVal(c, raw);
       const label = c.format ? formatDate(c.format, raw) : (ev?.label ?? raw);
       const shown = raw !== '' ? (c.prefix ?? '') + label + (c.suffix ?? '') : label;
@@ -1097,11 +1146,16 @@ export function FichaDePropiedadView() {
         variant: 'destructive' as const,
         icon: 'Trash2',
         onClick: (row: any) => {
-          askConfirm('Eliminar', 'El certificado se elimina de esta propiedad.', 'Eliminar', () => {
-            ((row: any) => {
-              void runServerAction('properties.certificates.delete', { id: row.id }, row);
-            })(row);
-          });
+          askConfirm(
+            'Eliminar',
+            'El certificado se va de la lista y deja de avisar cuando vence. Volver a tenerlo es cargarlo de nuevo con su fecha, su resultado y su archivo.',
+            'Eliminar',
+            () => {
+              ((row: any) => {
+                void runServerAction('properties.certificates.delete', { id: row.id }, row);
+              })(row);
+            }
+          );
         },
       },
     ];

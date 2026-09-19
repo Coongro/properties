@@ -93,20 +93,15 @@
           "kind": "field",
           "name": "status",
           "fieldType": "enum",
-          "label": "Estado",
+          "label": "Disponibilidad",
           "validations": [
             "required"
           ],
           "options": [
             {
               "value": "vacante",
-              "label": "Vacante",
-              "icon": "DoorOpen"
-            },
-            {
-              "value": "ocupada",
-              "label": "Ocupada",
-              "icon": "UserCheck"
+              "label": "Sin marca (según el contrato)",
+              "icon": "CircleDot"
             },
             {
               "value": "en_recambio",
