@@ -815,7 +815,7 @@ export function FichaDePropiedadView() {
         onClick: (row: any) => {
           askConfirm(
             'Eliminar',
-            'La expensa del período se elimina de esta propiedad.',
+            'La liquidación del período se va de la propiedad y los meses que se facturen desde ahora vuelven a las expensas pactadas en cada contrato. Los recibos ya emitidos no cambian.',
             'Eliminar',
             () => {
               ((row: any) => {
@@ -1146,11 +1146,16 @@ export function FichaDePropiedadView() {
         variant: 'destructive' as const,
         icon: 'Trash2',
         onClick: (row: any) => {
-          askConfirm('Eliminar', 'El certificado se elimina de esta propiedad.', 'Eliminar', () => {
-            ((row: any) => {
-              void runServerAction('properties.certificates.delete', { id: row.id }, row);
-            })(row);
-          });
+          askConfirm(
+            'Eliminar',
+            'El certificado se va de la lista y deja de avisar cuando vence. Volver a tenerlo es cargarlo de nuevo con su fecha, su resultado y su archivo.',
+            'Eliminar',
+            () => {
+              ((row: any) => {
+                void runServerAction('properties.certificates.delete', { id: row.id }, row);
+              })(row);
+            }
+          );
         },
       },
     ];

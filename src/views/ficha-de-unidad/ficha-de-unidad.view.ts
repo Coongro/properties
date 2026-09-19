@@ -477,11 +477,16 @@ export function FichaDeUnidadView() {
         variant: 'destructive' as const,
         icon: 'Trash2',
         onClick: (row: any) => {
-          askConfirm('Eliminar', 'El certificado se elimina de esta unidad.', 'Eliminar', () => {
-            ((row: any) => {
-              void runServerAction('properties.certificates.delete', { id: row.id }, row);
-            })(row);
-          });
+          askConfirm(
+            'Eliminar',
+            'El certificado se va de la lista y deja de avisar cuando vence. Volver a tenerlo es cargarlo de nuevo con su fecha, su resultado y su archivo.',
+            'Eliminar',
+            () => {
+              ((row: any) => {
+                void runServerAction('properties.certificates.delete', { id: row.id }, row);
+              })(row);
+            }
+          );
         },
         hidden: (row: any) => !['unidad'].includes(String(row?.['scope'] ?? '')),
       },
