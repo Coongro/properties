@@ -4,7 +4,7 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { getHostReact, getHostUI, useIsMobile, views } from '@coongro/plugin-sdk';
+import { getHostReact, getHostUI, useAccess, useIsMobile, views } from '@coongro/plugin-sdk';
 
 import { useFichaDeUnidadView } from './use-ficha-de-unidad.js';
 
@@ -15,6 +15,7 @@ const h = React.createElement;
 const UI = getHostUI() as any;
 
 export function FichaDeUnidadView() {
+  const access = useAccess();
   const isMobile = useIsMobile();
   // Tono del badge: el que devuelven los datos, y si no el del diseño.
   // ⚠️ MISMO mapa que el TONE_VARIANT de las tablas: el mismo estado tiene
@@ -198,6 +199,7 @@ export function FichaDeUnidadView() {
             }
           );
         },
+        hidden: () => !access.canRun('properties.unitOwners.removeOwner'),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -488,7 +490,9 @@ export function FichaDeUnidadView() {
             }
           );
         },
-        hidden: (row: any) => !['unidad'].includes(String(row?.['scope'] ?? '')),
+        hidden: (row: any) =>
+          !access.canRun('properties.certificates.delete') ||
+          !['unidad'].includes(String(row?.['scope'] ?? '')),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -750,20 +754,22 @@ export function FichaDeUnidadView() {
           h(
             'div',
             { style: { display: 'flex', gap: '9px', flexShrink: 0 } },
-            h(
-              UI.Button,
-              {
-                variant: 'secondary',
-                onClick: () => {
-                  views.open(
-                    'properties.unidad.open',
-                    { record: (views.params as any)?.record ?? null },
-                    { mode: 'sheet' }
-                  );
-                },
-              },
-              'Editar unidad'
-            )
+            access.canOpen('properties.unidad.open')
+              ? h(
+                  UI.Button,
+                  {
+                    variant: 'secondary',
+                    onClick: () => {
+                      views.open(
+                        'properties.unidad.open',
+                        { record: (views.params as any)?.record ?? null },
+                        { mode: 'sheet' }
+                      );
+                    },
+                  },
+                  'Editar unidad'
+                )
+              : null
           )
         )
       ),
@@ -1088,16 +1094,18 @@ export function FichaDeUnidadView() {
               h(
                 'div',
                 { style: { display: 'flex', justifyContent: 'flex-end' } },
-                h(
-                  UI.Button,
-                  {
-                    variant: 'secondary',
-                    onClick: () => {
-                      views.open('properties.propietario.open', undefined, { mode: 'dialog' });
-                    },
-                  },
-                  'Agregar titular'
-                )
+                access.canOpen('properties.propietario.open')
+                  ? h(
+                      UI.Button,
+                      {
+                        variant: 'secondary',
+                        onClick: () => {
+                          views.open('properties.propietario.open', undefined, { mode: 'dialog' });
+                        },
+                      },
+                      'Agregar titular'
+                    )
+                  : null
               )
             ),
             h(
@@ -1160,23 +1168,25 @@ export function FichaDeUnidadView() {
               h(
                 'div',
                 { style: { display: 'flex', justifyContent: 'flex-end' } },
-                h(
-                  UI.Button,
-                  {
-                    variant: 'secondary',
-                    onClick: () => {
-                      views.open(
-                        'properties.certificado.open',
-                        {
-                          parentRecord: (views.params as any)?.record ?? null,
-                          parentEntity: 'properties.units',
+                access.canOpen('properties.certificado.open')
+                  ? h(
+                      UI.Button,
+                      {
+                        variant: 'secondary',
+                        onClick: () => {
+                          views.open(
+                            'properties.certificado.open',
+                            {
+                              parentRecord: (views.params as any)?.record ?? null,
+                              parentEntity: 'properties.units',
+                            },
+                            { mode: 'sheet' }
+                          );
                         },
-                        { mode: 'sheet' }
-                      );
-                    },
-                  },
-                  'Registrar certificado'
-                )
+                      },
+                      'Registrar certificado'
+                    )
+                  : null
               )
             ),
             h(
