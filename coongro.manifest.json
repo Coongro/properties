@@ -2856,7 +2856,226 @@
     "actionContracts": "./dist/agentic/contracts.js",
     "copilotCatalogFingerprint": "f33e543c9901700e6971d2dba2d9a626",
     "copilotCatalogContentFingerprint": "3a0634dc798a11f879a51f6a4da2a5b8",
-    "copilotCatalogRuntimeFingerprint": "cb4770eb9d3ea3be76e4d72498ec49c0"
+    "copilotCatalogRuntimeFingerprint": "cb4770eb9d3ea3be76e4d72498ec49c0",
+    "permissions": [
+      {
+        "id": "properties.buildingExpenses.manage",
+        "label": "Gestionar liquidaciones de expensas",
+        "effect": "write",
+        "grants": {
+          "actions": [
+            "properties.buildingExpenses.create",
+            "properties.buildingExpenses.restore",
+            "properties.buildingExpenses.update"
+          ],
+          "views": ["properties.expensas-del-mes.open"]
+        },
+        "requires": [
+          "properties.buildingExpenses.read",
+          "properties.buildings.read"
+        ],
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.buildingExpenses.delete",
+        "label": "Eliminar liquidaciones de expensas",
+        "effect": "destructive",
+        "grants": { "actions": ["properties.buildingExpenses.delete"] },
+        "requires": ["properties.buildingExpenses.read"],
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.buildingExpenses.read",
+        "label": "Ver liquidaciones de expensas",
+        "effect": "read",
+        "grants": {
+          "actions": [
+            "properties.buildingExpenses.forBuilding",
+            "properties.buildingExpenses.forPeriod",
+            "properties.buildingExpenses.getById",
+            "properties.buildingExpenses.list"
+          ]
+        },
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.buildings.manage",
+        "label": "Gestionar propiedades",
+        "effect": "write",
+        "grants": {
+          "actions": [
+            "properties.buildings.create",
+            "properties.buildings.restore",
+            "properties.buildings.update"
+          ],
+          "views": ["properties.propiedad.open"]
+        },
+        "requires": ["properties.buildings.read"],
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.buildings.delete",
+        "label": "Eliminar propiedades",
+        "effect": "destructive",
+        "grants": { "actions": ["properties.buildings.delete"] },
+        "requires": ["properties.buildings.read"],
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.buildings.read",
+        "label": "Ver propiedades",
+        "effect": "read",
+        "grants": {
+          "actions": [
+            "properties.buildings.getById",
+            "properties.buildings.getSummary",
+            "properties.buildings.list"
+          ],
+          "views": [
+            "properties.ficha-de-propiedad.open",
+            "properties.propiedades.open"
+          ]
+        },
+        "requires": [
+          "properties.buildingExpenses.read",
+          "properties.certificates.read",
+          "properties.unitOwners.read",
+          "properties.units.read"
+        ],
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.certificates.manage",
+        "label": "Gestionar certificados",
+        "effect": "write",
+        "grants": {
+          "actions": [
+            "properties.certificates.create",
+            "properties.certificates.restore",
+            "properties.certificates.update"
+          ],
+          "views": ["properties.certificado.open"]
+        },
+        "requires": [
+          "properties.buildings.read",
+          "properties.certificates.read",
+          "properties.units.read"
+        ],
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.certificates.delete",
+        "label": "Eliminar certificados",
+        "effect": "destructive",
+        "grants": { "actions": ["properties.certificates.delete"] },
+        "requires": ["properties.certificates.read"],
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.certificates.read",
+        "label": "Ver certificados",
+        "effect": "read",
+        "grants": {
+          "actions": [
+            "properties.certificates.getById",
+            "properties.certificates.list",
+            "properties.certificates.listByBuilding",
+            "properties.certificates.listByUnit"
+          ]
+        },
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.unitOwners.manage",
+        "label": "Gestionar propietarios",
+        "effect": "write",
+        "grants": {
+          "actions": [
+            "properties.unitOwners.create",
+            "properties.unitOwners.restore",
+            "properties.unitOwners.saveOwner",
+            "properties.unitOwners.update"
+          ],
+          "views": ["properties.propietario.open"]
+        },
+        "requires": ["properties.unitOwners.read", "properties.units.read"],
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.unitOwners.delete",
+        "label": "Eliminar propietarios",
+        "effect": "destructive",
+        "grants": {
+          "actions": [
+            "properties.unitOwners.delete",
+            "properties.unitOwners.deleteOwner",
+            "properties.unitOwners.removeOwner"
+          ]
+        },
+        "requires": ["properties.unitOwners.read"],
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.unitOwners.read",
+        "label": "Ver propietarios",
+        "effect": "read",
+        "grants": {
+          "actions": [
+            "properties.unitOwners.getById",
+            "properties.unitOwners.getOwner",
+            "properties.unitOwners.list",
+            "properties.unitOwners.listByBuilding",
+            "properties.unitOwners.listByUnit",
+            "properties.unitOwners.listOwners",
+            "properties.unitOwners.listUnitsOf",
+            "properties.unitOwners.ownershipOf"
+          ],
+          "views": [
+            "properties.ficha-de-propietario.open",
+            "properties.propietarios.open"
+          ]
+        },
+        "generatedBy": "builder"
+      },
+      {
+        "id": "properties.units.manage",
+        "label": "Gestionar unidades",
+        "effect": "write",
+        "grants": {
+          "actions": [
+            "properties.units.create",
+            "properties.units.restore",
+            "properties.units.update"
+          ],
+          "views": ["properties.unidad.open"]
+        },
+        "requires": ["properties.buildings.read", "properties.units.read"]
+      },
+      {
+        "id": "properties.units.delete",
+        "label": "Eliminar unidades",
+        "effect": "destructive",
+        "grants": { "actions": ["properties.units.delete"] },
+        "requires": ["properties.units.read"]
+      },
+      {
+        "id": "properties.units.read",
+        "label": "Ver unidades",
+        "effect": "read",
+        "grants": {
+          "actions": [
+            "properties.units.getById",
+            "properties.units.list",
+            "properties.units.listByBuilding"
+          ],
+          "views": ["properties.ficha-de-unidad.open"]
+        },
+        "requires": [
+          "properties.certificates.read",
+          "properties.unitOwners.read"
+        ]
+      }
+    ]
   },
   "initView": null
 }
