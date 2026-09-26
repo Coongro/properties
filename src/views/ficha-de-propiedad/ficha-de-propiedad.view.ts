@@ -4,7 +4,7 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { getHostReact, getHostUI, useIsMobile, views } from '@coongro/plugin-sdk';
+import { getHostReact, getHostUI, useAccess, useIsMobile, views } from '@coongro/plugin-sdk';
 
 import { useFichaDePropiedadView } from './use-ficha-de-propiedad.js';
 
@@ -15,6 +15,7 @@ const h = React.createElement;
 const UI = getHostUI() as any;
 
 export function FichaDePropiedadView() {
+  const access = useAccess();
   const isMobile = useIsMobile();
   // Tono del badge: el que devuelven los datos, y si no el del diseño.
   // ⚠️ MISMO mapa que el TONE_VARIANT de las tablas: el mismo estado tiene
@@ -213,6 +214,7 @@ export function FichaDePropiedadView() {
         onClick: (row: any) => {
           views.open('properties.unidad.open', { record: row }, { mode: 'sheet' });
         },
+        hidden: () => !access.canOpen('properties.unidad.open'),
       },
       {
         label: 'Eliminar',
@@ -230,6 +232,7 @@ export function FichaDePropiedadView() {
             }
           );
         },
+        hidden: () => !access.canRun('properties.units.delete'),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -556,6 +559,7 @@ export function FichaDePropiedadView() {
             }
           );
         },
+        hidden: () => !access.canRun('properties.unitOwners.removeOwner'),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -824,6 +828,7 @@ export function FichaDePropiedadView() {
             }
           );
         },
+        hidden: () => !access.canRun('properties.buildingExpenses.delete'),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -1157,6 +1162,7 @@ export function FichaDePropiedadView() {
             }
           );
         },
+        hidden: () => !access.canRun('properties.certificates.delete'),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -1670,20 +1676,22 @@ export function FichaDePropiedadView() {
           h(
             'div',
             { style: { display: 'flex', gap: '9px', flexShrink: 0 } },
-            h(
-              UI.Button,
-              {
-                variant: 'secondary',
-                onClick: () => {
-                  views.open(
-                    'properties.propiedad.open',
-                    { record: (views.params as any)?.record ?? null },
-                    { mode: 'dialog' }
-                  );
-                },
-              },
-              'Editar propiedad'
-            )
+            access.canOpen('properties.propiedad.open')
+              ? h(
+                  UI.Button,
+                  {
+                    variant: 'secondary',
+                    onClick: () => {
+                      views.open(
+                        'properties.propiedad.open',
+                        { record: (views.params as any)?.record ?? null },
+                        { mode: 'dialog' }
+                      );
+                    },
+                  },
+                  'Editar propiedad'
+                )
+              : null
           )
         )
       ),
@@ -2276,23 +2284,25 @@ export function FichaDePropiedadView() {
                   h(
                     'div',
                     { style: { display: 'flex', justifyContent: 'flex-end' } },
-                    h(
-                      UI.Button,
-                      {
-                        variant: 'secondary',
-                        onClick: () => {
-                          views.open(
-                            'properties.unidad.open',
-                            {
-                              parentRecord: (views.params as any)?.record ?? null,
-                              parentEntity: 'properties.buildings',
+                    access.canOpen('properties.unidad.open')
+                      ? h(
+                          UI.Button,
+                          {
+                            variant: 'secondary',
+                            onClick: () => {
+                              views.open(
+                                'properties.unidad.open',
+                                {
+                                  parentRecord: (views.params as any)?.record ?? null,
+                                  parentEntity: 'properties.buildings',
+                                },
+                                { mode: 'sheet' }
+                              );
                             },
-                            { mode: 'sheet' }
-                          );
-                        },
-                      },
-                      'Nueva unidad'
-                    )
+                          },
+                          'Nueva unidad'
+                        )
+                      : null
                   )
                 ),
                 h(
@@ -2364,16 +2374,20 @@ export function FichaDePropiedadView() {
                   h(
                     'div',
                     { style: { display: 'flex', justifyContent: 'flex-end' } },
-                    h(
-                      UI.Button,
-                      {
-                        variant: 'secondary',
-                        onClick: () => {
-                          views.open('properties.propietario.open', undefined, { mode: 'dialog' });
-                        },
-                      },
-                      'Agregar titular'
-                    )
+                    access.canOpen('properties.propietario.open')
+                      ? h(
+                          UI.Button,
+                          {
+                            variant: 'secondary',
+                            onClick: () => {
+                              views.open('properties.propietario.open', undefined, {
+                                mode: 'dialog',
+                              });
+                            },
+                          },
+                          'Agregar titular'
+                        )
+                      : null
                   )
                 ),
                 h(
@@ -2470,23 +2484,25 @@ export function FichaDePropiedadView() {
                     h(
                       'div',
                       { style: { display: 'flex', justifyContent: 'flex-end' } },
-                      h(
-                        UI.Button,
-                        {
-                          variant: 'secondary',
-                          onClick: () => {
-                            views.open(
-                              'properties.expensas-del-mes.open',
-                              {
-                                parentRecord: (views.params as any)?.record ?? null,
-                                parentEntity: 'properties.buildings',
+                      access.canOpen('properties.expensas-del-mes.open')
+                        ? h(
+                            UI.Button,
+                            {
+                              variant: 'secondary',
+                              onClick: () => {
+                                views.open(
+                                  'properties.expensas-del-mes.open',
+                                  {
+                                    parentRecord: (views.params as any)?.record ?? null,
+                                    parentEntity: 'properties.buildings',
+                                  },
+                                  { mode: 'dialog' }
+                                );
                               },
-                              { mode: 'dialog' }
-                            );
-                          },
-                        },
-                        'Cargar mes'
-                      )
+                            },
+                            'Cargar mes'
+                          )
+                        : null
                     )
                   ),
                   h(
@@ -2568,23 +2584,25 @@ export function FichaDePropiedadView() {
                     h(
                       'div',
                       { style: { display: 'flex', justifyContent: 'flex-end' } },
-                      h(
-                        UI.Button,
-                        {
-                          variant: 'secondary',
-                          onClick: () => {
-                            views.open(
-                              'properties.certificado.open',
-                              {
-                                parentRecord: (views.params as any)?.record ?? null,
-                                parentEntity: 'properties.buildings',
+                      access.canOpen('properties.certificado.open')
+                        ? h(
+                            UI.Button,
+                            {
+                              variant: 'secondary',
+                              onClick: () => {
+                                views.open(
+                                  'properties.certificado.open',
+                                  {
+                                    parentRecord: (views.params as any)?.record ?? null,
+                                    parentEntity: 'properties.buildings',
+                                  },
+                                  { mode: 'sheet' }
+                                );
                               },
-                              { mode: 'sheet' }
-                            );
-                          },
-                        },
-                        'Registrar certificado'
-                      )
+                            },
+                            'Registrar certificado'
+                          )
+                        : null
                     )
                   ),
                   h(

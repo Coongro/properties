@@ -4,7 +4,7 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { getHostReact, getHostUI, useIsMobile, views } from '@coongro/plugin-sdk';
+import { getHostReact, getHostUI, useAccess, useIsMobile, views } from '@coongro/plugin-sdk';
 
 import { useFichaDePropietarioView } from './use-ficha-de-propietario.js';
 
@@ -15,6 +15,7 @@ const h = React.createElement;
 const UI = getHostUI() as any;
 
 export function FichaDePropietarioView() {
+  const access = useAccess();
   const isMobile = useIsMobile();
   // Tono del badge: el que devuelven los datos, y si no el del diseño.
   // ⚠️ MISMO mapa que el TONE_VARIANT de las tablas: el mismo estado tiene
@@ -203,6 +204,7 @@ export function FichaDePropietarioView() {
           }
         );
       },
+      hidden: () => !access.canRun('properties.unitOwners.removeOwner'),
     },
   ];
   const renderTable = () =>
@@ -417,20 +419,22 @@ export function FichaDePropietarioView() {
           h(
             'div',
             { style: { display: 'flex', gap: '9px', flexShrink: 0 } },
-            h(
-              UI.Button,
-              {
-                variant: 'secondary',
-                onClick: () => {
-                  views.open(
-                    'properties.propietario.open',
-                    { record: (views.params as any)?.record ?? null },
-                    { mode: 'dialog' }
-                  );
-                },
-              },
-              'Editar propietario'
-            )
+            access.canOpen('properties.propietario.open')
+              ? h(
+                  UI.Button,
+                  {
+                    variant: 'secondary',
+                    onClick: () => {
+                      views.open(
+                        'properties.propietario.open',
+                        { record: (views.params as any)?.record ?? null },
+                        { mode: 'dialog' }
+                      );
+                    },
+                  },
+                  'Editar propietario'
+                )
+              : null
           )
         )
       ),
@@ -839,13 +843,7 @@ export function FichaDePropietarioView() {
                     { 'data-cg-block-id': 'kv_cobro', style: { display: 'contents' } },
                     h(
                       'div',
-                      {
-                        style: {
-                          display: 'grid',
-                          gridTemplateColumns: 'auto 1fr',
-                          columnGap: '18px',
-                        },
-                      },
+                      { style: { display: 'grid', gridTemplateColumns: 'auto 1fr' } },
                       h(
                         React.Fragment,
                         { key: 'Banco' },
@@ -859,7 +857,7 @@ export function FichaDePropietarioView() {
                               fontSize: '12.5px',
                               fontWeight: 400,
                               color: 'var(--cg-text-muted)',
-                              padding: '8px 0',
+                              padding: '8px 18px 8px 0',
                               borderBottom: '1px solid var(--cg-border-light)',
                             },
                           },
@@ -874,7 +872,9 @@ export function FichaDePropietarioView() {
                               fontWeight: 500,
                               color: 'var(--cg-text)',
                               padding: '8px 0',
-                              textAlign: 'right' as const,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
                               borderBottom: '1px solid var(--cg-border-light)',
                             },
                           },
@@ -894,7 +894,7 @@ export function FichaDePropietarioView() {
                               fontSize: '12.5px',
                               fontWeight: 400,
                               color: 'var(--cg-text-muted)',
-                              padding: '8px 0',
+                              padding: '8px 18px 8px 0',
                               borderBottom: '1px solid var(--cg-border-light)',
                             },
                           },
@@ -909,7 +909,9 @@ export function FichaDePropietarioView() {
                               fontWeight: 500,
                               color: 'var(--cg-text)',
                               padding: '8px 0',
-                              textAlign: 'right' as const,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
                               borderBottom: '1px solid var(--cg-border-light)',
                             },
                           },
@@ -929,7 +931,7 @@ export function FichaDePropietarioView() {
                               fontSize: '12.5px',
                               fontWeight: 400,
                               color: 'var(--cg-text-muted)',
-                              padding: '8px 0',
+                              padding: '8px 18px 8px 0',
                               borderBottom: '1px solid var(--cg-border-light)',
                             },
                           },
@@ -944,7 +946,9 @@ export function FichaDePropietarioView() {
                               fontWeight: 500,
                               color: 'var(--cg-text)',
                               padding: '8px 0',
-                              textAlign: 'right' as const,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
                               borderBottom: '1px solid var(--cg-border-light)',
                             },
                           },
@@ -964,8 +968,7 @@ export function FichaDePropietarioView() {
                               fontSize: '12.5px',
                               fontWeight: 400,
                               color: 'var(--cg-text-muted)',
-                              padding: '8px 0',
-                              borderBottom: '1px solid var(--cg-border-light)',
+                              padding: '8px 18px 8px 0',
                             },
                           },
                           h(UI.DynamicIcon, { icon: 'CreditCard', size: 14 }),
@@ -979,8 +982,9 @@ export function FichaDePropietarioView() {
                               fontWeight: 500,
                               color: 'var(--cg-text)',
                               padding: '8px 0',
-                              textAlign: 'right' as const,
-                              borderBottom: '1px solid var(--cg-border-light)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
                             },
                           },
                           metric(
@@ -1065,13 +1069,7 @@ export function FichaDePropietarioView() {
                     { 'data-cg-block-id': 'kv_contacto', style: { display: 'contents' } },
                     h(
                       'div',
-                      {
-                        style: {
-                          display: 'grid',
-                          gridTemplateColumns: 'auto 1fr',
-                          columnGap: '18px',
-                        },
-                      },
+                      { style: { display: 'grid', gridTemplateColumns: 'auto 1fr' } },
                       h(
                         React.Fragment,
                         { key: 'Email' },
@@ -1085,7 +1083,7 @@ export function FichaDePropietarioView() {
                               fontSize: '12.5px',
                               fontWeight: 400,
                               color: 'var(--cg-text-muted)',
-                              padding: '8px 0',
+                              padding: '8px 18px 8px 0',
                               borderBottom: '1px solid var(--cg-border-light)',
                             },
                           },
@@ -1100,7 +1098,9 @@ export function FichaDePropietarioView() {
                               fontWeight: 500,
                               color: 'var(--cg-text)',
                               padding: '8px 0',
-                              textAlign: 'right' as const,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
                               borderBottom: '1px solid var(--cg-border-light)',
                             },
                           },
@@ -1120,7 +1120,7 @@ export function FichaDePropietarioView() {
                               fontSize: '12.5px',
                               fontWeight: 400,
                               color: 'var(--cg-text-muted)',
-                              padding: '8px 0',
+                              padding: '8px 18px 8px 0',
                               borderBottom: '1px solid var(--cg-border-light)',
                             },
                           },
@@ -1135,7 +1135,9 @@ export function FichaDePropietarioView() {
                               fontWeight: 500,
                               color: 'var(--cg-text)',
                               padding: '8px 0',
-                              textAlign: 'right' as const,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
                               borderBottom: '1px solid var(--cg-border-light)',
                             },
                           },
@@ -1155,8 +1157,7 @@ export function FichaDePropietarioView() {
                               fontSize: '12.5px',
                               fontWeight: 400,
                               color: 'var(--cg-text-muted)',
-                              padding: '8px 0',
-                              borderBottom: '1px solid var(--cg-border-light)',
+                              padding: '8px 18px 8px 0',
                             },
                           },
                           h(UI.DynamicIcon, { icon: 'MapPin', size: 14 }),
@@ -1170,8 +1171,9 @@ export function FichaDePropietarioView() {
                               fontWeight: 500,
                               color: 'var(--cg-text)',
                               padding: '8px 0',
-                              textAlign: 'right' as const,
-                              borderBottom: '1px solid var(--cg-border-light)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
                             },
                           },
                           metric('kv_contacto.Domicilio', 'value', 'Córdoba 1234, Rosario')

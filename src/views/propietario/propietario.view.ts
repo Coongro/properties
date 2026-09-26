@@ -355,6 +355,17 @@ export function PropietarioView() {
                           )
                         )
                       ),
+                      h(
+                        'div',
+                        {
+                          style: {
+                            fontSize: '12px',
+                            color: 'var(--cg-text-tertiary)',
+                            marginTop: '4px',
+                          },
+                        },
+                        'Opcional: se puede cargar la persona ahora y decir de qué unidad es dueña después.'
+                      ),
                       errors['unit_id']
                         ? h(
                             'div',
@@ -392,6 +403,17 @@ export function PropietarioView() {
                             e.target.value === '' ? null : Number(e.target.value)
                           ),
                       }),
+                      h(
+                        'div',
+                        {
+                          style: {
+                            fontSize: '12px',
+                            color: 'var(--cg-text-tertiary)',
+                            marginTop: '4px',
+                          },
+                        },
+                        'Si es dueño único, dejalo vacío: se toma 100 %. Entre todos los dueños de una unidad no puede pasar de 100 %.'
+                      ),
                       errors['share_pct']
                         ? h(
                             'div',
@@ -463,6 +485,17 @@ export function PropietarioView() {
                         },
                         'Nudo propietario'
                       )
+                    ),
+                    h(
+                      'div',
+                      {
+                        style: {
+                          fontSize: '12px',
+                          color: 'var(--cg-text-tertiary)',
+                          marginTop: '4px',
+                        },
+                      },
+                      'El usufructuario percibe el alquiler; el nudo propietario conserva el dominio sin cobrarlo.'
                     ),
                     errors['role']
                       ? h(

@@ -4,7 +4,7 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { getHostReact, getHostUI, useIsMobile, views } from '@coongro/plugin-sdk';
+import { getHostReact, getHostUI, useAccess, useIsMobile, views } from '@coongro/plugin-sdk';
 
 import { usePropietariosView } from './use-propietarios.js';
 
@@ -15,6 +15,7 @@ const h = React.createElement;
 const UI = getHostUI() as any;
 
 export function PropietariosView() {
+  const access = useAccess();
   const isMobile = useIsMobile();
   const {
     pendingConfirm,
@@ -171,6 +172,7 @@ export function PropietariosView() {
       onClick: (row: any) => {
         views.open('properties.propietario.open', { record: row }, { mode: 'dialog' });
       },
+      hidden: () => !access.canOpen('properties.propietario.open'),
     },
     {
       label: 'Eliminar',
@@ -188,6 +190,7 @@ export function PropietariosView() {
           }
         );
       },
+      hidden: () => !access.canRun('properties.unitOwners.deleteOwner'),
     },
   ];
   const renderTable = () =>
@@ -397,16 +400,18 @@ export function PropietariosView() {
           h(UI.PageHeader, {
             title: 'Propietarios',
             subtitle: 'Los titulares de las unidades y sus datos de cobro.',
-            action: h(
-              UI.Button,
-              {
-                variant: 'default',
-                onClick: () => {
-                  views.open('properties.propietario.open', undefined, { mode: 'dialog' });
-                },
-              },
-              'Nuevo propietario'
-            ),
+            action: access.canOpen('properties.propietario.open')
+              ? h(
+                  UI.Button,
+                  {
+                    variant: 'default',
+                    onClick: () => {
+                      views.open('properties.propietario.open', undefined, { mode: 'dialog' });
+                    },
+                  },
+                  'Nuevo propietario'
+                )
+              : null,
           })
         )
       ),
