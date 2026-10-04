@@ -284,7 +284,7 @@ export function UnidadView() {
                 h(
                   UI.Label,
                   { htmlFor: 'status', style: { display: 'block', marginBottom: '6px' } },
-                  'Estado',
+                  'Disponibilidad',
                   h('span', { style: { color: 'var(--cg-danger)' } }, ' *')
                 ),
                 h(
@@ -300,18 +300,9 @@ export function UnidadView() {
                     {
                       key: 'vacante',
                       value: 'vacante',
-                      icon: h(UI.DynamicIcon, { icon: 'DoorOpen', size: 16 }),
+                      icon: h(UI.DynamicIcon, { icon: 'CircleDot', size: 16 }),
                     },
-                    'Vacante'
-                  ),
-                  h(
-                    UI.SelectItem,
-                    {
-                      key: 'ocupada',
-                      value: 'ocupada',
-                      icon: h(UI.DynamicIcon, { icon: 'UserCheck', size: 16 }),
-                    },
-                    'Ocupada'
+                    'Sin marca (según el contrato)'
                   ),
                   h(
                     UI.SelectItem,

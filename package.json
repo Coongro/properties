@@ -1,6 +1,6 @@
 {
   "name": "@coongro/properties",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Edificios, unidades, certificados y titularidad para el kit de alquileres. Registra el patrimonio que se alquila: la propiedad, sus unidades con estado de ocupación, los certificados con vencimiento (matafuegos, gas, ascensor) y quién es dueño de cada unidad.",
   "main": "dist/index.js",
@@ -34,6 +34,7 @@
     "quality": "npm run typecheck && npm run format:check && npm run lint && npm run test",
     "quality:fix": "npm run format && npm run lint:fix",
     "sync-version": "node scripts/sync-version.cjs",
+    "version-packages": "node ../../scripts/version-packages.mjs",
     "version": "npm run sync-version && git add coongro.manifest.json",
     "prepublishOnly": "npm run quality && npm run build",
     "build": "npm run build:css && npm run copy:fontawesome && tsc",

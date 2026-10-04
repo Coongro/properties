@@ -143,7 +143,7 @@ export function useUnidadView() {
       values['status'] === '' ||
       values['status'] === false
     )
-      errs['status'] = '«Estado» es requerido';
+      errs['status'] = '«Disponibilidad» es requerido';
     return errs;
   }, [values]);
 

@@ -4,7 +4,7 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { getHostReact, getHostUI, useIsMobile, views } from '@coongro/plugin-sdk';
+import { getHostReact, getHostUI, useAccess, useIsMobile, views } from '@coongro/plugin-sdk';
 
 import { useFichaDeUnidadView } from './use-ficha-de-unidad.js';
 
@@ -15,6 +15,7 @@ const h = React.createElement;
 const UI = getHostUI() as any;
 
 export function FichaDeUnidadView() {
+  const access = useAccess();
   const isMobile = useIsMobile();
   // Tono del badge: el que devuelven los datos, y si no el del diseño.
   // ⚠️ MISMO mapa que el TONE_VARIANT de las tablas: el mismo estado tiene
@@ -198,6 +199,7 @@ export function FichaDeUnidadView() {
             }
           );
         },
+        hidden: () => !access.canRun('properties.unitOwners.removeOwner'),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -230,6 +232,9 @@ export function FichaDeUnidadView() {
           onSortChange,
           pagination: { page, pageSize: 20, total: visibleRows.length },
           onPageChange: setPage,
+          onRowClick: (row: any) => {
+            views.open('properties.ficha-de-propietario.open', { record: row });
+          },
           actions: ROW_ACTIONS,
           mobileRender: (row: any) =>
             h(
@@ -266,6 +271,37 @@ export function FichaDeUnidadView() {
                       },
                     },
                     renderCell(row, c)
+                  )
+                )
+              ),
+              h(
+                'div',
+                {
+                  style: {
+                    display: 'flex',
+                    gap: '4px',
+                    justifyContent: 'flex-end',
+                    borderTop: '1px solid var(--cg-border-light)',
+                    paddingTop: '8px',
+                    marginTop: '2px',
+                  },
+                },
+                ...ROW_ACTIONS.filter((a2: any) => !a2.hidden?.(row)).map((a2: any) =>
+                  h(
+                    UI.Button,
+                    {
+                      key: a2.label,
+                      size: 'sm' as const,
+                      variant:
+                        a2.variant === 'destructive'
+                          ? ('destructive' as const)
+                          : ('ghost' as const),
+                      onClick: (e: any) => {
+                        e.stopPropagation();
+                        a2.onClick(row);
+                      },
+                    },
+                    a2.label
                   )
                 )
               )
@@ -329,6 +365,21 @@ export function FichaDeUnidadView() {
     };
     const renderCell = (row: any, c: any) => {
       const raw = cellText(row, c);
+      if (raw === '' && c.emptyLabel) {
+        return h(
+          'span',
+          {
+            style: {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--cg-text-muted)',
+            },
+          },
+          c.emptyIcon ? h(UI.DynamicIcon, { icon: c.emptyIcon, size: 15 }) : null,
+          c.emptyLabel
+        );
+      }
       const ev = enumVal(c, raw);
       const label = c.format ? formatDate(c.format, raw) : (ev?.label ?? raw);
       const shown = raw !== '' ? (c.prefix ?? '') + label + (c.suffix ?? '') : label;
@@ -428,13 +479,20 @@ export function FichaDeUnidadView() {
         variant: 'destructive' as const,
         icon: 'Trash2',
         onClick: (row: any) => {
-          askConfirm('Eliminar', 'El certificado se elimina de esta unidad.', 'Eliminar', () => {
-            ((row: any) => {
-              void runServerAction('properties.certificates.delete', { id: row.id }, row);
-            })(row);
-          });
+          askConfirm(
+            'Eliminar',
+            'El certificado se va de la lista y deja de avisar cuando vence. Volver a tenerlo es cargarlo de nuevo con su fecha, su resultado y su archivo.',
+            'Eliminar',
+            () => {
+              ((row: any) => {
+                void runServerAction('properties.certificates.delete', { id: row.id }, row);
+              })(row);
+            }
+          );
         },
-        hidden: (row: any) => !['unidad'].includes(String(row?.['scope'] ?? '')),
+        hidden: (row: any) =>
+          !access.canRun('properties.certificates.delete') ||
+          !['unidad'].includes(String(row?.['scope'] ?? '')),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -696,20 +754,22 @@ export function FichaDeUnidadView() {
           h(
             'div',
             { style: { display: 'flex', gap: '9px', flexShrink: 0 } },
-            h(
-              UI.Button,
-              {
-                variant: 'secondary',
-                onClick: () => {
-                  views.open(
-                    'properties.unidad.open',
-                    { record: (views.params as any)?.record ?? null },
-                    { mode: 'sheet' }
-                  );
-                },
-              },
-              'Editar unidad'
-            )
+            access.canOpen('properties.unidad.open')
+              ? h(
+                  UI.Button,
+                  {
+                    variant: 'secondary',
+                    onClick: () => {
+                      views.open(
+                        'properties.unidad.open',
+                        { record: (views.params as any)?.record ?? null },
+                        { mode: 'sheet' }
+                      );
+                    },
+                  },
+                  'Editar unidad'
+                )
+              : null
           )
         )
       ),
@@ -1034,16 +1094,18 @@ export function FichaDeUnidadView() {
               h(
                 'div',
                 { style: { display: 'flex', justifyContent: 'flex-end' } },
-                h(
-                  UI.Button,
-                  {
-                    variant: 'secondary',
-                    onClick: () => {
-                      views.open('properties.propietario.open', undefined, { mode: 'dialog' });
-                    },
-                  },
-                  'Agregar titular'
-                )
+                access.canOpen('properties.propietario.open')
+                  ? h(
+                      UI.Button,
+                      {
+                        variant: 'secondary',
+                        onClick: () => {
+                          views.open('properties.propietario.open', undefined, { mode: 'dialog' });
+                        },
+                      },
+                      'Agregar titular'
+                    )
+                  : null
               )
             ),
             h(
@@ -1106,23 +1168,25 @@ export function FichaDeUnidadView() {
               h(
                 'div',
                 { style: { display: 'flex', justifyContent: 'flex-end' } },
-                h(
-                  UI.Button,
-                  {
-                    variant: 'secondary',
-                    onClick: () => {
-                      views.open(
-                        'properties.certificado.open',
-                        {
-                          parentRecord: (views.params as any)?.record ?? null,
-                          parentEntity: 'properties.units',
+                access.canOpen('properties.certificado.open')
+                  ? h(
+                      UI.Button,
+                      {
+                        variant: 'secondary',
+                        onClick: () => {
+                          views.open(
+                            'properties.certificado.open',
+                            {
+                              parentRecord: (views.params as any)?.record ?? null,
+                              parentEntity: 'properties.units',
+                            },
+                            { mode: 'sheet' }
+                          );
                         },
-                        { mode: 'sheet' }
-                      );
-                    },
-                  },
-                  'Registrar certificado'
-                )
+                      },
+                      'Registrar certificado'
+                    )
+                  : null
               )
             ),
             h(

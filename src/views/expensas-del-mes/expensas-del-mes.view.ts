@@ -216,31 +216,57 @@ export function ExpensasDelMesView() {
               ),
               h(
                 'div',
-                { 'data-cg-block-id': 'f_paid', style: { display: 'contents' } },
+                { 'data-cg-block-id': 'f_sent', style: { display: 'contents' } },
                 h(
                   'div',
                   { style: { flex: '1 1 260px', minWidth: 0 } },
                   h(
                     UI.Label,
-                    { htmlFor: 'paid_at', style: { display: 'block', marginBottom: '6px' } },
-                    'Fecha de pago'
+                    { htmlFor: 'sent_at', style: { display: 'block', marginBottom: '6px' } },
+                    'Cuándo llegó'
                   ),
                   h(UI.Input, {
-                    id: 'paid_at',
+                    id: 'sent_at',
                     type: 'date',
-                    value: String(values['paid_at'] ?? ''),
-                    onChange: (e: any) => setField('paid_at', e.target.value),
+                    value: String(values['sent_at'] ?? ''),
+                    onChange: (e: any) => setField('sent_at', e.target.value),
                   }),
-                  errors['paid_at']
+                  errors['sent_at']
                     ? h(
                         'div',
                         {
                           style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' },
                         },
-                        errors['paid_at']
+                        errors['sent_at']
                       )
                     : null
                 )
+              )
+            ),
+            h(
+              'div',
+              { 'data-cg-block-id': 'f_paid', style: { display: 'contents' } },
+              h(
+                'div',
+                { style: { flex: '1 1 100%', minWidth: 0 } },
+                h(
+                  UI.Label,
+                  { htmlFor: 'paid_at', style: { display: 'block', marginBottom: '6px' } },
+                  'Fecha de pago'
+                ),
+                h(UI.Input, {
+                  id: 'paid_at',
+                  type: 'date',
+                  value: String(values['paid_at'] ?? ''),
+                  onChange: (e: any) => setField('paid_at', e.target.value),
+                }),
+                errors['paid_at']
+                  ? h(
+                      'div',
+                      { style: { fontSize: '12px', color: 'var(--cg-danger)', marginTop: '4px' } },
+                      errors['paid_at']
+                    )
+                  : null
               )
             )
           )

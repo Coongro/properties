@@ -4,7 +4,7 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { getHostReact, getHostUI, useIsMobile, views } from '@coongro/plugin-sdk';
+import { getHostReact, getHostUI, useAccess, useIsMobile, views } from '@coongro/plugin-sdk';
 
 import { useFichaDePropiedadView } from './use-ficha-de-propiedad.js';
 
@@ -15,6 +15,7 @@ const h = React.createElement;
 const UI = getHostUI() as any;
 
 export function FichaDePropiedadView() {
+  const access = useAccess();
   const isMobile = useIsMobile();
   // Tono del badge: el que devuelven los datos, y si no el del diseño.
   // ⚠️ MISMO mapa que el TONE_VARIANT de las tablas: el mismo estado tiene
@@ -76,14 +77,45 @@ export function FichaDePropiedadView() {
       outline: 'outline',
     };
     const enumVal = (c: any, raw: string) => (c.values ?? []).find((e: any) => e.value === raw);
+    const formatDate = (fmt: string, raw: string) => {
+      const s = String(raw ?? '');
+      const only = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+      if (only) return only[3] + '/' + only[2] + '/' + only[1];
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return s;
+      const p = (n: number) => String(n).padStart(2, '0');
+      const dmy = p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear();
+      const hm = p(d.getHours()) + ':' + p(d.getMinutes());
+      return fmt === 'datetime' ? dmy + ' ' + hm : fmt === 'time' ? hm : dmy;
+    };
     const formatMoney = (raw: string) => {
       const n = Number(raw);
       return isNaN(n) ? raw : '$' + n.toLocaleString('es-AR');
     };
     const renderCell = (row: any, c: any) => {
       const raw = cellText(row, c);
+      if (raw === '' && c.emptyLabel) {
+        return h(
+          'span',
+          {
+            style: {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--cg-text-muted)',
+            },
+          },
+          c.emptyIcon ? h(UI.DynamicIcon, { icon: c.emptyIcon, size: 15 }) : null,
+          c.emptyLabel
+        );
+      }
       const ev = enumVal(c, raw);
-      const label = c.format === 'money' ? formatMoney(raw) : (ev?.label ?? raw);
+      const label =
+        c.format === 'money'
+          ? formatMoney(raw)
+          : c.format
+            ? formatDate(c.format, raw)
+            : (ev?.label ?? raw);
       const shown = raw !== '' ? (c.prefix ?? '') + label + (c.suffix ?? '') : label;
       if (c.display === 'avatar') {
         const initial = (String(raw).trim().charAt(0) || '?').toUpperCase();
@@ -182,6 +214,7 @@ export function FichaDePropiedadView() {
         onClick: (row: any) => {
           views.open('properties.unidad.open', { record: row }, { mode: 'sheet' });
         },
+        hidden: () => !access.canOpen('properties.unidad.open'),
       },
       {
         label: 'Eliminar',
@@ -199,6 +232,7 @@ export function FichaDePropiedadView() {
             }
           );
         },
+        hidden: () => !access.canRun('properties.units.delete'),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -525,6 +559,7 @@ export function FichaDePropiedadView() {
             }
           );
         },
+        hidden: () => !access.canRun('properties.unitOwners.removeOwner'),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -557,6 +592,9 @@ export function FichaDePropiedadView() {
           onSortChange,
           pagination: { page, pageSize: 20, total: visibleRows.length },
           onPageChange: setPage,
+          onRowClick: (row: any) => {
+            views.open('properties.ficha-de-propietario.open', { record: row });
+          },
           actions: ROW_ACTIONS,
           mobileRender: (row: any) =>
             h(
@@ -781,7 +819,7 @@ export function FichaDePropiedadView() {
         onClick: (row: any) => {
           askConfirm(
             'Eliminar',
-            'La expensa del período se elimina de esta propiedad.',
+            'La liquidación del período se va de la propiedad y los meses que se facturen desde ahora vuelven a las expensas pactadas en cada contrato. Los recibos ya emitidos no cambian.',
             'Eliminar',
             () => {
               ((row: any) => {
@@ -790,6 +828,7 @@ export function FichaDePropiedadView() {
             }
           );
         },
+        hidden: () => !access.canRun('properties.buildingExpenses.delete'),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -998,6 +1037,21 @@ export function FichaDePropiedadView() {
     };
     const renderCell = (row: any, c: any) => {
       const raw = cellText(row, c);
+      if (raw === '' && c.emptyLabel) {
+        return h(
+          'span',
+          {
+            style: {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--cg-text-muted)',
+            },
+          },
+          c.emptyIcon ? h(UI.DynamicIcon, { icon: c.emptyIcon, size: 15 }) : null,
+          c.emptyLabel
+        );
+      }
       const ev = enumVal(c, raw);
       const label = c.format ? formatDate(c.format, raw) : (ev?.label ?? raw);
       const shown = raw !== '' ? (c.prefix ?? '') + label + (c.suffix ?? '') : label;
@@ -1097,12 +1151,18 @@ export function FichaDePropiedadView() {
         variant: 'destructive' as const,
         icon: 'Trash2',
         onClick: (row: any) => {
-          askConfirm('Eliminar', 'El certificado se elimina de esta propiedad.', 'Eliminar', () => {
-            ((row: any) => {
-              void runServerAction('properties.certificates.delete', { id: row.id }, row);
-            })(row);
-          });
+          askConfirm(
+            'Eliminar',
+            'El certificado se va de la lista y deja de avisar cuando vence. Volver a tenerlo es cargarlo de nuevo con su fecha, su resultado y su archivo.',
+            'Eliminar',
+            () => {
+              ((row: any) => {
+                void runServerAction('properties.certificates.delete', { id: row.id }, row);
+              })(row);
+            }
+          );
         },
+        hidden: () => !access.canRun('properties.certificates.delete'),
       },
     ];
     // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -1616,20 +1676,22 @@ export function FichaDePropiedadView() {
           h(
             'div',
             { style: { display: 'flex', gap: '9px', flexShrink: 0 } },
-            h(
-              UI.Button,
-              {
-                variant: 'secondary',
-                onClick: () => {
-                  views.open(
-                    'properties.propiedad.open',
-                    { record: (views.params as any)?.record ?? null },
-                    { mode: 'dialog' }
-                  );
-                },
-              },
-              'Editar propiedad'
-            )
+            access.canOpen('properties.propiedad.open')
+              ? h(
+                  UI.Button,
+                  {
+                    variant: 'secondary',
+                    onClick: () => {
+                      views.open(
+                        'properties.propiedad.open',
+                        { record: (views.params as any)?.record ?? null },
+                        { mode: 'dialog' }
+                      );
+                    },
+                  },
+                  'Editar propiedad'
+                )
+              : null
           )
         )
       ),
@@ -2222,23 +2284,25 @@ export function FichaDePropiedadView() {
                   h(
                     'div',
                     { style: { display: 'flex', justifyContent: 'flex-end' } },
-                    h(
-                      UI.Button,
-                      {
-                        variant: 'secondary',
-                        onClick: () => {
-                          views.open(
-                            'properties.unidad.open',
-                            {
-                              parentRecord: (views.params as any)?.record ?? null,
-                              parentEntity: 'properties.buildings',
+                    access.canOpen('properties.unidad.open')
+                      ? h(
+                          UI.Button,
+                          {
+                            variant: 'secondary',
+                            onClick: () => {
+                              views.open(
+                                'properties.unidad.open',
+                                {
+                                  parentRecord: (views.params as any)?.record ?? null,
+                                  parentEntity: 'properties.buildings',
+                                },
+                                { mode: 'sheet' }
+                              );
                             },
-                            { mode: 'sheet' }
-                          );
-                        },
-                      },
-                      'Nueva unidad'
-                    )
+                          },
+                          'Nueva unidad'
+                        )
+                      : null
                   )
                 ),
                 h(
@@ -2310,16 +2374,20 @@ export function FichaDePropiedadView() {
                   h(
                     'div',
                     { style: { display: 'flex', justifyContent: 'flex-end' } },
-                    h(
-                      UI.Button,
-                      {
-                        variant: 'secondary',
-                        onClick: () => {
-                          views.open('properties.propietario.open', undefined, { mode: 'dialog' });
-                        },
-                      },
-                      'Agregar titular'
-                    )
+                    access.canOpen('properties.propietario.open')
+                      ? h(
+                          UI.Button,
+                          {
+                            variant: 'secondary',
+                            onClick: () => {
+                              views.open('properties.propietario.open', undefined, {
+                                mode: 'dialog',
+                              });
+                            },
+                          },
+                          'Agregar titular'
+                        )
+                      : null
                   )
                 ),
                 h(
@@ -2416,23 +2484,25 @@ export function FichaDePropiedadView() {
                     h(
                       'div',
                       { style: { display: 'flex', justifyContent: 'flex-end' } },
-                      h(
-                        UI.Button,
-                        {
-                          variant: 'secondary',
-                          onClick: () => {
-                            views.open(
-                              'properties.expensas-del-mes.open',
-                              {
-                                parentRecord: (views.params as any)?.record ?? null,
-                                parentEntity: 'properties.buildings',
+                      access.canOpen('properties.expensas-del-mes.open')
+                        ? h(
+                            UI.Button,
+                            {
+                              variant: 'secondary',
+                              onClick: () => {
+                                views.open(
+                                  'properties.expensas-del-mes.open',
+                                  {
+                                    parentRecord: (views.params as any)?.record ?? null,
+                                    parentEntity: 'properties.buildings',
+                                  },
+                                  { mode: 'dialog' }
+                                );
                               },
-                              { mode: 'dialog' }
-                            );
-                          },
-                        },
-                        'Cargar mes'
-                      )
+                            },
+                            'Cargar mes'
+                          )
+                        : null
                     )
                   ),
                   h(
@@ -2514,23 +2584,25 @@ export function FichaDePropiedadView() {
                     h(
                       'div',
                       { style: { display: 'flex', justifyContent: 'flex-end' } },
-                      h(
-                        UI.Button,
-                        {
-                          variant: 'secondary',
-                          onClick: () => {
-                            views.open(
-                              'properties.certificado.open',
-                              {
-                                parentRecord: (views.params as any)?.record ?? null,
-                                parentEntity: 'properties.buildings',
+                      access.canOpen('properties.certificado.open')
+                        ? h(
+                            UI.Button,
+                            {
+                              variant: 'secondary',
+                              onClick: () => {
+                                views.open(
+                                  'properties.certificado.open',
+                                  {
+                                    parentRecord: (views.params as any)?.record ?? null,
+                                    parentEntity: 'properties.buildings',
+                                  },
+                                  { mode: 'sheet' }
+                                );
                               },
-                              { mode: 'sheet' }
-                            );
-                          },
-                        },
-                        'Registrar certificado'
-                      )
+                            },
+                            'Registrar certificado'
+                          )
+                        : null
                     )
                   ),
                   h(

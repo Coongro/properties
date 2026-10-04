@@ -1,0 +1,4547 @@
+{
+  "version": 1,
+  "pluginId": "properties",
+  "overrides": {
+    "cmd:properties.buildingExpenses.create": {
+      "type": "agentic.command",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "always",
+            "description": "Crea Expensas del mes con los mismos campos disponibles en el formulario del cliente.",
+            "effect": "write",
+            "generatedBy": "builder",
+            "id": "properties.buildingExpenses.create",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "additionalProperties": false,
+                  "description": "Datos de Expensas del mes a crear.",
+                  "properties": {
+                    "amount": {
+                      "description": "Total liquidado",
+                      "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                      "type": "string"
+                    },
+                    "building_id": {
+                      "description": "Propiedad",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "document_url": {
+                      "description": "Link a la liquidación",
+                      "type": "string"
+                    },
+                    "notes": {
+                      "description": "Observaciones",
+                      "type": "string"
+                    },
+                    "paid_at": {
+                      "description": "Fecha de pago",
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "period": {
+                      "description": "Período",
+                      "type": "string"
+                    },
+                    "status": {
+                      "default": "recibida",
+                      "description": "Estado. Opciones: recibida (Recibida), pagada (Pagada).",
+                      "enum": [
+                        "recibida",
+                        "pagada"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "building_id",
+                    "period",
+                    "amount"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "period",
+                  "label": "Período",
+                  "name": "period"
+                },
+                {
+                  "format": "money",
+                  "key": "amount",
+                  "label": "Total",
+                  "name": "amount"
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Recibida",
+                      "value": "recibida"
+                    },
+                    {
+                      "label": "Pagada",
+                      "value": "pagada"
+                    }
+                  ]
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Crear Expensas del mes"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "cmd:properties.buildingExpenses.update": {
+      "type": "agentic.command",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "always",
+            "description": "Actualiza los campos editables de Expensas del mes.",
+            "effect": "write",
+            "generatedBy": "builder",
+            "id": "properties.buildingExpenses.update",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "additionalProperties": false,
+                  "description": "Campos de Expensas del mes a modificar.",
+                  "properties": {
+                    "amount": {
+                      "description": "Total liquidado",
+                      "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                      "type": "string"
+                    },
+                    "building_id": {
+                      "description": "Propiedad",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "document_url": {
+                      "description": "Link a la liquidación",
+                      "type": "string"
+                    },
+                    "notes": {
+                      "description": "Observaciones",
+                      "type": "string"
+                    },
+                    "paid_at": {
+                      "description": "Fecha de pago",
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "period": {
+                      "description": "Período",
+                      "type": "string"
+                    },
+                    "status": {
+                      "default": "recibida",
+                      "description": "Estado. Opciones: recibida (Recibida), pagada (Pagada).",
+                      "enum": [
+                        "recibida",
+                        "pagada"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "id": {
+                  "description": "ID",
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "data"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "period",
+                  "label": "Período",
+                  "name": "period"
+                },
+                {
+                  "format": "money",
+                  "key": "amount",
+                  "label": "Total",
+                  "name": "amount"
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Recibida",
+                      "value": "recibida"
+                    },
+                    {
+                      "label": "Pagada",
+                      "value": "pagada"
+                    }
+                  ]
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Actualizar Expensas del mes"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "cmd:properties.buildings.create": {
+      "type": "agentic.command",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "always",
+            "description": "Crea Propiedad con los mismos campos disponibles en el formulario del cliente.",
+            "effect": "write",
+            "generatedBy": "builder",
+            "id": "properties.buildings.create",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "additionalProperties": false,
+                  "description": "Datos de Propiedad a crear.",
+                  "properties": {
+                    "admin_email": {
+                      "description": "Email",
+                      "type": "string"
+                    },
+                    "admin_name": {
+                      "description": "Administrador",
+                      "type": "string"
+                    },
+                    "admin_phone": {
+                      "description": "Teléfono",
+                      "type": "string"
+                    },
+                    "cadastral_ref": {
+                      "description": "Partida inmobiliaria",
+                      "type": "string"
+                    },
+                    "city": {
+                      "description": "Localidad",
+                      "type": "string"
+                    },
+                    "description": {
+                      "description": "Descripción",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Nombre",
+                      "type": "string"
+                    },
+                    "notes": {
+                      "description": "Notas",
+                      "type": "string"
+                    },
+                    "ownership_mode": {
+                      "description": "Modo de tenencia. Opciones: propia (Propia), condominio (Condominio), sucesion (Sucesión).",
+                      "enum": [
+                        "propia",
+                        "condominio",
+                        "sucesion"
+                      ],
+                      "type": "string"
+                    },
+                    "photos": {
+                      "description": "Fotos (lista de fotos, en orden: la primera es la principal)",
+                      "items": {
+                        "additionalProperties": false,
+                        "description": "Una foto de la lista.",
+                        "properties": {
+                          "caption": {
+                            "description": "Qué se ve en la foto.",
+                            "type": "string"
+                          },
+                          "url": {
+                            "description": "Dirección de la foto, no el archivo.",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "url"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "province": {
+                      "description": "Provincia. Opciones: buenos_aires (Buenos Aires), caba (Ciudad Autónoma de Buenos Aires), catamarca (Catamarca), chaco (Chaco), chubut (Chubut), cordoba (Córdoba), corrientes (Corrientes), entre_rios (Entre Ríos), formosa (Formosa), jujuy (Jujuy), la_pampa (La Pampa), la_rioja (La Rioja), mendoza (Mendoza), misiones (Misiones), neuquen (Neuquén), rio_negro (Río Negro), salta (Salta), san_juan (San Juan), san_luis (San Luis), santa_cruz (Santa Cruz), santa_fe (Santa Fe), sant…",
+                      "enum": [
+                        "buenos_aires",
+                        "caba",
+                        "catamarca",
+                        "chaco",
+                        "chubut",
+                        "cordoba",
+                        "corrientes",
+                        "entre_rios",
+                        "formosa",
+                        "jujuy",
+                        "la_pampa",
+                        "la_rioja",
+                        "mendoza",
+                        "misiones",
+                        "neuquen",
+                        "rio_negro",
+                        "salta",
+                        "san_juan",
+                        "san_luis",
+                        "santa_cruz",
+                        "santa_fe",
+                        "santiago_del_estero",
+                        "tierra_del_fuego",
+                        "tucuman"
+                      ],
+                      "type": "string"
+                    },
+                    "street": {
+                      "description": "Calle",
+                      "type": "string"
+                    },
+                    "street_number": {
+                      "description": "Altura",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Tipo. Opciones: edificio (Edificio), departamento (Departamento), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera).",
+                      "enum": [
+                        "edificio",
+                        "departamento",
+                        "casa",
+                        "local",
+                        "oficina",
+                        "galpon",
+                        "cochera",
+                        "baulera"
+                      ],
+                      "type": "string"
+                    },
+                    "year_built": {
+                      "description": "Año de construcción",
+                      "type": "integer"
+                    },
+                    "zip_code": {
+                      "description": "Código postal",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "name",
+                    "street",
+                    "street_number",
+                    "city"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Propiedad",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "address",
+                  "label": "Dirección",
+                  "name": "address"
+                },
+                {
+                  "format": "text",
+                  "key": "certs",
+                  "label": "Certificados",
+                  "name": "certs",
+                  "values": [
+                    {
+                      "label": "Al día",
+                      "value": "ok"
+                    },
+                    {
+                      "label": "Certificado por vencer",
+                      "value": "soon"
+                    },
+                    {
+                      "label": "Certificado vencido",
+                      "value": "expired"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Tipo",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Edificio",
+                      "value": "edificio"
+                    },
+                    {
+                      "label": "Departamento",
+                      "value": "departamento"
+                    },
+                    {
+                      "label": "Casa",
+                      "value": "casa"
+                    },
+                    {
+                      "label": "Local",
+                      "value": "local"
+                    },
+                    {
+                      "label": "Oficina",
+                      "value": "oficina"
+                    },
+                    {
+                      "label": "Galpón",
+                      "value": "galpon"
+                    },
+                    {
+                      "label": "Cochera",
+                      "value": "cochera"
+                    },
+                    {
+                      "label": "Baulera",
+                      "value": "baulera"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "occupancy",
+                  "label": "Ocupación",
+                  "name": "occupancy"
+                },
+                {
+                  "format": "money",
+                  "key": "reference_rent",
+                  "label": "Alquiler de referencia",
+                  "name": "referenceRent"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Crear Propiedad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "cmd:properties.buildings.update": {
+      "type": "agentic.command",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "always",
+            "description": "Actualiza los campos editables de Propiedad.",
+            "effect": "write",
+            "generatedBy": "builder",
+            "id": "properties.buildings.update",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "additionalProperties": false,
+                  "description": "Campos de Propiedad a modificar.",
+                  "properties": {
+                    "admin_email": {
+                      "description": "Email",
+                      "type": "string"
+                    },
+                    "admin_name": {
+                      "description": "Administrador",
+                      "type": "string"
+                    },
+                    "admin_phone": {
+                      "description": "Teléfono",
+                      "type": "string"
+                    },
+                    "cadastral_ref": {
+                      "description": "Partida inmobiliaria",
+                      "type": "string"
+                    },
+                    "city": {
+                      "description": "Localidad",
+                      "type": "string"
+                    },
+                    "description": {
+                      "description": "Descripción",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Nombre",
+                      "type": "string"
+                    },
+                    "notes": {
+                      "description": "Notas",
+                      "type": "string"
+                    },
+                    "ownership_mode": {
+                      "description": "Modo de tenencia. Opciones: propia (Propia), condominio (Condominio), sucesion (Sucesión).",
+                      "enum": [
+                        "propia",
+                        "condominio",
+                        "sucesion"
+                      ],
+                      "type": "string"
+                    },
+                    "photos": {
+                      "description": "Fotos (lista de fotos, en orden: la primera es la principal)",
+                      "items": {
+                        "additionalProperties": false,
+                        "description": "Una foto de la lista.",
+                        "properties": {
+                          "caption": {
+                            "description": "Qué se ve en la foto.",
+                            "type": "string"
+                          },
+                          "url": {
+                            "description": "Dirección de la foto, no el archivo.",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "url"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "province": {
+                      "description": "Provincia. Opciones: buenos_aires (Buenos Aires), caba (Ciudad Autónoma de Buenos Aires), catamarca (Catamarca), chaco (Chaco), chubut (Chubut), cordoba (Córdoba), corrientes (Corrientes), entre_rios (Entre Ríos), formosa (Formosa), jujuy (Jujuy), la_pampa (La Pampa), la_rioja (La Rioja), mendoza (Mendoza), misiones (Misiones), neuquen (Neuquén), rio_negro (Río Negro), salta (Salta), san_juan (San Juan), san_luis (San Luis), santa_cruz (Santa Cruz), santa_fe (Santa Fe), sant…",
+                      "enum": [
+                        "buenos_aires",
+                        "caba",
+                        "catamarca",
+                        "chaco",
+                        "chubut",
+                        "cordoba",
+                        "corrientes",
+                        "entre_rios",
+                        "formosa",
+                        "jujuy",
+                        "la_pampa",
+                        "la_rioja",
+                        "mendoza",
+                        "misiones",
+                        "neuquen",
+                        "rio_negro",
+                        "salta",
+                        "san_juan",
+                        "san_luis",
+                        "santa_cruz",
+                        "santa_fe",
+                        "santiago_del_estero",
+                        "tierra_del_fuego",
+                        "tucuman"
+                      ],
+                      "type": "string"
+                    },
+                    "street": {
+                      "description": "Calle",
+                      "type": "string"
+                    },
+                    "street_number": {
+                      "description": "Altura",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Tipo. Opciones: edificio (Edificio), departamento (Departamento), casa (Casa), local (Local), oficina (Oficina), galpon (Galpón), cochera (Cochera), baulera (Baulera).",
+                      "enum": [
+                        "edificio",
+                        "departamento",
+                        "casa",
+                        "local",
+                        "oficina",
+                        "galpon",
+                        "cochera",
+                        "baulera"
+                      ],
+                      "type": "string"
+                    },
+                    "year_built": {
+                      "description": "Año de construcción",
+                      "type": "integer"
+                    },
+                    "zip_code": {
+                      "description": "Código postal",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "id": {
+                  "description": "ID",
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "data"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Propiedad",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "address",
+                  "label": "Dirección",
+                  "name": "address"
+                },
+                {
+                  "format": "text",
+                  "key": "certs",
+                  "label": "Certificados",
+                  "name": "certs",
+                  "values": [
+                    {
+                      "label": "Al día",
+                      "value": "ok"
+                    },
+                    {
+                      "label": "Certificado por vencer",
+                      "value": "soon"
+                    },
+                    {
+                      "label": "Certificado vencido",
+                      "value": "expired"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Tipo",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Edificio",
+                      "value": "edificio"
+                    },
+                    {
+                      "label": "Departamento",
+                      "value": "departamento"
+                    },
+                    {
+                      "label": "Casa",
+                      "value": "casa"
+                    },
+                    {
+                      "label": "Local",
+                      "value": "local"
+                    },
+                    {
+                      "label": "Oficina",
+                      "value": "oficina"
+                    },
+                    {
+                      "label": "Galpón",
+                      "value": "galpon"
+                    },
+                    {
+                      "label": "Cochera",
+                      "value": "cochera"
+                    },
+                    {
+                      "label": "Baulera",
+                      "value": "baulera"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "occupancy",
+                  "label": "Ocupación",
+                  "name": "occupancy"
+                },
+                {
+                  "format": "money",
+                  "key": "reference_rent",
+                  "label": "Alquiler de referencia",
+                  "name": "referenceRent"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Actualizar Propiedad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "cmd:properties.certificates.create": {
+      "type": "agentic.command",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "always",
+            "description": "Crea Certificado con los mismos campos disponibles en el formulario del cliente.",
+            "effect": "write",
+            "generatedBy": "builder",
+            "id": "properties.certificates.create",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "additionalProperties": false,
+                  "description": "Datos de Certificado a crear.",
+                  "properties": {
+                    "alert_days": {
+                      "description": "Avisarme con (días de anticipación)",
+                      "type": "integer"
+                    },
+                    "building_id": {
+                      "description": "Propiedad",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "done_at": {
+                      "description": "Fecha de realización",
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "expires_at": {
+                      "description": "Vence",
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "file_url": {
+                      "description": "Certificado (URL)",
+                      "type": "string"
+                    },
+                    "notes": {
+                      "description": "Observaciones",
+                      "type": "string"
+                    },
+                    "result": {
+                      "description": "Resultado. Opciones: apto (Apto), apto_con_observaciones (Apto con observaciones), rechazado (Rechazado).",
+                      "enum": [
+                        "apto",
+                        "apto_con_observaciones",
+                        "rechazado"
+                      ],
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Tipo. Opciones: matafuegos (Matafuegos), gas (Instalación de gas), ascensor (Ascensor), electricidad (Instalación eléctrica), seguro (Seguro del inmueble), otro (Otro).",
+                      "enum": [
+                        "matafuegos",
+                        "gas",
+                        "ascensor",
+                        "electricidad",
+                        "seguro",
+                        "otro"
+                      ],
+                      "type": "string"
+                    },
+                    "unit_id": {
+                      "description": "Unidad",
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "building_id",
+                    "type",
+                    "expires_at"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Certificado",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Matafuegos",
+                      "value": "matafuegos"
+                    },
+                    {
+                      "label": "Instalación de gas",
+                      "value": "gas"
+                    },
+                    {
+                      "label": "Ascensor",
+                      "value": "ascensor"
+                    },
+                    {
+                      "label": "Instalación eléctrica",
+                      "value": "electricidad"
+                    },
+                    {
+                      "label": "Seguro del inmueble",
+                      "value": "seguro"
+                    },
+                    {
+                      "label": "Otro",
+                      "value": "otro"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Vigente",
+                      "value": "vigente"
+                    },
+                    {
+                      "label": "Por vencer",
+                      "value": "por_vencer"
+                    },
+                    {
+                      "label": "Vencido",
+                      "value": "vencido"
+                    }
+                  ]
+                },
+                {
+                  "format": "date",
+                  "key": "expires_at",
+                  "label": "Vence",
+                  "name": "expiresAt"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Crear Certificado"
+          },
+          "source": "formulario"
+        },
+        "scopeInvariants": [
+          {
+            "columns": [
+              "building_id",
+              "unit_id"
+            ],
+            "coverage": "input",
+            "note": "No es xor: todo certificado pertenece a una propiedad, y el de una unidad puntual lleva las dos columnas. Por eso el input obliga building_id y deja unit_id opcional — es lo que hace la pantalla, y es lo que mantiene el certificado visible en las dos consultas (los de la propiedad y los de sus unidades se leen juntos en listByBuilding). Un certificado con unit_id y sin building_id sería alcanzable en la base pero quedaría fuera de esa lectura, así que no se ofrece.",
+            "rule": "requires"
+          }
+        ]
+      },
+      "prov": {
+        "contractDraft": "user",
+        "scopeInvariants": "user"
+      }
+    },
+    "cmd:properties.certificates.update": {
+      "type": "agentic.command",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "always",
+            "description": "Actualiza los campos editables de Certificado.",
+            "effect": "write",
+            "generatedBy": "builder",
+            "id": "properties.certificates.update",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "additionalProperties": false,
+                  "description": "Campos de Certificado a modificar.",
+                  "properties": {
+                    "alert_days": {
+                      "description": "Avisarme con (días de anticipación)",
+                      "type": "integer"
+                    },
+                    "building_id": {
+                      "description": "Propiedad",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "done_at": {
+                      "description": "Fecha de realización",
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "expires_at": {
+                      "description": "Vence",
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "file_url": {
+                      "description": "Certificado (URL)",
+                      "type": "string"
+                    },
+                    "notes": {
+                      "description": "Observaciones",
+                      "type": "string"
+                    },
+                    "result": {
+                      "description": "Resultado. Opciones: apto (Apto), apto_con_observaciones (Apto con observaciones), rechazado (Rechazado).",
+                      "enum": [
+                        "apto",
+                        "apto_con_observaciones",
+                        "rechazado"
+                      ],
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Tipo. Opciones: matafuegos (Matafuegos), gas (Instalación de gas), ascensor (Ascensor), electricidad (Instalación eléctrica), seguro (Seguro del inmueble), otro (Otro).",
+                      "enum": [
+                        "matafuegos",
+                        "gas",
+                        "ascensor",
+                        "electricidad",
+                        "seguro",
+                        "otro"
+                      ],
+                      "type": "string"
+                    },
+                    "unit_id": {
+                      "description": "Unidad",
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "id": {
+                  "description": "ID",
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "data"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Certificado",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Matafuegos",
+                      "value": "matafuegos"
+                    },
+                    {
+                      "label": "Instalación de gas",
+                      "value": "gas"
+                    },
+                    {
+                      "label": "Ascensor",
+                      "value": "ascensor"
+                    },
+                    {
+                      "label": "Instalación eléctrica",
+                      "value": "electricidad"
+                    },
+                    {
+                      "label": "Seguro del inmueble",
+                      "value": "seguro"
+                    },
+                    {
+                      "label": "Otro",
+                      "value": "otro"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Vigente",
+                      "value": "vigente"
+                    },
+                    {
+                      "label": "Por vencer",
+                      "value": "por_vencer"
+                    },
+                    {
+                      "label": "Vencido",
+                      "value": "vencido"
+                    }
+                  ]
+                },
+                {
+                  "format": "date",
+                  "key": "expires_at",
+                  "label": "Vence",
+                  "name": "expiresAt"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Actualizar Certificado"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "cmd:properties.unitOwners.deleteOwner": {
+      "type": "agentic.command",
+      "fields": {
+        "excluded": true,
+        "excludedReason": "Dar de baja a una PERSONA de la cartera no se le ofrece a un agente. La operación es correcta y tiene su resguardo —se niega si tiene unidades a su nombre, y la baja es lógica—, pero borrar gente es una decisión de quien administra, no un paso que convenga automatizar: el daño de un falso positivo no lo paga el agente. Se hace desde el listado de Propietarios, que es donde hay una persona que puede dudar. Mismo criterio que su equivalente para inquilinos (leases.contracts.deleteTenant), que tampoco se publica. coveredBy: none — que no haya camino agentic para esto es la decisión, no un hueco."
+      },
+      "prov": {
+        "excluded": "user",
+        "excludedReason": "user"
+      }
+    },
+    "cmd:properties.unitOwners.removeOwner": {
+      "type": "agentic.command",
+      "fields": {
+        "verifyWith": {
+          "action": "properties.unitOwners.listByUnit",
+          "arg": "unitId"
+        }
+      },
+      "prov": {
+        "verifyWith": "user"
+      }
+    },
+    "cmd:properties.unitOwners.saveOwner": {
+      "type": "agentic.command",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "always",
+            "description": "Propietario: capacidad declarada por el Builder.",
+            "effect": "write",
+            "generatedBy": "builder",
+            "id": "properties.unitOwners.saveOwner",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "additionalProperties": false,
+                  "description": "Datos de Propietario a crear.",
+                  "properties": {
+                    "account": {
+                      "description": "Tipo y número de cuenta",
+                      "type": "string"
+                    },
+                    "address": {
+                      "description": "Domicilio",
+                      "type": "string"
+                    },
+                    "alias": {
+                      "description": "Alias",
+                      "type": "string"
+                    },
+                    "bank": {
+                      "description": "Banco",
+                      "type": "string"
+                    },
+                    "cbu": {
+                      "description": "CBU",
+                      "type": "string"
+                    },
+                    "document_number": {
+                      "description": "Número",
+                      "type": "string"
+                    },
+                    "document_type": {
+                      "description": "Documento. Opciones: cuit (CUIT), cuil (CUIL), dni (DNI).",
+                      "enum": [
+                        "cuit",
+                        "cuil",
+                        "dni"
+                      ],
+                      "type": "string"
+                    },
+                    "email": {
+                      "description": "Email",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Nombre y apellido o razón social",
+                      "type": "string"
+                    },
+                    "phone": {
+                      "description": "Teléfono",
+                      "type": "string"
+                    },
+                    "tax_condition": {
+                      "description": "Condición frente al IVA. Opciones: monotributo (Monotributo), responsable_inscripto (Responsable inscripto), exento (Exento), consumidor_final (Consumidor final).",
+                      "enum": [
+                        "monotributo",
+                        "responsable_inscripto",
+                        "exento",
+                        "consumidor_final"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "document_type",
+                    "document_number"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Propietario",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "document",
+                  "label": "Documento",
+                  "name": "document"
+                },
+                {
+                  "format": "text",
+                  "key": "units",
+                  "label": "Unidades",
+                  "name": "units"
+                },
+                {
+                  "format": "text",
+                  "key": "cbu",
+                  "label": "CBU / alias",
+                  "name": "cbu"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Propietario"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "cmd:properties.units.create": {
+      "type": "agentic.command",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "always",
+            "description": "Crea Unidad con los mismos campos disponibles en el formulario del cliente.",
+            "effect": "write",
+            "generatedBy": "builder",
+            "id": "properties.units.create",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "additionalProperties": false,
+                  "description": "Datos de Unidad a crear.",
+                  "properties": {
+                    "bathrooms": {
+                      "description": "Baños",
+                      "type": "integer"
+                    },
+                    "building_id": {
+                      "description": "Propiedad",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Nombre o número",
+                      "type": "string"
+                    },
+                    "notes": {
+                      "description": "Notas",
+                      "type": "string"
+                    },
+                    "photos": {
+                      "description": "Fotos (lista de fotos, en orden: la primera es la principal)",
+                      "items": {
+                        "additionalProperties": false,
+                        "description": "Una foto de la lista.",
+                        "properties": {
+                          "caption": {
+                            "description": "Qué se ve en la foto.",
+                            "type": "string"
+                          },
+                          "url": {
+                            "description": "Dirección de la foto, no el archivo.",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "url"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "reference_rent": {
+                      "description": "Alquiler de referencia",
+                      "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                      "type": "string"
+                    },
+                    "rooms": {
+                      "description": "Ambientes",
+                      "type": "integer"
+                    },
+                    "share_pct": {
+                      "description": "Alícuota de expensas (%)",
+                      "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "Estado. Opciones: vacante (Vacante), ocupada (Ocupada), en_recambio (En recambio), con_preaviso (Con preaviso), no_disponible (No disponible).",
+                      "enum": [
+                        "vacante",
+                        "ocupada",
+                        "en_recambio",
+                        "con_preaviso",
+                        "no_disponible"
+                      ],
+                      "type": "string"
+                    },
+                    "surface_m2": {
+                      "description": "Superficie (m²)",
+                      "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "building_id",
+                    "name",
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Unidad",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "detail",
+                  "label": "Detalle",
+                  "name": "detail"
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Ocupada",
+                      "value": "ocupada"
+                    },
+                    {
+                      "label": "Vacante",
+                      "value": "vacante"
+                    },
+                    {
+                      "label": "En recambio",
+                      "value": "en_recambio"
+                    },
+                    {
+                      "label": "Con preaviso",
+                      "value": "con_preaviso"
+                    },
+                    {
+                      "label": "No disponible",
+                      "value": "no_disponible"
+                    }
+                  ]
+                },
+                {
+                  "format": "money",
+                  "key": "reference_rent",
+                  "label": "Alquiler de referencia",
+                  "name": "referenceRent"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Crear Unidad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "cmd:properties.units.update": {
+      "type": "agentic.command",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "always",
+            "description": "Actualiza los campos editables de Unidad.",
+            "effect": "write",
+            "generatedBy": "builder",
+            "id": "properties.units.update",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "data": {
+                  "additionalProperties": false,
+                  "description": "Campos de Unidad a modificar.",
+                  "properties": {
+                    "bathrooms": {
+                      "description": "Baños",
+                      "type": "integer"
+                    },
+                    "building_id": {
+                      "description": "Propiedad",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Nombre o número",
+                      "type": "string"
+                    },
+                    "notes": {
+                      "description": "Notas",
+                      "type": "string"
+                    },
+                    "photos": {
+                      "description": "Fotos (lista de fotos, en orden: la primera es la principal)",
+                      "items": {
+                        "additionalProperties": false,
+                        "description": "Una foto de la lista.",
+                        "properties": {
+                          "caption": {
+                            "description": "Qué se ve en la foto.",
+                            "type": "string"
+                          },
+                          "url": {
+                            "description": "Dirección de la foto, no el archivo.",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "url"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "reference_rent": {
+                      "description": "Alquiler de referencia",
+                      "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                      "type": "string"
+                    },
+                    "rooms": {
+                      "description": "Ambientes",
+                      "type": "integer"
+                    },
+                    "share_pct": {
+                      "description": "Alícuota de expensas (%)",
+                      "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "Estado. Opciones: vacante (Vacante), ocupada (Ocupada), en_recambio (En recambio), con_preaviso (Con preaviso), no_disponible (No disponible).",
+                      "enum": [
+                        "vacante",
+                        "ocupada",
+                        "en_recambio",
+                        "con_preaviso",
+                        "no_disponible"
+                      ],
+                      "type": "string"
+                    },
+                    "surface_m2": {
+                      "description": "Superficie (m²)",
+                      "pattern": "^-?\\d+(?:\\.\\d+)?$",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "id": {
+                  "description": "ID",
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "data"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Unidad",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "detail",
+                  "label": "Detalle",
+                  "name": "detail"
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Ocupada",
+                      "value": "ocupada"
+                    },
+                    {
+                      "label": "Vacante",
+                      "value": "vacante"
+                    },
+                    {
+                      "label": "En recambio",
+                      "value": "en_recambio"
+                    },
+                    {
+                      "label": "Con preaviso",
+                      "value": "con_preaviso"
+                    },
+                    {
+                      "label": "No disponible",
+                      "value": "no_disponible"
+                    }
+                  ]
+                },
+                {
+                  "format": "money",
+                  "key": "reference_rent",
+                  "label": "Alquiler de referencia",
+                  "name": "referenceRent"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Actualizar Unidad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.buildingExpenses.forBuilding": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.buildingExpenses.forBuilding",
+            "input": {
+              "none": true
+            },
+            "output": {
+              "defaultLimit": 10,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "period",
+                  "label": "Período",
+                  "name": "period"
+                },
+                {
+                  "format": "money",
+                  "key": "amount",
+                  "label": "Total",
+                  "name": "amount"
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Recibida",
+                      "value": "recibida"
+                    },
+                    {
+                      "label": "Pagada",
+                      "value": "pagada"
+                    }
+                  ]
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Ficha de propiedad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.buildingExpenses.getById": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Obtiene un registro de Expensas del mes por su ID.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.buildingExpenses.getById",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "ID",
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "period",
+                  "label": "Período",
+                  "name": "period"
+                },
+                {
+                  "format": "money",
+                  "key": "amount",
+                  "label": "Total",
+                  "name": "amount"
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Recibida",
+                      "value": "recibida"
+                    },
+                    {
+                      "label": "Pagada",
+                      "value": "pagada"
+                    }
+                  ]
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Consultar Expensas del mes"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.buildingExpenses.list": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Obtiene Expensas del mes disponibles para el cliente actual.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.buildingExpenses.list",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "limit": {
+                  "description": "Cantidad de resultados a devolver. Default 20; máximo 50.",
+                  "type": "integer"
+                },
+                "offset": {
+                  "description": "Cantidad de resultados a saltear para pedir la página siguiente.",
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "output": {
+              "defaultLimit": 10,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "period",
+                  "label": "Período",
+                  "name": "period"
+                },
+                {
+                  "format": "money",
+                  "key": "amount",
+                  "label": "Total",
+                  "name": "amount"
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Recibida",
+                      "value": "recibida"
+                    },
+                    {
+                      "label": "Pagada",
+                      "value": "pagada"
+                    }
+                  ]
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Listar Expensas del mes"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.buildings.getById": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Obtiene un registro de Propiedad por su ID.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.buildings.getById",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "ID",
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Propiedad",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "address",
+                  "label": "Dirección",
+                  "name": "address"
+                },
+                {
+                  "format": "text",
+                  "key": "certs",
+                  "label": "Certificados",
+                  "name": "certs",
+                  "values": [
+                    {
+                      "label": "Al día",
+                      "value": "ok"
+                    },
+                    {
+                      "label": "Certificado por vencer",
+                      "value": "soon"
+                    },
+                    {
+                      "label": "Certificado vencido",
+                      "value": "expired"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Tipo",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Edificio",
+                      "value": "edificio"
+                    },
+                    {
+                      "label": "Departamento",
+                      "value": "departamento"
+                    },
+                    {
+                      "label": "Casa",
+                      "value": "casa"
+                    },
+                    {
+                      "label": "Local",
+                      "value": "local"
+                    },
+                    {
+                      "label": "Oficina",
+                      "value": "oficina"
+                    },
+                    {
+                      "label": "Galpón",
+                      "value": "galpon"
+                    },
+                    {
+                      "label": "Cochera",
+                      "value": "cochera"
+                    },
+                    {
+                      "label": "Baulera",
+                      "value": "baulera"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "occupancy",
+                  "label": "Ocupación",
+                  "name": "occupancy"
+                },
+                {
+                  "format": "money",
+                  "key": "reference_rent",
+                  "label": "Alquiler de referencia",
+                  "name": "referenceRent"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Consultar Propiedad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.buildings.getSummary": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.buildings.getSummary",
+            "input": {
+              "none": true
+            },
+            "output": {
+              "defaultLimit": 20,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Propiedad",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "address",
+                  "label": "Dirección",
+                  "name": "address"
+                },
+                {
+                  "format": "text",
+                  "key": "certs",
+                  "label": "Certificados",
+                  "name": "certs",
+                  "values": [
+                    {
+                      "label": "Al día",
+                      "value": "ok"
+                    },
+                    {
+                      "label": "Certificado por vencer",
+                      "value": "soon"
+                    },
+                    {
+                      "label": "Certificado vencido",
+                      "value": "expired"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Tipo",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Edificio",
+                      "value": "edificio"
+                    },
+                    {
+                      "label": "Departamento",
+                      "value": "departamento"
+                    },
+                    {
+                      "label": "Casa",
+                      "value": "casa"
+                    },
+                    {
+                      "label": "Local",
+                      "value": "local"
+                    },
+                    {
+                      "label": "Oficina",
+                      "value": "oficina"
+                    },
+                    {
+                      "label": "Galpón",
+                      "value": "galpon"
+                    },
+                    {
+                      "label": "Cochera",
+                      "value": "cochera"
+                    },
+                    {
+                      "label": "Baulera",
+                      "value": "baulera"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "occupancy",
+                  "label": "Ocupación",
+                  "name": "occupancy"
+                },
+                {
+                  "format": "money",
+                  "key": "reference_rent",
+                  "label": "Alquiler de referencia",
+                  "name": "referenceRent"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Ficha de propiedad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.buildings.list": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Obtiene Propiedad disponibles para el cliente actual.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.buildings.list",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "limit": {
+                  "description": "Cantidad de resultados a devolver. Default 20; máximo 50.",
+                  "type": "integer"
+                },
+                "offset": {
+                  "description": "Cantidad de resultados a saltear para pedir la página siguiente.",
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "output": {
+              "defaultLimit": 20,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Propiedad",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "address",
+                  "label": "Dirección",
+                  "name": "address"
+                },
+                {
+                  "format": "text",
+                  "key": "certs",
+                  "label": "Certificados",
+                  "name": "certs",
+                  "values": [
+                    {
+                      "label": "Al día",
+                      "value": "ok"
+                    },
+                    {
+                      "label": "Certificado por vencer",
+                      "value": "soon"
+                    },
+                    {
+                      "label": "Certificado vencido",
+                      "value": "expired"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Tipo",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Edificio",
+                      "value": "edificio"
+                    },
+                    {
+                      "label": "Departamento",
+                      "value": "departamento"
+                    },
+                    {
+                      "label": "Casa",
+                      "value": "casa"
+                    },
+                    {
+                      "label": "Local",
+                      "value": "local"
+                    },
+                    {
+                      "label": "Oficina",
+                      "value": "oficina"
+                    },
+                    {
+                      "label": "Galpón",
+                      "value": "galpon"
+                    },
+                    {
+                      "label": "Cochera",
+                      "value": "cochera"
+                    },
+                    {
+                      "label": "Baulera",
+                      "value": "baulera"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "occupancy",
+                  "label": "Ocupación",
+                  "name": "occupancy"
+                },
+                {
+                  "format": "money",
+                  "key": "reference_rent",
+                  "label": "Alquiler de referencia",
+                  "name": "referenceRent"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Listar Propiedad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.certificates.getById": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Obtiene un registro de Certificado por su ID.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.certificates.getById",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "ID",
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Certificado",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Matafuegos",
+                      "value": "matafuegos"
+                    },
+                    {
+                      "label": "Instalación de gas",
+                      "value": "gas"
+                    },
+                    {
+                      "label": "Ascensor",
+                      "value": "ascensor"
+                    },
+                    {
+                      "label": "Instalación eléctrica",
+                      "value": "electricidad"
+                    },
+                    {
+                      "label": "Seguro del inmueble",
+                      "value": "seguro"
+                    },
+                    {
+                      "label": "Otro",
+                      "value": "otro"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Vigente",
+                      "value": "vigente"
+                    },
+                    {
+                      "label": "Por vencer",
+                      "value": "por_vencer"
+                    },
+                    {
+                      "label": "Vencido",
+                      "value": "vencido"
+                    }
+                  ]
+                },
+                {
+                  "format": "date",
+                  "key": "expires_at",
+                  "label": "Vence",
+                  "name": "expiresAt"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Consultar Certificado"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.certificates.list": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Obtiene Certificado disponibles para el cliente actual.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.certificates.list",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "limit": {
+                  "description": "Cantidad de resultados a devolver. Default 20; máximo 50.",
+                  "type": "integer"
+                },
+                "offset": {
+                  "description": "Cantidad de resultados a saltear para pedir la página siguiente.",
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "output": {
+              "defaultLimit": 10,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Certificado",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Matafuegos",
+                      "value": "matafuegos"
+                    },
+                    {
+                      "label": "Instalación de gas",
+                      "value": "gas"
+                    },
+                    {
+                      "label": "Ascensor",
+                      "value": "ascensor"
+                    },
+                    {
+                      "label": "Instalación eléctrica",
+                      "value": "electricidad"
+                    },
+                    {
+                      "label": "Seguro del inmueble",
+                      "value": "seguro"
+                    },
+                    {
+                      "label": "Otro",
+                      "value": "otro"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Vigente",
+                      "value": "vigente"
+                    },
+                    {
+                      "label": "Por vencer",
+                      "value": "por_vencer"
+                    },
+                    {
+                      "label": "Vencido",
+                      "value": "vencido"
+                    }
+                  ]
+                },
+                {
+                  "format": "date",
+                  "key": "expires_at",
+                  "label": "Vence",
+                  "name": "expiresAt"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Listar Certificado"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.certificates.listByBuilding": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.certificates.listByBuilding",
+            "input": {
+              "none": true
+            },
+            "output": {
+              "defaultLimit": 10,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Certificado",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Matafuegos",
+                      "value": "matafuegos"
+                    },
+                    {
+                      "label": "Instalación de gas",
+                      "value": "gas"
+                    },
+                    {
+                      "label": "Ascensor",
+                      "value": "ascensor"
+                    },
+                    {
+                      "label": "Instalación eléctrica",
+                      "value": "electricidad"
+                    },
+                    {
+                      "label": "Seguro del inmueble",
+                      "value": "seguro"
+                    },
+                    {
+                      "label": "Otro",
+                      "value": "otro"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Vigente",
+                      "value": "vigente"
+                    },
+                    {
+                      "label": "Por vencer",
+                      "value": "por_vencer"
+                    },
+                    {
+                      "label": "Vencido",
+                      "value": "vencido"
+                    }
+                  ]
+                },
+                {
+                  "format": "date",
+                  "key": "expires_at",
+                  "label": "Vence",
+                  "name": "expiresAt"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Ficha de propiedad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.certificates.listByUnit": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Ficha de unidad: capacidad declarada por el Builder.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.certificates.listByUnit",
+            "input": {
+              "none": true
+            },
+            "output": {
+              "defaultLimit": 10,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "type",
+                  "label": "Certificado",
+                  "name": "type",
+                  "values": [
+                    {
+                      "label": "Matafuegos",
+                      "value": "matafuegos"
+                    },
+                    {
+                      "label": "Instalación de gas",
+                      "value": "gas"
+                    },
+                    {
+                      "label": "Ascensor",
+                      "value": "ascensor"
+                    },
+                    {
+                      "label": "Instalación eléctrica",
+                      "value": "electricidad"
+                    },
+                    {
+                      "label": "Seguro del inmueble",
+                      "value": "seguro"
+                    },
+                    {
+                      "label": "Otro",
+                      "value": "otro"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "scope",
+                  "label": "Alcance",
+                  "name": "scope",
+                  "values": [
+                    {
+                      "label": "De la unidad",
+                      "value": "unidad"
+                    },
+                    {
+                      "label": "Del edificio",
+                      "value": "edificio"
+                    }
+                  ]
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Vigente",
+                      "value": "vigente"
+                    },
+                    {
+                      "label": "Por vencer",
+                      "value": "por_vencer"
+                    },
+                    {
+                      "label": "Vencido",
+                      "value": "vencido"
+                    }
+                  ]
+                },
+                {
+                  "format": "date",
+                  "key": "expires_at",
+                  "label": "Vence",
+                  "name": "expiresAt"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Ficha de unidad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.unitOwners.getOwner": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Propietario: capacidad declarada por el Builder.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.unitOwners.getOwner",
+            "input": {
+              "none": true
+            },
+            "output": {
+              "defaultLimit": 20,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Propietario",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "document",
+                  "label": "Documento",
+                  "name": "document"
+                },
+                {
+                  "format": "text",
+                  "key": "units",
+                  "label": "Unidades",
+                  "name": "units"
+                },
+                {
+                  "format": "text",
+                  "key": "cbu",
+                  "label": "CBU / alias",
+                  "name": "cbu"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Propietario"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.unitOwners.listOwners": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Propietarios: capacidad declarada por el Builder.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.unitOwners.listOwners",
+            "input": {
+              "none": true
+            },
+            "output": {
+              "defaultLimit": 20,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Propietario",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "document",
+                  "label": "Documento",
+                  "name": "document"
+                },
+                {
+                  "format": "text",
+                  "key": "units",
+                  "label": "Unidades",
+                  "name": "units"
+                },
+                {
+                  "format": "text",
+                  "key": "cbu",
+                  "label": "CBU / alias",
+                  "name": "cbu"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Propietarios"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.units.getById": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Obtiene un registro de Unidad por su ID.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.units.getById",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "ID",
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "output": {
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Unidad",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "detail",
+                  "label": "Detalle",
+                  "name": "detail"
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Ocupada",
+                      "value": "ocupada"
+                    },
+                    {
+                      "label": "Vacante",
+                      "value": "vacante"
+                    },
+                    {
+                      "label": "En recambio",
+                      "value": "en_recambio"
+                    },
+                    {
+                      "label": "Con preaviso",
+                      "value": "con_preaviso"
+                    },
+                    {
+                      "label": "No disponible",
+                      "value": "no_disponible"
+                    }
+                  ]
+                },
+                {
+                  "format": "money",
+                  "key": "reference_rent",
+                  "label": "Alquiler de referencia",
+                  "name": "referenceRent"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "record"
+            },
+            "tenantScope": "required",
+            "title": "Consultar Unidad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.units.list": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Obtiene Unidad disponibles para el cliente actual.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.units.list",
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "limit": {
+                  "description": "Cantidad de resultados a devolver. Default 20; máximo 50.",
+                  "type": "integer"
+                },
+                "offset": {
+                  "description": "Cantidad de resultados a saltear para pedir la página siguiente.",
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "output": {
+              "defaultLimit": 20,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Unidad",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "detail",
+                  "label": "Detalle",
+                  "name": "detail"
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Ocupada",
+                      "value": "ocupada"
+                    },
+                    {
+                      "label": "Vacante",
+                      "value": "vacante"
+                    },
+                    {
+                      "label": "En recambio",
+                      "value": "en_recambio"
+                    },
+                    {
+                      "label": "Con preaviso",
+                      "value": "con_preaviso"
+                    },
+                    {
+                      "label": "No disponible",
+                      "value": "no_disponible"
+                    }
+                  ]
+                },
+                {
+                  "format": "money",
+                  "key": "reference_rent",
+                  "label": "Alquiler de referencia",
+                  "name": "referenceRent"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Listar Unidad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    },
+    "q:properties.units.listByBuilding": {
+      "type": "agentic.query",
+      "fields": {
+        "contractDraft": {
+          "confidence": "media",
+          "nota": "Derivado del formulario: describe lo que la PANTALLA envía, no lo que el handler exige. Revisalo (agentic_scaffold_contract → defineAction) antes de publicarlo.",
+          "proposal": {
+            "confirmation": "never",
+            "description": "Ficha de propiedad: capacidad declarada por el Builder.",
+            "effect": "read",
+            "generatedBy": "builder",
+            "id": "properties.units.listByBuilding",
+            "input": {
+              "none": true
+            },
+            "output": {
+              "defaultLimit": 20,
+              "fields": [
+                {
+                  "format": "text",
+                  "key": "name",
+                  "label": "Unidad",
+                  "name": "name"
+                },
+                {
+                  "format": "text",
+                  "key": "detail",
+                  "label": "Detalle",
+                  "name": "detail"
+                },
+                {
+                  "format": "text",
+                  "key": "status",
+                  "label": "Estado",
+                  "name": "status",
+                  "values": [
+                    {
+                      "label": "Ocupada",
+                      "value": "ocupada"
+                    },
+                    {
+                      "label": "Vacante",
+                      "value": "vacante"
+                    },
+                    {
+                      "label": "En recambio",
+                      "value": "en_recambio"
+                    },
+                    {
+                      "label": "Con preaviso",
+                      "value": "con_preaviso"
+                    },
+                    {
+                      "label": "No disponible",
+                      "value": "no_disponible"
+                    }
+                  ]
+                },
+                {
+                  "format": "money",
+                  "key": "reference_rent",
+                  "label": "Alquiler de referencia",
+                  "name": "referenceRent"
+                }
+              ],
+              "identifierKey": "id",
+              "kind": "collection",
+              "maxLimit": 50
+            },
+            "tenantScope": "required",
+            "title": "Ficha de propiedad"
+          },
+          "source": "formulario"
+        }
+      },
+      "prov": {
+        "contractDraft": "user"
+      }
+    }
+  },
+  "nodes": {
+    "cmd:properties.buildingExpenses.delete": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.buildingExpenses.delete",
+        "argSchemas": {
+          "id": {
+            "description": "ID del registro.",
+            "ref": {
+              "resource": "properties.buildingExpenses"
+            },
+            "type": "string"
+          }
+        },
+        "args": [
+          {
+            "description": "ID del registro.",
+            "label": "id",
+            "name": "id",
+            "required": true,
+            "resource": "properties.buildingExpenses",
+            "type": "ref"
+          }
+        ],
+        "confirmation": "always",
+        "contract": {
+          "confirmation": "always",
+          "description": "Ejecuta properties.buildingExpenses.delete.",
+          "effect": "destructive",
+          "generatedBy": "builder-high-confidence",
+          "id": "properties.buildingExpenses.delete",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "ref": {
+                  "resource": "properties.buildingExpenses"
+                },
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "tenantScope": "required",
+          "title": "Delete"
+        },
+        "contractAdoption": {
+          "confidence": "alta",
+          "kind": "automatic",
+          "source": "drizzle"
+        },
+        "contractAuthority": true,
+        "contractDraft": {
+          "confidence": "alta",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "source": "drizzle"
+        },
+        "description": "Ejecuta properties.buildingExpenses.delete.",
+        "effect": "destructive",
+        "excluded": true,
+        "excludedReason": "Ninguna pantalla lo ejercita, y la liquidación de expensas del mes es el respaldo de un reparto que ya salió: `leases` prorratea ese total por alícuota y emite los cargos a cada inquilino. Borrar la liquidación no borra esos cargos — quedan cobrados sin nada que los explique. Corregir un mes mal cargado es editar el importe, no eliminar la fila.",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "requiredArgs": [
+          "id"
+        ],
+        "tenantScope": "required",
+        "title": "Delete",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "generated",
+        "args": "custom",
+        "argSchemas": "custom",
+        "confirmation": "custom",
+        "contract": "user",
+        "contractAdoption": "user",
+        "contractAuthority": "generated",
+        "contractDraft": "user",
+        "description": "generated",
+        "effect": "custom",
+        "excluded": "user",
+        "excludedReason": "user",
+        "idempotent": "user",
+        "outputs": "custom",
+        "permissions": "user",
+        "preconditions": "user",
+        "requiredArgs": "custom",
+        "tenantScope": "custom",
+        "title": "generated",
+        "transactional": "user"
+      }
+    },
+    "cmd:properties.buildingExpenses.restore": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.buildingExpenses.restore",
+        "argSchemas": {},
+        "args": [],
+        "confirmation": "always",
+        "contractDraft": {
+          "confidence": "no-inferible",
+          "source": "drizzle"
+        },
+        "effect": "write",
+        "excluded": true,
+        "excludedReason": "CRUD genérico del scaffolder, sin pantalla. Una liquidación de expensas borrada se vuelve a cargar con el monto que mandó el consorcio; restaurarla a ciegas puede reponer un reparto entre unidades que ya se rehízo con otros números.",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "tenantScope": "required",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "inferred",
+        "args": "inferred",
+        "excluded": "user",
+        "excludedReason": "user"
+      }
+    },
+    "cmd:properties.buildings.delete": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.buildings.delete",
+        "argSchemas": {
+          "id": {
+            "description": "ID del registro.",
+            "ref": {
+              "resource": "properties.buildings"
+            },
+            "type": "string"
+          }
+        },
+        "args": [
+          {
+            "description": "ID del registro.",
+            "label": "id",
+            "name": "id",
+            "required": true,
+            "resource": "properties.buildings",
+            "type": "ref"
+          }
+        ],
+        "confirmation": "always",
+        "contract": {
+          "confirmation": "always",
+          "description": "Ejecuta properties.buildings.delete.",
+          "effect": "destructive",
+          "generatedBy": "builder-high-confidence",
+          "id": "properties.buildings.delete",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "ref": {
+                  "resource": "properties.buildings"
+                },
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "tenantScope": "required",
+          "title": "Delete"
+        },
+        "contractAdoption": {
+          "confidence": "alta",
+          "kind": "automatic",
+          "source": "drizzle"
+        },
+        "contractAuthority": true,
+        "contractDraft": {
+          "confidence": "alta",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "source": "drizzle"
+        },
+        "description": "Ejecuta properties.buildings.delete.",
+        "effect": "destructive",
+        "excluded": true,
+        "excludedHandlerHash": "568aa842",
+        "excludedReason": "Reevaluada en COONG-300 releyendo el handler: la condición de la exclusión anterior SE CUMPLIÓ y la razón cambia. Ya no son cuatro líneas ciegas — hoy lee las unidades del edificio, corta con deletionBlockedMessage si alguna está ocupada («mientras haya un contrato vigente el inmueble no se puede eliminar») y cascadea las libres con un deleted_at compartido, que permite deshacer selectivamente. El daño que motivaba excluirla —un contrato cobrándose contra un inmueble que ya no existe— hoy es imposible. Se mantiene excluida por una razón DISTINTA y deliberada: dar de baja un inmueble entero de la cartera es una decisión de quien administra, no un paso que convenga automatizar; el daño de un falso positivo no lo paga el agente. Mismo criterio que unitOwners.deleteOwner. Queda además un residuo técnico: el borrado no mira los certificados del edificio, así que sus alertas de vencimiento quedan apuntando a un sujeto inexistente. coveredBy: none — que no haya camino agentic para esto es la decisión, no un hueco. Se reevalúa si el negocio pide que un agente pueda dar de baja inmuebles. (Huella re-estampada: el archivo del repositorio cambió por la ocupación derivada, que no toca este delete — la huella es por archivo, no por método.)",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "requiredArgs": [
+          "id"
+        ],
+        "tenantScope": "required",
+        "title": "Delete",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "generated",
+        "args": "custom",
+        "argSchemas": "custom",
+        "confirmation": "custom",
+        "contract": "user",
+        "contractAdoption": "user",
+        "contractAuthority": "generated",
+        "contractDraft": "user",
+        "description": "generated",
+        "effect": "custom",
+        "excluded": "user",
+        "excludedHandlerHash": "user",
+        "excludedReason": "user",
+        "idempotent": "user",
+        "outputs": "custom",
+        "permissions": "user",
+        "preconditions": "user",
+        "requiredArgs": "custom",
+        "tenantScope": "custom",
+        "title": "generated",
+        "transactional": "user"
+      }
+    },
+    "cmd:properties.buildings.restore": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.buildings.restore",
+        "argSchemas": {},
+        "args": [],
+        "confirmation": "always",
+        "contractDraft": {
+          "confidence": "no-inferible",
+          "source": "drizzle"
+        },
+        "effect": "write",
+        "excluded": true,
+        "excludedReason": "CRUD genérico del scaffolder. Restaurar una propiedad borrada no tiene pantalla ni camino de negocio: reactivarla sin revisar qué pasó con sus unidades, contratos y certificados dejaría la cartera en un estado que nadie revisó. Si hace falta recuperar una propiedad, se carga de nuevo o se resuelve en la base con alguien mirando.",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "tenantScope": "required",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "inferred",
+        "args": "inferred",
+        "excluded": "user",
+        "excludedReason": "user"
+      }
+    },
+    "cmd:properties.certificates.delete": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.certificates.delete",
+        "argSchemas": {
+          "id": {
+            "description": "ID del registro.",
+            "ref": {
+              "resource": "properties.certificates"
+            },
+            "type": "string"
+          }
+        },
+        "args": [
+          {
+            "description": "ID del registro.",
+            "label": "id",
+            "name": "id",
+            "required": true,
+            "resource": "properties.certificates",
+            "type": "ref"
+          }
+        ],
+        "confirmation": "always",
+        "contract": {
+          "confirmation": "always",
+          "description": "Ejecuta properties.certificates.delete.",
+          "effect": "destructive",
+          "generatedBy": "builder-high-confidence",
+          "id": "properties.certificates.delete",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "ref": {
+                  "resource": "properties.certificates"
+                },
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "tenantScope": "required",
+          "title": "Delete"
+        },
+        "contractAdoption": {
+          "confidence": "alta",
+          "kind": "automatic",
+          "source": "drizzle"
+        },
+        "contractAuthority": true,
+        "contractDraft": {
+          "confidence": "alta",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "source": "drizzle"
+        },
+        "description": "Ejecuta properties.certificates.delete.",
+        "effect": "destructive",
+        "excluded": true,
+        "excludedHandlerHash": "040dfae2",
+        "excludedReason": "Reevaluada en COONG-300 releyendo el handler. La mitad de la razón original caducó: la ficha de propiedad HOY sí lo ejercita (ficha-de-propiedad.view.ts:1102), así que «ninguna pantalla lo usa» ya no es cierto. Lo que sigue igual es el motivo de fondo: el handler nunca cambió — son cuatro líneas que marcan deleted_at sin mirar nada. El barrido de vencimientos de leases guarda sus alertas por (kind, subject_id), así que borrar el certificado deja la alerta apuntando a un sujeto que ya no existe, y nadie la limpia. El camino para un certificado que dejó de aplicar sigue siendo editarlo. Se reevalúa cuando el borrado limpie o reasigne la alerta de vencimiento asociada.",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "requiredArgs": [
+          "id"
+        ],
+        "tenantScope": "required",
+        "title": "Delete",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "generated",
+        "args": "custom",
+        "argSchemas": "custom",
+        "confirmation": "custom",
+        "contract": "user",
+        "contractAdoption": "user",
+        "contractAuthority": "generated",
+        "contractDraft": "user",
+        "description": "generated",
+        "effect": "custom",
+        "excluded": "user",
+        "excludedHandlerHash": "user",
+        "excludedReason": "user",
+        "idempotent": "user",
+        "outputs": "custom",
+        "permissions": "user",
+        "preconditions": "user",
+        "requiredArgs": "custom",
+        "tenantScope": "custom",
+        "title": "generated",
+        "transactional": "user"
+      }
+    },
+    "cmd:properties.certificates.restore": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.certificates.restore",
+        "argSchemas": {},
+        "args": [],
+        "confirmation": "always",
+        "contractDraft": {
+          "confidence": "no-inferible",
+          "source": "drizzle"
+        },
+        "effect": "write",
+        "excluded": true,
+        "excludedReason": "CRUD genérico del scaffolder, sin pantalla. Un certificado borrado se vuelve a registrar con su fecha de vencimiento real, que es lo que el barrido de vencimientos necesita; restaurarlo tal cual reviviría un aviso que quizá ya no corresponde.",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "tenantScope": "required",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "inferred",
+        "args": "inferred",
+        "excluded": "user",
+        "excludedReason": "user"
+      }
+    },
+    "cmd:properties.unitOwners.create": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.unitOwners.create",
+        "argSchemas": {
+          "data": {
+            "additionalProperties": false,
+            "description": "Campos de Unit-owner.",
+            "properties": {
+              "contact_id": {
+                "description": "Contact ID",
+                "type": "string"
+              },
+              "is_active": {
+                "description": "Is active",
+                "type": "boolean"
+              },
+              "notes": {
+                "description": "Notes",
+                "type": "string"
+              },
+              "role": {
+                "description": "Role",
+                "type": "string"
+              },
+              "share_pct": {
+                "description": "Share pct",
+                "type": "number"
+              },
+              "unit_id": {
+                "description": "Unit ID",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "args": [
+          {
+            "description": "Campos de Unit-owner.",
+            "label": "data",
+            "name": "data",
+            "required": true,
+            "type": "object"
+          }
+        ],
+        "confirmation": "always",
+        "contractDraft": {
+          "confidence": "media",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "data": {
+                "additionalProperties": false,
+                "description": "Campos de Unit-owner.",
+                "properties": {
+                  "contact_id": {
+                    "description": "Contact ID",
+                    "type": "string"
+                  },
+                  "is_active": {
+                    "description": "Is active",
+                    "type": "boolean"
+                  },
+                  "notes": {
+                    "description": "Notes",
+                    "type": "string"
+                  },
+                  "role": {
+                    "description": "Role",
+                    "type": "string"
+                  },
+                  "share_pct": {
+                    "description": "Share pct",
+                    "type": "number"
+                  },
+                  "unit_id": {
+                    "description": "Unit ID",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "required": [
+              "data"
+            ],
+            "type": "object"
+          },
+          "source": "drizzle"
+        },
+        "effect": "write",
+        "excluded": true,
+        "excludedReason": "CRUD genérico del scaffolder: existe la operación de negocio equivalente, saveOwner, y es la única que hace bien las dos mitades — crea el contacto por ContactRepository (respetando su type y el merge de metadata) y recién después lo vincula a la unidad. Insertar la fila cruda es exactamente lo que tenía rota el alta de propietarios: el contacto quedaba sin id y nadie lo notaba porque editar iba por otra rama del código.",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "tenantScope": "required",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "inferred",
+        "args": "inferred",
+        "excluded": "user",
+        "excludedReason": "user"
+      }
+    },
+    "cmd:properties.unitOwners.delete": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.unitOwners.delete",
+        "argSchemas": {
+          "id": {
+            "description": "ID del registro.",
+            "ref": {
+              "resource": "properties.unitOwners"
+            },
+            "type": "string"
+          }
+        },
+        "args": [
+          {
+            "description": "ID del registro.",
+            "label": "id",
+            "name": "id",
+            "required": true,
+            "resource": "properties.unitOwners",
+            "type": "ref"
+          }
+        ],
+        "confirmation": "always",
+        "contract": {
+          "confirmation": "always",
+          "description": "Ejecuta properties.unitOwners.delete.",
+          "effect": "destructive",
+          "generatedBy": "builder-high-confidence",
+          "id": "properties.unitOwners.delete",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "ref": {
+                  "resource": "properties.unitOwners"
+                },
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "tenantScope": "required",
+          "title": "Delete"
+        },
+        "contractAdoption": {
+          "confidence": "alta",
+          "kind": "automatic",
+          "source": "drizzle"
+        },
+        "contractAuthority": true,
+        "contractDraft": {
+          "confidence": "alta",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "source": "drizzle"
+        },
+        "description": "Ejecuta properties.unitOwners.delete.",
+        "effect": "destructive",
+        "excluded": true,
+        "excludedReason": "CRUD del scaffolder sobre la tabla de vínculo unidad↔propietario. Ninguna pantalla lo usa y desvincular a un titular sin tocar su participación (`share_pct`) deja el reparto de la unidad sumando distinto de 100%. Si hace falta cambiar la titularidad, es una operación de negocio que todavía no existe — cuando exista se publica esa, no este delete.",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "requiredArgs": [
+          "id"
+        ],
+        "tenantScope": "required",
+        "title": "Delete",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "generated",
+        "args": "custom",
+        "argSchemas": "custom",
+        "confirmation": "custom",
+        "contract": "user",
+        "contractAdoption": "user",
+        "contractAuthority": "generated",
+        "contractDraft": "user",
+        "description": "generated",
+        "effect": "custom",
+        "excluded": "user",
+        "excludedReason": "user",
+        "idempotent": "user",
+        "outputs": "custom",
+        "permissions": "user",
+        "preconditions": "user",
+        "requiredArgs": "custom",
+        "tenantScope": "custom",
+        "title": "generated",
+        "transactional": "user"
+      }
+    },
+    "cmd:properties.unitOwners.restore": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.unitOwners.restore",
+        "argSchemas": {},
+        "args": [],
+        "confirmation": "always",
+        "contractDraft": {
+          "confidence": "no-inferible",
+          "source": "drizzle"
+        },
+        "effect": "write",
+        "excluded": true,
+        "excludedReason": "CRUD genérico del scaffolder, sin pantalla. El vínculo entre una unidad y su propietario se vuelve a crear con saveOwner, que además escribe el contacto por ContactRepository; restaurar la fila cruda saltearía ese camino, que es justamente el que se corrigió cuando el alta de propietarios estaba rota.",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "tenantScope": "required",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "inferred",
+        "args": "inferred",
+        "excluded": "user",
+        "excludedReason": "user"
+      }
+    },
+    "cmd:properties.unitOwners.update": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.unitOwners.update",
+        "argSchemas": {
+          "data": {
+            "additionalProperties": false,
+            "description": "Campos de Unit-owner.",
+            "properties": {
+              "contact_id": {
+                "description": "Contact ID",
+                "type": "string"
+              },
+              "is_active": {
+                "description": "Is active",
+                "type": "boolean"
+              },
+              "notes": {
+                "description": "Notes",
+                "type": "string"
+              },
+              "role": {
+                "description": "Role",
+                "type": "string"
+              },
+              "share_pct": {
+                "description": "Share pct",
+                "type": "number"
+              },
+              "unit_id": {
+                "description": "Unit ID",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "id": {
+            "description": "ID del registro.",
+            "type": "string"
+          }
+        },
+        "args": [
+          {
+            "description": "ID del registro.",
+            "label": "id",
+            "name": "id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Campos de Unit-owner.",
+            "label": "data",
+            "name": "data",
+            "required": true,
+            "type": "object"
+          }
+        ],
+        "confirmation": "always",
+        "contractDraft": {
+          "confidence": "media",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "data": {
+                "additionalProperties": false,
+                "description": "Campos de Unit-owner.",
+                "properties": {
+                  "contact_id": {
+                    "description": "Contact ID",
+                    "type": "string"
+                  },
+                  "is_active": {
+                    "description": "Is active",
+                    "type": "boolean"
+                  },
+                  "notes": {
+                    "description": "Notes",
+                    "type": "string"
+                  },
+                  "role": {
+                    "description": "Role",
+                    "type": "string"
+                  },
+                  "share_pct": {
+                    "description": "Share pct",
+                    "type": "number"
+                  },
+                  "unit_id": {
+                    "description": "Unit ID",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "id": {
+                "description": "ID del registro.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "data"
+            ],
+            "type": "object"
+          },
+          "source": "drizzle"
+        },
+        "effect": "write",
+        "excluded": true,
+        "excludedReason": "Escribe la tabla de vínculo directo, igual que `unitOwners.create` (ya excluida). Guardar un propietario no es escribir una fila: hay que decidir qué va en columnas y qué en `metadata`, respetar lo que otro rol le puso al mismo contacto y fijar `type` solo cuando nace. Esas tres reglas viven en `unitOwners.saveOwner` — publicar el update suelto le da al agente una puerta para saltearlas y borrar datos de alguien.",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "tenantScope": "required",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "inferred",
+        "args": "inferred",
+        "excluded": "user",
+        "excludedReason": "user"
+      }
+    },
+    "cmd:properties.units.delete": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.units.delete",
+        "argSchemas": {
+          "id": {
+            "description": "ID del registro.",
+            "ref": {
+              "resource": "properties.units"
+            },
+            "type": "string"
+          }
+        },
+        "args": [
+          {
+            "description": "ID del registro.",
+            "label": "id",
+            "name": "id",
+            "required": true,
+            "resource": "properties.units",
+            "type": "ref"
+          }
+        ],
+        "confirmation": "always",
+        "contract": {
+          "confirmation": "always",
+          "description": "Ejecuta properties.units.delete.",
+          "effect": "destructive",
+          "generatedBy": "builder-high-confidence",
+          "id": "properties.units.delete",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "ref": {
+                  "resource": "properties.units"
+                },
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "tenantScope": "required",
+          "title": "Delete"
+        },
+        "contractAdoption": {
+          "confidence": "alta",
+          "kind": "automatic",
+          "source": "drizzle"
+        },
+        "contractAuthority": true,
+        "contractDraft": {
+          "confidence": "alta",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "source": "drizzle"
+        },
+        "description": "Ejecuta properties.units.delete.",
+        "effect": "destructive",
+        "excluded": true,
+        "excludedHandlerHash": "b66cdee7",
+        "excludedReason": "Reevaluada en COONG-300 releyendo el handler: la condición de la exclusión anterior SE CUMPLIÓ y la razón cambia. Ya no es un soft-delete ciego — hoy corta con unitDeletionBlockedMessage si la unidad está ocupada («mientras haya un contrato vigente no se puede eliminar») y cascadea la titularidad (unit_owner) con un deleted_at compartido, que es lo que después permite restaurar solo los vínculos dados de baja en esa misma operación. Ya no puede dejar un alquiler cobrándose contra una unidad inexistente, y sí hay pantalla que lo ejercita. Se mantiene excluida por una razón DISTINTA: dar de baja una unidad de la cartera es decisión de quien administra, mismo criterio que buildings.delete y unitOwners.deleteOwner. Residuo técnico: no mira los certificados de la unidad, así que sus alertas de vencimiento quedan huérfanas. coveredBy: none. Se reevalúa si el negocio pide que un agente pueda dar de baja unidades. (Huella re-estampada: el archivo del repositorio cambió por la ocupación derivada, que no toca este delete — la huella es por archivo, no por método.)",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "requiredArgs": [
+          "id"
+        ],
+        "tenantScope": "required",
+        "title": "Delete",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "generated",
+        "args": "custom",
+        "argSchemas": "custom",
+        "confirmation": "custom",
+        "contract": "user",
+        "contractAdoption": "user",
+        "contractAuthority": "generated",
+        "contractDraft": "user",
+        "description": "generated",
+        "effect": "custom",
+        "excluded": "user",
+        "excludedHandlerHash": "user",
+        "excludedReason": "user",
+        "idempotent": "user",
+        "outputs": "custom",
+        "permissions": "user",
+        "preconditions": "user",
+        "requiredArgs": "custom",
+        "tenantScope": "custom",
+        "title": "generated",
+        "transactional": "user"
+      }
+    },
+    "cmd:properties.units.restore": {
+      "type": "agentic.command",
+      "groupId": "ph-operacion",
+      "data": {
+        "actionId": "properties.units.restore",
+        "argSchemas": {},
+        "args": [],
+        "confirmation": "always",
+        "contractDraft": {
+          "confidence": "no-inferible",
+          "source": "drizzle"
+        },
+        "effect": "write",
+        "excluded": true,
+        "excludedReason": "CRUD genérico del scaffolder. Ninguna pantalla ofrece restaurar una unidad borrada, y reactivarla sin mirar si su contrato sigue vivo ni cómo quedó la ocupación del edificio deja la cartera diciendo cosas distintas. El borrado sí se publica (destructive): deshacerlo es una operación que todavía nadie diseñó.",
+        "idempotent": false,
+        "origin": "inferred",
+        "outputs": [],
+        "permissions": [],
+        "preconditions": [],
+        "tenantScope": "required",
+        "transactional": false
+      },
+      "prov": {
+        "actionId": "inferred",
+        "args": "inferred",
+        "excluded": "user",
+        "excludedReason": "user"
+      }
+    },
+    "q:properties.unitOwners.getById": {
+      "type": "agentic.query",
+      "groupId": "ph-consultas",
+      "data": {
+        "actionId": "properties.unitOwners.getById",
+        "argSchemas": {
+          "id": {
+            "description": "ID del registro.",
+            "ref": {
+              "resource": "properties.unitOwners"
+            },
+            "type": "string"
+          }
+        },
+        "args": [
+          {
+            "description": "ID del registro.",
+            "label": "id",
+            "name": "id",
+            "required": true,
+            "resource": "properties.unitOwners",
+            "type": "ref"
+          }
+        ],
+        "contract": {
+          "confirmation": "never",
+          "description": "Ejecuta properties.unitOwners.getById.",
+          "effect": "read",
+          "generatedBy": "builder-high-confidence",
+          "id": "properties.unitOwners.getById",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "ref": {
+                  "resource": "properties.unitOwners"
+                },
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "tenantScope": "required",
+          "title": "Get By ID"
+        },
+        "contractAdoption": {
+          "confidence": "alta",
+          "kind": "automatic",
+          "source": "drizzle"
+        },
+        "contractAuthority": true,
+        "contractDraft": {
+          "confidence": "alta",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "ID del registro.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "source": "drizzle"
+        },
+        "description": "Ejecuta properties.unitOwners.getById.",
+        "excluded": true,
+        "excludedReason": "Trae la fila del vínculo, no el propietario. El camino real es `unitOwners.getOwner`, que aplana el contacto y saca de `metadata` los datos de cobro (CBU, alias, banco, condición fiscal) para que quien lea un propietario lo vea igual que la pantalla, sin saber que hay un `metadata` de por medio.",
+        "origin": "inferred",
+        "requiredArgs": [
+          "id"
+        ],
+        "resource": "properties.unitOwners",
+        "title": "Get By ID"
+      },
+      "prov": {
+        "actionId": "generated",
+        "args": "custom",
+        "argSchemas": "custom",
+        "contract": "user",
+        "contractAdoption": "user",
+        "contractAuthority": "generated",
+        "contractDraft": "user",
+        "description": "generated",
+        "excluded": "user",
+        "excludedReason": "user",
+        "requiredArgs": "custom",
+        "resource": "generated",
+        "title": "generated"
+      }
+    },
+    "q:properties.unitOwners.list": {
+      "type": "agentic.query",
+      "groupId": "ph-consultas",
+      "data": {
+        "actionId": "properties.unitOwners.list",
+        "argSchemas": {
+          "limit": {
+            "description": "Cantidad de resultados.",
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Resultados a saltear.",
+            "type": "integer"
+          }
+        },
+        "args": [
+          {
+            "description": "Cantidad de resultados.",
+            "label": "limit",
+            "name": "limit",
+            "required": false,
+            "resource": null,
+            "type": "integer"
+          },
+          {
+            "description": "Resultados a saltear.",
+            "label": "offset",
+            "name": "offset",
+            "required": false,
+            "resource": null,
+            "type": "integer"
+          }
+        ],
+        "contract": {
+          "confirmation": "never",
+          "description": "Ejecuta properties.unitOwners.list.",
+          "effect": "read",
+          "generatedBy": "builder-high-confidence",
+          "id": "properties.unitOwners.list",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "description": "Cantidad de resultados.",
+                "type": "integer"
+              },
+              "offset": {
+                "description": "Resultados a saltear.",
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "tenantScope": "required",
+          "title": "List"
+        },
+        "contractAdoption": {
+          "confidence": "alta",
+          "kind": "automatic",
+          "source": "drizzle"
+        },
+        "contractAuthority": true,
+        "contractDraft": {
+          "confidence": "alta",
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "limit": {
+                "description": "Cantidad de resultados.",
+                "type": "integer"
+              },
+              "offset": {
+                "description": "Resultados a saltear.",
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "source": "drizzle"
+        },
+        "description": "Ejecuta properties.unitOwners.list.",
+        "excluded": true,
+        "excludedReason": "Devuelve filas crudas de la tabla de vínculo (`unit_id`, `contact_id`, `share_pct`), que no son «los propietarios»: para un agente eso son UUIDs sin nombre. El camino real es `unitOwners.listOwners`, que arma el propietario como lo entiende el negocio —contacto + cuántas unidades + participación promedio + datos de cobro— y es el que usa la pantalla de Propietarios.",
+        "origin": "inferred",
+        "requiredArgs": [],
+        "resource": "properties.unitOwners",
+        "title": "List"
+      },
+      "prov": {
+        "actionId": "generated",
+        "args": "custom",
+        "argSchemas": "custom",
+        "contract": "user",
+        "contractAdoption": "user",
+        "contractAuthority": "generated",
+        "contractDraft": "user",
+        "description": "generated",
+        "excluded": "user",
+        "excludedReason": "user",
+        "requiredArgs": "custom",
+        "resource": "generated",
+        "title": "generated"
+      }
+    },
+    "src:cmd:properties.buildingExpenses.update:id": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "ID",
+        "examples": [],
+        "name": "id",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:cmd:properties.buildings.update:id": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "ID",
+        "examples": [],
+        "name": "id",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:cmd:properties.certificates.update:id": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "ID",
+        "examples": [],
+        "name": "id",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:cmd:properties.unitOwners.removeOwner:contactId": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La persona que deja de figurar. Es el id del propietario, no el del vínculo — el mismo que devuelve «Titulares de una unidad» en su columna de contacto.",
+        "examples": [],
+        "name": "contactId",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:cmd:properties.unitOwners.removeOwner:unitId": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La unidad de la que se saca al titular.",
+        "examples": [],
+        "name": "unitId",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:cmd:properties.units.update:id": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "ID",
+        "examples": [],
+        "name": "id",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.buildingExpenses.forBuilding:buildingId": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La propiedad cuyas liquidaciones se quieren ver.",
+        "examples": [],
+        "name": "buildingId",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.buildingExpenses.forPeriod:period": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "El mes a consultar, como «2026-08». Las expensas son mensuales.",
+        "examples": [],
+        "name": "period",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.buildingExpenses.getById:id": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "ID",
+        "examples": [],
+        "name": "id",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.buildings.getById:id": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "ID",
+        "examples": [],
+        "name": "id",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.buildings.getSummary:id": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La propiedad de la que se quiere el resumen.",
+        "examples": [],
+        "name": "id",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.certificates.getById:id": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "ID",
+        "examples": [],
+        "name": "id",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.certificates.listByBuilding:buildingId": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La propiedad cuyos certificados se quieren ver.",
+        "examples": [],
+        "name": "buildingId",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.certificates.listByUnit:unitId": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La unidad cuyos certificados se quieren ver.",
+        "examples": [],
+        "name": "unitId",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.unitOwners.getOwner:id": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "El propietario que se quiere ver, tal como lo devuelve «Listar propietarios».",
+        "examples": [],
+        "name": "id",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.unitOwners.listByBuilding:buildingId": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La propiedad cuyos titulares se quieren ver.",
+        "examples": [],
+        "name": "buildingId",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.unitOwners.listByUnit:unitId": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La unidad cuyos titulares se quieren ver.",
+        "examples": [],
+        "name": "unitId",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.unitOwners.listUnitsOf:contactId": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La persona de la que se quieren ver las unidades.",
+        "examples": [],
+        "name": "contactId",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.unitOwners.ownershipOf:unitId": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La unidad que se quiere revisar.",
+        "examples": [],
+        "name": "unitId",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.units.getById:id": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "ID",
+        "examples": [],
+        "name": "id",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    },
+    "src:q:properties.units.listByBuilding:buildingId": {
+      "type": "agentic.agent-input",
+      "groupId": "ph-entradas",
+      "data": {
+        "description": "La propiedad cuyas unidades se quieren listar.",
+        "examples": [],
+        "name": "buildingId",
+        "options": [],
+        "origin": "user",
+        "required": true,
+        "valueType": "string"
+      }
+    }
+  },
+  "edges": [
+    {
+      "id": "edge-14rkf9d",
+      "sourceNodeId": "src:q:properties.buildings.getById:id",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.buildings.getById",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-18wggaq",
+      "sourceNodeId": "src:cmd:properties.unitOwners.removeOwner:unitId",
+      "sourcePortId": "value",
+      "targetNodeId": "cmd:properties.unitOwners.removeOwner",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-1ihrwv8",
+      "sourceNodeId": "src:q:properties.certificates.listByUnit:unitId",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.certificates.listByUnit",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-1wjtso3",
+      "sourceNodeId": "src:q:properties.unitOwners.listByBuilding:buildingId",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.unitOwners.listByBuilding",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-286v9it",
+      "sourceNodeId": "src:q:properties.unitOwners.listUnitsOf:contactId",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.unitOwners.listUnitsOf",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-2q956tk",
+      "sourceNodeId": "src:cmd:properties.buildings.update:id",
+      "sourcePortId": "value",
+      "targetNodeId": "cmd:properties.buildings.update",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-2r4n8nl",
+      "sourceNodeId": "src:cmd:properties.unitOwners.removeOwner:contactId",
+      "sourcePortId": "value",
+      "targetNodeId": "cmd:properties.unitOwners.removeOwner",
+      "targetPortId": "arg-1",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-318r3j4",
+      "sourceNodeId": "src:q:properties.units.getById:id",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.units.getById",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-3m3mzhf",
+      "sourceNodeId": "src:q:properties.unitOwners.ownershipOf:unitId",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.unitOwners.ownershipOf",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-44q2mp4",
+      "sourceNodeId": "src:q:properties.unitOwners.listByUnit:unitId",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.unitOwners.listByUnit",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-4fgrn0n",
+      "sourceNodeId": "src:cmd:properties.units.update:id",
+      "sourcePortId": "value",
+      "targetNodeId": "cmd:properties.units.update",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-50h7ofv",
+      "sourceNodeId": "src:q:properties.certificates.getById:id",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.certificates.getById",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-60mbqin",
+      "sourceNodeId": "src:cmd:properties.certificates.update:id",
+      "sourcePortId": "value",
+      "targetNodeId": "cmd:properties.certificates.update",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-7lj65eu",
+      "sourceNodeId": "src:q:properties.buildingExpenses.getById:id",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.buildingExpenses.getById",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-8nk7u3y",
+      "sourceNodeId": "src:cmd:properties.buildingExpenses.update:id",
+      "sourcePortId": "value",
+      "targetNodeId": "cmd:properties.buildingExpenses.update",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-9qq1cqk",
+      "sourceNodeId": "src:q:properties.buildings.getSummary:id",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.buildings.getSummary",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-agayd91",
+      "sourceNodeId": "src:q:properties.units.listByBuilding:buildingId",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.units.listByBuilding",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-budu6wu",
+      "sourceNodeId": "src:q:properties.certificates.listByBuilding:buildingId",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.certificates.listByBuilding",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-c8nzqrl",
+      "sourceNodeId": "src:q:properties.buildingExpenses.forBuilding:buildingId",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.buildingExpenses.forBuilding",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-dnb7ajb",
+      "sourceNodeId": "src:q:properties.unitOwners.getOwner:id",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.unitOwners.getOwner",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "id": "edge-eerhzp2",
+      "sourceNodeId": "src:q:properties.buildingExpenses.forPeriod:period",
+      "sourcePortId": "value",
+      "targetNodeId": "q:properties.buildingExpenses.forPeriod",
+      "targetPortId": "arg-0",
+      "data": {
+        "origin": "user"
+      }
+    }
+  ]
+}
