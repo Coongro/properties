@@ -1,5 +1,112 @@
 # @coongro/properties
 
+## 0.3.0
+
+### Minor Changes
+
+- Propiedades y unidades declaran quién puede verlas y gestionarlas
+
+  El plugin declara sus permisos (`contributes.permissions`, generados con el Coongro Builder) y trae `src/permissions/permissions.gen.ts` con las constantes para chequearlos en código. En Coongro Standalone, cada usuario ve y hace solo lo que le permiten sus roles; el dueño, todo.
+
+  Las vistas del Builder se regeneraron: los botones que abren una pantalla o ejecutan una acción que el rol no permite ya no se muestran. Necesita un Core con `useAccess` en el plugin-sdk (Coongro/coongro-core#687).
+
+### Patch Changes
+
+- El catálogo del Copilot describía una columna que ya no existe
+
+  Cuando la ocupación pasó a derivarse de las fechas del contrato, el campo que la informa
+  se llamó `occupancy` y `status` quedó para la marca que pone una persona. El catálogo
+  agentic siguió declarando `status` como el estado de la unidad, así que el Copilot leía
+  un campo que ya no viene y creía que «ocupada» era un valor que podía escribir — cuando
+  el repositorio lo rechaza justamente para que nadie marque a mano algo que sale del
+  contrato.
+
+  Ahora las seis acciones de unidades informan `occupancy`, el alta y la edición ofrecen
+  sólo lo que se puede escribir (con «vacante» explicado como «sacar la marca»), y
+  `status` deja de ser obligatorio al crear: una unidad nace sin marca.
+
+- La unidad guarda desde y hasta cuándo está comprometida, y la ocupación se calcula
+
+  Una unidad figuraba ocupada desde que se FIRMABA el contrato, no desde que empezaba: un
+  contrato que arrancaba el mes siguiente la marcaba alquilada al instante, así que no se
+  podía ofrecer una unidad que en realidad estaba libre tres semanas más. Y del otro lado no
+  existía nada que la liberara al vencer el contrato — quedaba ocupada para siempre.
+
+  Ahora la unidad guarda `occupied_from` y `occupied_until` (los escribe `leases`, que es
+  quien firma) y el estado se deriva comparándolos contra hoy. No hace falta ningún proceso
+  diario que mantenga nada al día: un hecho no caduca, un estado sí. Es el mismo criterio
+  que `billing` usa para «vencido».
+
+  Lo que decide quien administra sigue mandando: `no_disponible`, `en_recambio` y
+  `con_preaviso` no los pisa el contrato. Y una unidad comprometida a futuro ahora puede
+  decir desde cuándo, en vez de aparecer como vacante a secas.
+
+- Catálogo agentic republicado: las tres huellas coinciden y las exclusiones vencidas quedaron reevaluadas
+
+  El catálogo se había publicado antes de que existiera la huella de runtime, así que
+  `verify_catalog` lo daba por no fresco. Republicado con la certificación live corrida: las
+  tres huellas —grafo, catálogo y runtime— coinciden y `fresh` es verdadero por primera vez.
+
+  Las tres exclusiones que se habían escrito con una condición de re-evaluación quedaron
+  revisadas leyendo cada handler. `buildings.delete` y `units.delete` cumplieron su
+  condición —hoy validan dependencias y cascadean— pero se mantienen excluidas por una razón
+  distinta y deliberada: dar de baja un inmueble de la cartera es decisión de quien
+  administra, no algo que convenga automatizar. `certificates.delete` sigue excluida porque
+  su handler nunca cambió: la pantalla existe, pero el borrado sigue dejando huérfana la
+  alerta de vencimiento. Las tres con su huella estampada, así que la próxima vez que un
+  handler cambie el gate las devuelve a la mesa solo.
+
+  Ninguna capability se agregó ni se quitó y ninguna cambió de contenido: el diff grande es
+  reformateo del manifest. Lo que cambió son las huellas y los niveles de evidencia.
+
+- Una fila abre el registro que muestra, y el formulario de la unidad carga lo que está guardado
+
+  Tres cosas que se rompían por separado eran la misma: las listas no devolvían el registro
+  que la pantalla promete, y las vistas las usaban como si lo hicieran.
+
+  Entrando a una unidad **desde la ficha de un propietario** no funcionaba nada: la ficha se
+  abría con el id del vínculo de titularidad en vez del de la unidad, así que sus titulares y
+  sus certificados venían vacíos, «Editar unidad» abría el formulario en blanco y «Registrar
+  certificado» no podía completar la propiedad. Ahora la fila ES la unidad, con la
+  titularidad anotada encima.
+
+  Lo mismo pasaba con la tabla **«Titulares»**: la fila se veía clickeable y no llevaba a
+  ningún lado, porque pedía la ficha del propietario con una clave que no existe entre los
+  contactos. Ahora la fila lleva el id de la persona, y las dos tablas de titulares —la de la
+  unidad y la de la propiedad— abren a quien muestran.
+
+  Y el **estado de la unidad**: la lista pisaba el estado guardado con la ocupación derivada
+  de las fechas del contrato. Ese valor llegaba al formulario como prefill, así que guardar
+  escribía «ocupada» en la columna — el estado guardado que COONG-300 había sacado
+  justamente porque a los dos días miente. Ahora la ocupación viaja aparte, en `occupancy`, y
+  `status` es lo que alguien decidió.
+
+  De ahí salieron dos arreglos más:
+  - El formulario de la unidad ofrecía cinco estados cuando solo tres se podían guardar, y
+    volver a «vacante» estaba bloqueado: una unidad marcada «no disponible» no tenía forma de
+    volver atrás. Guardar «vacante» no libera nada —eso lo deciden las fechas—, así que ahora
+    se acepta como «sacar la marca», y el campo ofrece únicamente lo que alguien decide.
+  - El freno que impide borrar una unidad con contrato vigente leía la columna, que desde
+    COONG-300 dice «vacante» en toda unidad alquilada: no frenaba nada. Ahora mira la
+    ocupación derivada.
+
+- Tres datos que el sistema guardaba y no mostraba en ninguna pantalla
+
+  **Una unidad comprometida se veía igual que una libre.** El repositorio calcula
+  `reserved_from` —desde cuándo está tomada por un contrato que todavía no empezó— y su
+  comentario dice para qué existe: «sin esto, "vacante" esconde que ya está prometida y
+  alguien la vuelve a ofrecer». Ninguna vista lo leía, así que el problema que el campo vino
+  a resolver seguía intacto. Ahora las unidades muestran «Comprometida desde».
+
+  **Un certificado rechazado se veía igual que uno apto.** El formulario pide el resultado
+  del control —lo más importante de una inspección— y las tres tablas mostraban solo tipo,
+  estado y vencimiento. Un «rechazado» pintaba con el mismo verde de «vigente» mientras no
+  se le venciera el plazo. Ahora el resultado se ve en la lista, en rojo cuando corresponde.
+
+  **`sent_at` era una columna fantasma.** La fecha en que llegó la liquidación del consorcio
+  existía en la base y no estaba en ningún formulario: quedaba siempre vacía. Se carga junto
+  a la de pago.
+
 ## 0.2.0
 
 ### Minor Changes
@@ -17,7 +124,6 @@
   Ahora cada operación declara su `defineAction` en `src/agentic/contracts.ts`: el mismo
   objeto que valida en runtime es el que se publica, así que no pueden desincronizarse.
   Lo que eso corrigió:
-
   - Las cuatro consultas de arriba piden la propiedad, y la piden **tipada**: el runtime
     comprueba que ese registro sea del tenant en vez de aceptar cualquier UUID.
   - `buildingExpenses.forPeriod` estaba declarada como escritura con confirmación. Es un
@@ -40,7 +146,6 @@
 
   La tabla de expensas por período existía desde el principio y no había forma de cargarla desde la
   app: quedaba vacía para siempre y los cargos se facturaban con el monto fijo del contrato.
-
   - Sección **Expensas** en la ficha de la propiedad, junto a Certificados y Órdenes: el histórico de
     meses con su total y su estado, y «Cargar mes» para dar de alta el que llegó.
   - Formulario **Expensas del mes**: propiedad, período, total liquidado, estado (recibida / pagada),
@@ -218,7 +323,6 @@
   contexto.
 
 - 272cb76: fix: la ficha de la propiedad no inventa datos que no tiene (COONG-275)
-
   - La tabla de unidades traía una columna **«Inquilino» que siempre decía «Sin inquilino»**: quién
     alquila es un hecho de los contratos y `properties` no lo conoce (la dependencia va al revés). Se
     quita hasta que `leases` pueda aportarlo por contribución — mostrar una columna que nunca se puede
