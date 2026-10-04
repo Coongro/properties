@@ -4,7 +4,7 @@
  * ⚠️ ARCHIVO REGENERABLE: se reescribe al guardar el diseño en el Builder.
  * La lógica custom va en `handlers.ts` (nunca se pisa). Diseño: `spec.json`.
  */
-import { getHostReact, getHostUI, useIsMobile, views } from '@coongro/plugin-sdk';
+import { getHostReact, getHostUI, useAccess, useIsMobile, views } from '@coongro/plugin-sdk';
 
 import { usePropiedadesView } from './use-propiedades.js';
 
@@ -15,6 +15,7 @@ const h = React.createElement;
 const UI = getHostUI() as any;
 
 export function PropiedadesView() {
+  const access = useAccess();
   const isMobile = useIsMobile();
   const {
     loading,
@@ -167,6 +168,7 @@ export function PropiedadesView() {
       onClick: (row: any) => {
         views.open('properties.propiedad.open', { record: row }, { mode: 'dialog' });
       },
+      hidden: () => !access.canOpen('properties.propiedad.open'),
     },
     {
       label: 'Eliminar',
@@ -175,6 +177,7 @@ export function PropiedadesView() {
       onClick: (row: any) => {
         void removeRow(row);
       },
+      hidden: () => !access.canRun('properties.buildings.delete'),
     },
   ];
   const renderTable = () =>
@@ -395,16 +398,18 @@ export function PropiedadesView() {
           h(UI.PageHeader, {
             title: 'Propiedades',
             subtitle: 'Los edificios y unidades que administrás.',
-            action: h(
-              UI.Button,
-              {
-                variant: 'default',
-                onClick: () => {
-                  views.open('properties.propiedad.open', undefined, { mode: 'dialog' });
-                },
-              },
-              'Nueva propiedad'
-            ),
+            action: access.canOpen('properties.propiedad.open')
+              ? h(
+                  UI.Button,
+                  {
+                    variant: 'default',
+                    onClick: () => {
+                      views.open('properties.propiedad.open', undefined, { mode: 'dialog' });
+                    },
+                  },
+                  'Nueva propiedad'
+                )
+              : null,
           })
         )
       ),

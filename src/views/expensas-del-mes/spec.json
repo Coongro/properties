@@ -73,6 +73,15 @@
           "validations": []
         },
         {
+          "id": "f_sent",
+          "kind": "field",
+          "name": "sent_at",
+          "fieldType": "date",
+          "label": "Cuándo llegó",
+          "width": "half",
+          "validations": []
+        },
+        {
           "id": "f_paid",
           "kind": "field",
           "fieldType": "date",

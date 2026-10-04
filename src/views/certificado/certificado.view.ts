@@ -123,6 +123,17 @@ export function CertificadoView() {
                       )
                     )
                   ),
+                  h(
+                    'div',
+                    {
+                      style: {
+                        fontSize: '12px',
+                        color: 'var(--cg-text-tertiary)',
+                        marginTop: '4px',
+                      },
+                    },
+                    'Solo si el certificado es de una unidad puntual. Vacío = alcanza a toda la propiedad.'
+                  ),
                   errors['unit_id']
                     ? h(
                         'div',
@@ -373,6 +384,13 @@ export function CertificadoView() {
                   onChange: (v: any) => setField('file_url', v),
                   onUpload: customHandlers.uploadImage,
                 }),
+                h(
+                  'div',
+                  {
+                    style: { fontSize: '12px', color: 'var(--cg-text-tertiary)', marginTop: '4px' },
+                  },
+                  'Sacale una foto al papel o arrastrá el archivo. Antes había que pegar una dirección, así que hacía falta tenerlo publicado en otro lado — y por eso nadie cargaba ninguno.'
+                ),
                 errors['file_url']
                   ? h(
                       'div',
@@ -420,6 +438,13 @@ export function CertificadoView() {
                   onChange: (e: any) =>
                     setField('alert_days', e.target.value === '' ? null : Number(e.target.value)),
                 }),
+                h(
+                  'div',
+                  {
+                    style: { fontSize: '12px', color: 'var(--cg-text-tertiary)', marginTop: '4px' },
+                  },
+                  'Vacío = el que corresponde al tipo (matafuegos 30, gas 45, ascensor 60).'
+                ),
                 errors['alert_days']
                   ? h(
                       'div',

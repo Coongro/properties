@@ -199,7 +199,7 @@
                 "label": "Detalle"
               },
               {
-                "key": "status",
+                "key": "occupancy",
                 "label": "Estado",
                 "display": "pill",
                 "values": [
@@ -234,6 +234,12 @@
                     "icon": "Ban"
                   }
                 ]
+              },
+              {
+                "key": "reserved_from",
+                "label": "Comprometida desde",
+                "format": "date",
+                "emptyLabel": "—"
               },
               {
                 "key": "reference_rent",
@@ -418,7 +424,12 @@
               }
             ],
             "emptyTitle": "Esta propiedad no tiene titulares cargados",
-            "emptySub": "Sin dueño cargado no hay a quién liquidarle lo que se cobra."
+            "emptySub": "Sin dueño cargado no hay a quién liquidarle lo que se cobra.",
+            "rowAction": {
+              "id": "navigate",
+              "label": "Ver al titular",
+              "target": "properties.ficha-de-propietario.open"
+            }
           }
         }
       ]
@@ -526,7 +537,7 @@
                           "label": "Eliminar",
                           "target": "properties.buildingExpenses.delete"
                         },
-                        "confirm": "La expensa del período se elimina de esta propiedad."
+                        "confirm": "La liquidación del período se va de la propiedad y los meses que se facturen desde ahora vuelven a las expensas pactadas en cada contrato. Los recibos ya emitidos no cambian."
                       }
                     ],
                     "emptyTitle": "Sin expensas cargadas",
@@ -642,6 +653,32 @@
                         ]
                       },
                       {
+                        "key": "result",
+                        "label": "Resultado",
+                        "display": "pill",
+                        "emptyLabel": "Sin cargar",
+                        "values": [
+                          {
+                            "value": "apto",
+                            "label": "Apto",
+                            "tone": "success",
+                            "icon": "CircleCheck"
+                          },
+                          {
+                            "value": "apto_con_observaciones",
+                            "label": "Con observaciones",
+                            "tone": "warning",
+                            "icon": "TriangleAlert"
+                          },
+                          {
+                            "value": "rechazado",
+                            "label": "Rechazado",
+                            "tone": "danger",
+                            "icon": "CircleX"
+                          }
+                        ]
+                      },
+                      {
                         "key": "expires_at",
                         "label": "Vence",
                         "format": "date"
@@ -677,7 +714,7 @@
                           "label": "Eliminar",
                           "target": "properties.certificates.delete"
                         },
-                        "confirm": "El certificado se elimina de esta propiedad."
+                        "confirm": "El certificado se va de la lista y deja de avisar cuando vence. Volver a tenerlo es cargarlo de nuevo con su fecha, su resultado y su archivo."
                       }
                     ]
                   }

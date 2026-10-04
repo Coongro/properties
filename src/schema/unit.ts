@@ -27,7 +27,25 @@ export const unitTable = pgTable(
     surface_m2: numeric('surface_m2'),
     /** Porcentual de la unidad en el consorcio — reparte las expensas del edificio. */
     share_pct: numeric('share_pct'),
+    /**
+     * Lo que decide quien administra: `no_disponible` cuando el dueño no la alquila,
+     * `en_recambio` o `con_preaviso` mientras se prepara. La ocupación NO se guarda acá
+     * —se deriva de las fechas de abajo—, así que `ocupada`/`vacante` en esta columna son
+     * el valor con el que nació la unidad y no mandan sobre lo que dice el contrato.
+     */
     status: text('status').notNull(),
+    /**
+     * Desde y hasta cuándo está comprometida por un contrato. Los escribe `leases`, que es
+     * quien firma; `properties` solo los compara contra hoy.
+     *
+     * Son HECHOS, no un estado: por eso no hace falta ningún proceso que los revise. Antes
+     * se guardaba `status: 'ocupada'` al firmar, así que un contrato que empezaba el mes
+     * siguiente ocupaba la unidad desde el día de la firma, y uno que terminaba no la
+     * liberaba nunca —no había nada que lo hiciera—. Un estado guardado es una promesa que
+     * alguien tiene que renovar; el día que nadie la renueva, miente.
+     */
+    occupied_from: text('occupied_from'),
+    occupied_until: text('occupied_until'),
     /** Valor de referencia para publicar o proponer un alquiler. El precio real lo fija el contrato. */
     reference_rent: numeric('reference_rent'),
     /** Fotos de la unidad, en orden: `[{ url, caption? }]`. La primera va en la tarjeta. */
